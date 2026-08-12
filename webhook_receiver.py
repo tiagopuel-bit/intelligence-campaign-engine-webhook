@@ -384,17 +384,24 @@ def get_history(symbol, timeframe):
 def export_db():
     if not state_is_authorized():
         return jsonify({"error": "unauthorized"}), 401
-    import io
-    backup = io.BytesIO()
-    src = get_db()
-    dest = sqlite3.connect(backup)
-    src.backup(dest)
-    dest.commit()
-    dest.close()
-    src.close()
-    backup.seek(0)
+    import tempfile
+    tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    tmp.close()
+    try:
+        src = get_db()
+        dest = sqlite3.connect(tmp.name)
+        src.backup(dest)
+        dest.close()
+        src.close()
+        with open(tmp.name, "rb") as f:
+            data = f.read()
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
     return app.response_class(
-        backup.getvalue(),
+        data,
         mimetype="application/octet-stream",
         headers={"Content-Disposition": "attachment; filename=dna_alerts.db"},
     )
