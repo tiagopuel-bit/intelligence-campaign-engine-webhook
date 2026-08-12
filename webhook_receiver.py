@@ -380,6 +380,62 @@ def get_history(symbol, timeframe):
     return jsonify([dict(r) for r in rows])
 
 
+@app.route("/export/db", methods=["GET"])
+def export_db():
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    import io
+    backup = io.BytesIO()
+    src = get_db()
+    dest = sqlite3.connect(backup)
+    src.backup(dest)
+    dest.commit()
+    dest.close()
+    src.close()
+    backup.seek(0)
+    return app.response_class(
+        backup.getvalue(),
+        mimetype="application/octet-stream",
+        headers={"Content-Disposition": "attachment; filename=dna_alerts.db"},
+    )
+
+
+@app.route("/export/csv", methods=["GET"])
+def export_csv():
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    import io
+    import csv
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT * FROM alerts ORDER BY id"
+    ).fetchall()
+    conn.close()
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["id", "symbol", "timeframe", "phase", "health", "score",
+                      "confidence", "momentum", "status", "action",
+                      "exhaustion_warning", "reload_quality", "htf_phase",
+                      "campaign_alignment", "last_fail_type", "close",
+                      "bar_event", "bar_time", "rsi", "ema21_distance_atr",
+                      "received_at"])
+    for row in rows:
+        writer.writerow([row["id"], row["symbol"], row["timeframe"],
+                         row["phase"], row["health"], row["score"],
+                         row["confidence"], row["momentum"], row["status"],
+                         row["action"], row["exhaustion_warning"],
+                         row["reload_quality"], row["htf_phase"],
+                         row["campaign_alignment"], row["last_fail_type"],
+                         row["close"], row["bar_event"], row["bar_time"],
+                         row["rsi"], row["ema21_distance_atr"],
+                         row["received_at"]])
+    return app.response_class(
+        buf.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=dna_alerts.csv"},
+    )
+
+
 init_db()
 
 if __name__ == "__main__":
