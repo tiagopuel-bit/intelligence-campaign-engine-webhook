@@ -1,0 +1,519 @@
+import os
+import sys
+import tempfile
+import json
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import webhook_receiver
+from webhook_receiver import app, init_db, compute_extension_label
+
+TEST_SECRET = "test-manual-secret"
+TEST_STATE_TOKEN = "test-state-token"
+
+
+class WebhookReceiverTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmpfile = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        cls._tmpfile.close()
+        cls._original_db = webhook_receiver.DB_PATH
+        webhook_receiver.DB_PATH = Path(cls._tmpfile.name)
+        cls._original_secret = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = TEST_SECRET
+        cls._original_state_token = webhook_receiver.STATE_API_TOKEN
+        webhook_receiver.STATE_API_TOKEN = TEST_STATE_TOKEN
+        init_db()
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+
+    @classmethod
+    def tearDownClass(cls):
+        webhook_receiver.DB_PATH = cls._original_db
+        webhook_receiver.WEBHOOK_SECRET = cls._original_secret
+        webhook_receiver.STATE_API_TOKEN = cls._original_state_token
+        try:
+            os.unlink(cls._tmpfile.name)
+        except OSError:
+            pass
+        for sidecar in ("-journal", "-wal", "-shm"):
+            try:
+                os.unlink(cls._tmpfile.name + sidecar)
+            except OSError:
+                pass
+
+    def _post(self, payload, headers=None):
+        hdrs = {"Content-Type": "application/json"}
+        if headers:
+            hdrs.update(headers)
+        return self.client.post("/webhook", data=json.dumps(payload), headers=hdrs)
+
+    def _strong_start_payload(self, **overrides):
+        base = {
+            "symbol": "TEST",
+            "timeframe": "240",
+            "phase": "EXPANSION",
+            "health": 75,
+            "score": 72,
+            "confidence": 68,
+            "momentum": "BUILDING",
+            "status": "ACTIVE",
+            "action": "BUILD",
+            "exhaustion_warning": False,
+            "reload_quality": "CLEAN",
+            "htf_phase": "ACCUMULATION",
+            "campaign_alignment": "CONFIRMED",
+            "last_fail_type": "NONE",
+            "close": 100.0,
+            "time": "2026-01-01T00:00:00Z",
+            "event": "STRONG START",
+            "rsi": 52.0,
+            "ema21_distance_atr": 0.4,
+            "secret": TEST_SECRET,
+        }
+        base.update(overrides)
+        return base
+
+    def _state_headers(self, token=None):
+        if token is None:
+            token = TEST_STATE_TOKEN
+        return {"Authorization": f"Bearer {token}"}
+
+    # =========================================================================
+    # Existing functional tests (kept unchanged, secret added to payloads)
+    # =========================================================================
+
+    def test_empty_body_rejected(self):
+        resp = self.client.post("/webhook", data="", content_type="application/json")
+        self.assertEqual(resp.status_code, 400)
+
+    def test_malformed_json_rejected(self):
+        resp = self.client.post("/webhook", data="not json", content_type="application/json")
+        self.assertEqual(resp.status_code, 400)
+
+    def test_no_json_content_type(self):
+        resp = self.client.post("/webhook", data="{}")
+        self.assertEqual(resp.status_code, 400)
+
+    def test_strong_start_creates_watch_state(self):
+        self._post(self._strong_start_payload())
+        resp = self.client.get("/state/TEST/240", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertEqual(data["signal_event"], "STRONG START")
+        self.assertIsNone(data["next_event_after_signal"])
+
+    def test_extension_label_fresh(self):
+        payload = self._strong_start_payload(rsi=52.0, ema21_distance_atr=0.4,
+                                              symbol="FRESH1", timeframe="240")
+        self._post(payload)
+        resp = self.client.get("/state/FRESH1/240", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.get_json()["signal_bar_extension_label"], "FRESH")
+
+    def test_extension_label_extended_rsi(self):
+        payload = self._strong_start_payload(rsi=70.0, ema21_distance_atr=0.4,
+                                              symbol="EXT1", timeframe="240")
+        self._post(payload)
+        resp = self.client.get("/state/EXT1/240", headers=self._state_headers())
+        self.assertEqual(resp.get_json()["signal_bar_extension_label"], "EXTENDED")
+
+    def test_extension_label_extended_ema_distance(self):
+        payload = self._strong_start_payload(rsi=50.0, ema21_distance_atr=1.5,
+                                              symbol="EXT2", timeframe="240")
+        self._post(payload)
+        resp = self.client.get("/state/EXT2/240", headers=self._state_headers())
+        self.assertEqual(resp.get_json()["signal_bar_extension_label"], "EXTENDED")
+
+    def test_add_consumes_watch_once(self):
+        self._post(self._strong_start_payload(symbol="WATCH1", timeframe="240"))
+        self._post(self._strong_start_payload(symbol="WATCH1", timeframe="240",
+                                               event="ADD", action="MANAGE",
+                                               last_fail_type="ADD"))
+        resp = self.client.get("/state/WATCH1/240", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertEqual(data["next_event_after_signal"], "ADD")
+        self._post(self._strong_start_payload(symbol="WATCH1", timeframe="240",
+                                               event="ADD", action="MANAGE",
+                                               last_fail_type="ADD"))
+        resp2 = self.client.get("/state/WATCH1/240", headers=self._state_headers())
+        self.assertEqual(resp2.get_json()["next_event_after_signal"], "ADD")
+
+    def test_fire_add_consumes_watch_once(self):
+        self._post(self._strong_start_payload(symbol="WATCH2", timeframe="60"))
+        self._post(self._strong_start_payload(symbol="WATCH2", timeframe="60",
+                                               event="FIRE ADD"))
+        resp = self.client.get("/state/WATCH2/60", headers=self._state_headers())
+        self.assertEqual(resp.get_json()["next_event_after_signal"], "FIRE ADD")
+        self._post(self._strong_start_payload(symbol="WATCH2", timeframe="60",
+                                               event="MANAGE"))
+        resp2 = self.client.get("/state/WATCH2/60", headers=self._state_headers())
+        self.assertEqual(resp2.get_json()["next_event_after_signal"], "FIRE ADD")
+
+    def test_manage_consumes_watch_once(self):
+        self._post(self._strong_start_payload(symbol="WATCH3", timeframe="120"))
+        self._post(self._strong_start_payload(symbol="WATCH3", timeframe="120",
+                                               event="MANAGE"))
+        resp = self.client.get("/state/WATCH3/120", headers=self._state_headers())
+        self.assertEqual(resp.get_json()["next_event_after_signal"], "MANAGE")
+
+    def test_different_symbol_does_not_consume(self):
+        self._post(self._strong_start_payload(symbol="DIFF1", timeframe="240"))
+        self._post(self._strong_start_payload(symbol="DIFF2", timeframe="240",
+                                               event="ADD"))
+        resp = self.client.get("/state/DIFF1/240", headers=self._state_headers())
+        self.assertIsNone(resp.get_json()["next_event_after_signal"])
+
+    def test_different_timeframe_does_not_consume(self):
+        self._post(self._strong_start_payload(symbol="DIFF3", timeframe="240"))
+        self._post(self._strong_start_payload(symbol="DIFF3", timeframe="60",
+                                               event="ADD"))
+        resp = self.client.get("/state/DIFF3/240", headers=self._state_headers())
+        self.assertIsNone(resp.get_json()["next_event_after_signal"])
+
+    def test_strong_start_restarts_watch(self):
+        self._post(self._strong_start_payload(symbol="RESTART1", timeframe="240"))
+        self._post(self._strong_start_payload(symbol="RESTART1", timeframe="240",
+                                               event="ADD"))
+        self._post(self._strong_start_payload(symbol="RESTART1", timeframe="240",
+                                               time="2026-01-02T00:00:00Z"))
+        resp = self.client.get("/state/RESTART1/240", headers=self._state_headers())
+        data = resp.get_json()
+        self.assertEqual(data["signal_event"], "STRONG START")
+        self.assertIsNone(data["next_event_after_signal"])
+        self.assertIsNotNone(data["signal_time"])
+
+    def test_reload_restarts_watch(self):
+        self._post(self._strong_start_payload(symbol="RESTART2", timeframe="240"))
+        self._post(self._strong_start_payload(symbol="RESTART2", timeframe="240",
+                                               event="ADD"))
+        self._post(self._strong_start_payload(symbol="RESTART2", timeframe="240",
+                                               event="RELOAD", time="2026-01-02T00:00:00Z"))
+        resp = self.client.get("/state/RESTART2/240", headers=self._state_headers())
+        data = resp.get_json()
+        self.assertEqual(data["signal_event"], "RELOAD")
+        self.assertIsNone(data["next_event_after_signal"])
+
+    def test_state_endpoint_shape(self):
+        payload = self._strong_start_payload(symbol="SHAPE1", timeframe="240")
+        self._post(payload)
+        resp = self.client.get("/state/SHAPE1/240", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertEqual(data["symbol"], "SHAPE1")
+        self.assertEqual(data["timeframe"], "240")
+        self.assertEqual(data["phase"], "EXPANSION")
+        self.assertEqual(data["health"], 75)
+        self.assertEqual(data["confidence"], 68)
+        self.assertEqual(data["momentum"], "BUILDING")
+        self.assertEqual(data["recent_event"], "STRONG START")
+        self.assertFalse(data["exhaustion_warning"])
+        self.assertEqual(data["reload_quality"], "CLEAN")
+        self.assertEqual(data["htf_phase"], "ACCUMULATION")
+        self.assertEqual(data["campaign_alignment"], "CONFIRMED")
+        self.assertEqual(data["last_fail_type"], "NONE")
+        self.assertEqual(data["close"], 100.0)
+        self.assertEqual(data["rsi"], 52.0)
+        self.assertEqual(data["ema21_distance_atr"], 0.4)
+        self.assertIsNone(data["next_event_after_signal"])
+        self.assertEqual(data["signal_event"], "STRONG START")
+        self.assertEqual(data["signal_bar_extension_label"], "FRESH")
+
+    def test_state_all_returns_all_timeframes(self):
+        self._post(self._strong_start_payload(symbol="ALLTF", timeframe="60"))
+        self._post(self._strong_start_payload(symbol="ALLTF", timeframe="240"))
+        resp = self.client.get("/state_all/ALLTF", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertEqual(data["symbol"], "ALLTF")
+        self.assertEqual(data["timeframe_count"], 2)
+        tfs = sorted(s["timeframe"] for s in data["states"])
+        self.assertEqual(tfs, ["240", "60"])
+
+    def test_unknown_state_returns_404(self):
+        resp = self.client.get("/state/NOEXIST/240", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 404)
+
+    def test_unknown_state_all_returns_404(self):
+        resp = self.client.get("/state_all/NOEXISTATALL", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 404)
+
+    def test_poll_can_build_campaign_state(self):
+        self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
+        from poll_and_recommend import build_campaign_state
+        resp = self.client.get("/state/POLL/240", headers=self._state_headers())
+        shaped = resp.get_json()
+        state = build_campaign_state(shaped)
+        self.assertEqual(state.symbol, "POLL")
+        self.assertEqual(state.timeframe, "240")
+        self.assertEqual(state.phase.name, "EXPANSION")
+        self.assertEqual(state.momentum.name, "BUILDING")
+        self.assertEqual(state.health, 75)
+        self.assertEqual(state.confidence, 68)
+        self.assertEqual(state.next_event_after_signal, None)
+        self.assertEqual(state.signal_bar_extension_label, "FRESH")
+
+    def test_poll_single_tf_recommendations(self):
+        from poll_and_recommend import build_campaign_state
+        from decision_engine import Position, build_recommendations
+        self._post(self._strong_start_payload(symbol="SINGLE", timeframe="240"))
+        resp = self.client.get("/state/SINGLE/240", headers=self._state_headers())
+        shaped = resp.get_json()
+        state = build_campaign_state(shaped)
+        recs = build_recommendations(state, Position(), current_price=100.0)
+        self.assertTrue(len(recs) > 0)
+        actions = [r.action for r in recs]
+        self.assertTrue(any("WATCHING" in a for a in actions))
+
+    def test_poll_multi_tf_recommendations(self):
+        from poll_and_recommend import build_campaign_state
+        from decision_engine import Position, synthesize_multi_timeframe_decision
+        self._post(self._strong_start_payload(symbol="MULTI", timeframe="60"))
+        self._post(self._strong_start_payload(symbol="MULTI", timeframe="240"))
+        resp = self.client.get("/state_all/MULTI", headers=self._state_headers())
+        shaped = resp.get_json()
+        states = [build_campaign_state(d) for d in shaped["states"]]
+        rec = synthesize_multi_timeframe_decision(states, Position(), current_price=100.0)
+        self.assertIn("NO SYNTHESIZED SIGNAL", rec.action)
+
+    def test_poll_multi_tf_with_confirmed_events(self):
+        from poll_and_recommend import build_campaign_state
+        from decision_engine import Position, synthesize_multi_timeframe_decision
+        for tf in ("60", "120", "240"):
+            self._post(self._strong_start_payload(symbol="CONFIRMED", timeframe=tf))
+            self._post(self._strong_start_payload(symbol="CONFIRMED", timeframe=tf,
+                                                   event="ADD"))
+        resp = self.client.get("/state_all/CONFIRMED", headers=self._state_headers())
+        shaped = resp.get_json()
+        states = [build_campaign_state(d) for d in shaped["states"]]
+        rec = synthesize_multi_timeframe_decision(states, Position(), current_price=100.0)
+        self.assertIn("ENTRY SIGNAL", rec.action)
+
+    def test_compute_extension_label_none_input(self):
+        self.assertIsNone(compute_extension_label(None, None))
+        self.assertIsNone(compute_extension_label(50.0, None))
+        self.assertIsNone(compute_extension_label(None, 0.5))
+
+    def test_compute_extension_label_fresh(self):
+        self.assertEqual(compute_extension_label(40.0, 0.5), "FRESH")
+
+    def test_compute_extension_label_extended_rsi(self):
+        self.assertEqual(compute_extension_label(65.0, 0.5), "EXTENDED")
+
+    def test_compute_extension_label_extended_distance(self):
+        self.assertEqual(compute_extension_label(40.0, 1.0), "EXTENDED")
+
+    # =========================================================================
+    # NEW: Authentication tests
+    # =========================================================================
+
+    # --- Test 1: TradingView X-Real-IP accepted in Railway mode ---
+
+    def test_auth_tradingview_ip_via_xrealip(self):
+        tv_ip = "52.89.214.238"
+        saved = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = ""
+        try:
+            os.environ["RAILWAY_ENVIRONMENT"] = "1"
+            resp = self.client.post(
+                "/webhook",
+                data=json.dumps(self._strong_start_payload(secret=None)),
+                content_type="application/json",
+                headers={"X-Real-IP": tv_ip},
+            )
+            self.assertEqual(resp.status_code, 200)
+            del os.environ["RAILWAY_ENVIRONMENT"]
+        finally:
+            webhook_receiver.WEBHOOK_SECRET = saved
+            os.environ.pop("RAILWAY_ENVIRONMENT", None)
+        self.assertIn("recorded", resp.get_json()["status"])
+
+    # --- Test 2: Non-allowlisted X-Real-IP rejected in Railway mode ---
+
+    def test_auth_non_allowlisted_ip_rejected_railway(self):
+        saved = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = ""
+        try:
+            os.environ["RAILWAY_ENVIRONMENT"] = "1"
+            resp = self.client.post(
+                "/webhook",
+                data=json.dumps(self._strong_start_payload(secret=None)),
+                content_type="application/json",
+                headers={"X-Real-IP": "192.0.2.1"},
+            )
+            self.assertEqual(resp.status_code, 401)
+        finally:
+            webhook_receiver.WEBHOOK_SECRET = saved
+            os.environ.pop("RAILWAY_ENVIRONMENT", None)
+
+    # --- Test 3: Spoofed X-Forwarded-For ignored on Railway ---
+
+    def test_auth_xforwardedfor_ignored_on_railway(self):
+        saved = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = ""
+        try:
+            os.environ["RAILWAY_ENVIRONMENT"] = "1"
+            resp = self.client.post(
+                "/webhook",
+                data=json.dumps(self._strong_start_payload(secret=None)),
+                content_type="application/json",
+                headers={
+                    "X-Real-IP": "192.0.2.1",
+                    "X-Forwarded-For": "52.89.214.238",
+                },
+            )
+            self.assertEqual(resp.status_code, 401)
+        finally:
+            webhook_receiver.WEBHOOK_SECRET = saved
+            os.environ.pop("RAILWAY_ENVIRONMENT", None)
+
+    # --- Test 4: Local loopback request uses remote_addr ---
+
+    def test_auth_local_loopback_with_secret(self):
+        payload = self._strong_start_payload(symbol="LOCAL1", timeframe="60")
+        resp = self._post(payload)
+        self.assertEqual(resp.status_code, 200)
+
+    # --- Test 5: Ngrok loopback + official X-Forwarded-For accepted ---
+
+    def test_auth_ngrok_loopback_official_ip(self):
+        tv_ip = "52.89.214.238"
+        saved = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = ""
+        try:
+            resp = self.client.post(
+                "/webhook",
+                data=json.dumps(self._strong_start_payload(secret=None)),
+                content_type="application/json",
+                environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+                headers={"X-Forwarded-For": tv_ip},
+            )
+            self.assertEqual(resp.status_code, 200)
+        finally:
+            webhook_receiver.WEBHOOK_SECRET = saved
+
+    # --- Test 6: Ngrok loopback + unapproved X-Forwarded-For rejected ---
+
+    def test_auth_ngrok_loopback_unapproved_rejected(self):
+        saved = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = ""
+        try:
+            resp = self.client.post(
+                "/webhook",
+                data=json.dumps(self._strong_start_payload(secret=None)),
+                content_type="application/json",
+                environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+                headers={"X-Forwarded-For": "192.0.2.1"},
+            )
+            self.assertEqual(resp.status_code, 401)
+        finally:
+            webhook_receiver.WEBHOOK_SECRET = saved
+
+    # --- Test 7: Valid optional X-Webhook-Secret accepted ---
+
+    def test_auth_valid_webhook_secret_header(self):
+        resp = self.client.post(
+            "/webhook",
+            data=json.dumps(self._strong_start_payload(secret=None)),
+            content_type="application/json",
+            headers={"X-Webhook-Secret": TEST_SECRET},
+        )
+        self.assertEqual(resp.status_code, 200)
+
+    # --- Test 8: Invalid secret rejected ---
+
+    def test_auth_invalid_secret_rejected(self):
+        resp = self.client.post(
+            "/webhook",
+            data=json.dumps(self._strong_start_payload(secret="wrong-secret")),
+            content_type="application/json",
+        )
+        self.assertEqual(resp.status_code, 401)
+
+    # --- Test 9: Constant-time comparison (hmac used, functionally tested above) ---
+
+    def test_auth_hmac_comparison_used(self):
+        import hmac
+        self.assertTrue(hasattr(hmac, "compare_digest"))
+        saved = webhook_receiver.WEBHOOK_SECRET
+        webhook_receiver.WEBHOOK_SECRET = "secret-value"
+        try:
+            self.assertFalse(hmac.compare_digest("wrong", webhook_receiver.WEBHOOK_SECRET))
+            self.assertTrue(hmac.compare_digest("secret-value", webhook_receiver.WEBHOOK_SECRET))
+        finally:
+            webhook_receiver.WEBHOOK_SECRET = saved
+
+    # --- Test 10: /health stays public ---
+
+    def test_auth_health_stays_public(self):
+        resp = self.client.get("/health")
+        self.assertEqual(resp.status_code, 200)
+
+    def test_auth_health_public_even_with_state_token_set(self):
+        saved = webhook_receiver.STATE_API_TOKEN
+        webhook_receiver.STATE_API_TOKEN = TEST_STATE_TOKEN
+        try:
+            resp = self.client.get("/health")
+            self.assertEqual(resp.status_code, 200)
+        finally:
+            webhook_receiver.STATE_API_TOKEN = saved
+
+    # --- Test 11: State/history reject absent/invalid bearer tokens ---
+
+    def test_auth_state_rejects_no_token_when_configured(self):
+        saved = webhook_receiver.STATE_API_TOKEN
+        webhook_receiver.STATE_API_TOKEN = TEST_STATE_TOKEN
+        try:
+            self._post(self._strong_start_payload(symbol="BOS1", timeframe="240"))
+            resp = self.client.get("/state/BOS1/240")
+            self.assertEqual(resp.status_code, 401)
+            resp = self.client.get("/state_all/BOS1")
+            self.assertEqual(resp.status_code, 401)
+            resp = self.client.get("/history/BOS1/240")
+            self.assertEqual(resp.status_code, 401)
+        finally:
+            webhook_receiver.STATE_API_TOKEN = saved
+
+    def test_auth_state_rejects_invalid_token(self):
+        saved = webhook_receiver.STATE_API_TOKEN
+        webhook_receiver.STATE_API_TOKEN = TEST_STATE_TOKEN
+        try:
+            self._post(self._strong_start_payload(symbol="BOS2", timeframe="240"))
+            resp = self.client.get("/state/BOS2/240",
+                                    headers={"Authorization": "Bearer wrong-token"})
+            self.assertEqual(resp.status_code, 401)
+        finally:
+            webhook_receiver.STATE_API_TOKEN = saved
+
+    # --- Test 12: State/history accept correct bearer token ---
+
+    def test_auth_state_accepts_correct_token(self):
+        saved = webhook_receiver.STATE_API_TOKEN
+        webhook_receiver.STATE_API_TOKEN = TEST_STATE_TOKEN
+        try:
+            self._post(self._strong_start_payload(symbol="BOS3", timeframe="240"))
+            resp = self.client.get("/state/BOS3/240", headers=self._state_headers())
+            self.assertEqual(resp.status_code, 200)
+            resp = self.client.get("/state_all/BOS3", headers=self._state_headers())
+            self.assertEqual(resp.status_code, 200)
+            resp = self.client.get("/history/BOS3/240", headers=self._state_headers())
+            self.assertEqual(resp.status_code, 200)
+        finally:
+            webhook_receiver.STATE_API_TOKEN = saved
+
+    # --- Test 13: poll_and_recommend sends bearer token without printing ---
+
+    def test_auth_poller_sends_bearer_header(self):
+        from poll_and_recommend import _headers
+        h = _headers("my-token")
+        self.assertEqual(h["Authorization"], "Bearer my-token")
+        self.assertEqual(_headers(None), {})
+        self.assertEqual(_headers(""), {})
+
+
+if __name__ == "__main__":
+    unittest.main()

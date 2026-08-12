@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+dna_alerts.db*
+*.log
+.env
+*.pem
+*.key
+backups/
+runtime/
