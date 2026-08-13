@@ -786,6 +786,7 @@ def _compute_valuation(symbol, instruments):
             if (cur is not None and avg_cost is not None) else None,
             "total_return_pct": round((cur - avg_cost) / avg_cost * 100, 2)
             if (cur is not None and avg_cost) else None,
+            "leg_ids": [l["id"] for l in stock_legs],
         }
 
     def _sum(items, key):

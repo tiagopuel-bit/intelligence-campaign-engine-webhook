@@ -8,7 +8,7 @@
   :root{
     --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
     --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
-    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14);
+    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14); --accent2:#0D9488;
     --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
     --positive-glow:rgba(47,158,91,.12); --warning-glow:rgba(180,121,12,.12); --critical-glow:rgba(196,67,58,.12);
     --font-display: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, monospace;
@@ -18,7 +18,7 @@
     :root{
       --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
       --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
-      --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12);
+      --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12); --accent2:#2DD4BF;
       --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
       --positive-glow:rgba(111,207,124,.11); --warning-glow:rgba(231,178,76,.11); --critical-glow:rgba(226,104,92,.11);
     }
@@ -26,14 +26,14 @@
   :root[data-theme="dark"]{
     --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
     --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
-    --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12);
+    --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12); --accent2:#2DD4BF;
     --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
     --positive-glow:rgba(111,207,124,.11); --warning-glow:rgba(231,178,76,.11); --critical-glow:rgba(226,104,92,.11);
   }
   :root[data-theme="light"]{
     --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
     --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
-    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14);
+    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14); --accent2:#0D9488;
     --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
     --positive-glow:rgba(47,158,91,.12); --warning-glow:rgba(180,121,12,.12); --critical-glow:rgba(196,67,58,.12);
   }
@@ -176,6 +176,12 @@
   .pf-actions{display:flex; gap:8px; margin-top:12px}
   .pf-close{background:var(--critical-glow); color:var(--critical); border:1px solid color-mix(in srgb,var(--critical) 40%,transparent); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600}
   .pf-close:hover{background:color-mix(in srgb,var(--critical) 18%,transparent)}
+  .pf-contracts{font-size:11.5px; color:var(--muted); font-family:var(--font-display)}
+  .pf-section{margin-bottom:18px; border-left:3px solid var(--accent2); padding-left:12px}
+  .pf-section .stage-head h2{color:var(--accent2)}
+  .pos-stat.acc2{border-left:3px solid var(--accent2)}
+  .pos-stat.acc2 .stat-label{color:var(--accent2)}
+  .pos-stat.acc2 .stat-value{color:var(--text)}
 
   /* ---- open-a-position (collapsible) ---- */
   .open-wrap{margin:0 0 20px}
@@ -492,6 +498,100 @@
     return parts.join(" · ");
   }
 
+  function deriveHoldings() {
+    var shares = [], strategies = [];
+    portfolio.forEach(function (p) {
+      var v = p.valuation;
+      if (!v) return;
+      var base = { symbol: p.summary.symbol, direction: p.summary.direction, position_id: p.summary.id };
+      if (v.stock && v.stock.shares) shares.push(Object.assign({}, v.stock, base));
+      (v.options || []).forEach(function (o) { strategies.push(Object.assign({}, o, base)); });
+    });
+    return { shares: shares, strategies: strategies };
+  }
+
+  function statCard2(label, value) {
+    return '<div class="pos-stat acc2"><div class="stat-label">' + label + '</div>' +
+      '<div class="stat-value tabular">' + value + '</div></div>';
+  }
+
+  function renderStockDetail(s) {
+    return '<div class="pos-opt-detail">' +
+      '<span><b>avg cost</b> ' + fmtMoney(s.avg_cost) + '</span>' +
+      '<span><b>current</b> ' + fmtMoney(s.current_price) + '</span>' +
+      '<span><b>market value</b> ' + fmtMoney(s.market_value) + '</span>' +
+      '<span><b>bought</b> ' + fmtDate(s.first_entry) + '</span>' +
+      '<span><b>today</b> ' + fmtSigned(s.today_pnl) + ' (' + fmtPct(s.today_return_pct) + ')</span>' +
+      '<span><b>total</b> ' + fmtSigned(s.total_pnl) + ' (' + fmtPct(s.total_return_pct) + ')</span>' +
+      '</div>';
+  }
+
+  function renderSharesSection(shares) {
+    if (!shares.length) return "";
+    var totalShares = 0, value = 0, today = 0, total = 0;
+    shares.forEach(function (s) {
+      totalShares += s.shares; value += s.market_value || 0; today += s.today_pnl || 0; total += s.total_pnl || 0;
+    });
+    var rows = shares.map(function (s) {
+      var pnl = s.total_pnl;
+      var detail = renderStockDetail(s) +
+        '<div class="pf-actions">' +
+          '<button class="pf-close" data-pid="' + s.position_id + '" data-legs="' + JSON.stringify(s.leg_ids) + '" data-label="' + s.symbol + ' shares">Close shares…</button>' +
+          '<button class="pf-del" data-pid="' + s.position_id + '" data-legs="' + JSON.stringify(s.leg_ids) + '" data-label="' + s.symbol + ' shares">✕</button>' +
+        '</div>';
+      return '<div class="pf-item">' +
+        '<div class="pf-row"><span class="pf-label">' + s.symbol + ' ' + s.direction + ' — ' + s.shares + ' shares</span>' +
+        '<span class="pf-val tabular">' + fmtMoney(s.market_value) + '</span>' +
+        '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
+        '</div><div class="pf-detail" style="display:none">' + detail + '</div></div>';
+    }).join("");
+    return '<div class="pf-section shares">' +
+      '<div class="stage-head"><h2>Shares</h2><span class="hint">may stay open — exit per holding</span></div>' +
+      '<div class="pf-summary">' +
+        statCard2("Shares", totalShares) +
+        statCard2("Value", fmtMoney(value)) +
+        statCard2("Today", fmtSigned(today)) +
+        statCard2("Total return", fmtSigned(total)) +
+      '</div>' +
+      '<div class="pf-rows">' + rows + '</div></div>';
+  }
+
+  function renderOptionsSection(strategies) {
+    if (!strategies.length) return "";
+    var totalContracts = 0, value = 0, today = 0, total = 0;
+    strategies.forEach(function (o) {
+      totalContracts += o.contracts; value += o.market_value || 0; today += o.today_pnl || 0; total += o.total_pnl || 0;
+    });
+    var rows = strategies.map(function (o) {
+      var c = o.contract;
+      var moneyness = o.itm === true ? "ITM" : (o.itm === false ? "OTM" : "");
+      var moneyCls = moneyness === "ITM" ? "pos" : (moneyness === "OTM" ? "neg" : "");
+      var label = o.symbol + ' ' + o.direction + ' $' + c.strike + ' ' + c.type + ' ' + fmtExpiry(c.expiration) + (moneyness ? ' (' + moneyness + ')' : '');
+      var pnl = o.total_pnl;
+      var detail = '<div class="pos-opt-list">' + renderOptionRow(o.symbol, o) + '</div>' +
+        '<div class="pf-actions">' +
+          '<button class="pf-close" data-pid="' + o.position_id + '" data-legs="' + JSON.stringify(o.leg_ids) + '" data-label="' + label + '">Close contract…</button>' +
+          '<button class="pf-del" data-pid="' + o.position_id + '" data-legs="' + JSON.stringify(o.leg_ids) + '" data-label="' + label + '">✕</button>' +
+        '</div>';
+      return '<div class="pf-item">' +
+        '<div class="pf-row"><span class="pf-label ' + moneyCls + '">' + label + '</span>' +
+        '<span class="pf-contracts tabular">' + o.contracts + ' contracts</span>' +
+        '<span class="pf-val tabular">' + fmtMoney(o.market_value) + '</span>' +
+        '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
+        '</div><div class="pf-detail" style="display:none">' + detail + '</div></div>';
+    }).join("");
+    return '<div class="pf-section options">' +
+      '<div class="stage-head"><h2>Options</h2><span class="hint">strategies by contract + expiration</span></div>' +
+      '<div class="pf-summary">' +
+        statCard2("Strategies", strategies.length) +
+        statCard2("Contracts", totalContracts) +
+        statCard2("Options value", fmtMoney(value)) +
+        statCard2("Today", fmtSigned(today)) +
+        statCard2("Total return", fmtSigned(total)) +
+      '</div>' +
+      '<div class="pf-rows">' + rows + '</div></div>';
+  }
+
   function renderPortfolio() {
     var totalValue = 0, today = 0, total = 0;
     portfolio.forEach(function (p) {
@@ -501,44 +601,51 @@
         total += p.valuation.summary.total_pnl || 0;
       }
     });
-    var rows = portfolio.map(function (p) {
-      var s = p.summary, v = p.valuation ? p.valuation.summary : null;
-      var label = s.symbol + " " + s.direction + (p.valuation ? " — " + contractLabels(p.valuation) : "");
-      var val = v ? fmtMoney(v.total_value) : "—";
-      var pnl = v ? v.total_pnl : null;
-      var detail = (p.valuation && p.valuation.summary)
-        ? renderValuationBody(s.symbol, p.valuation)
-        : '<div class="position-placeholder">No valuation available.</div>';
-      if (s.status === "OPEN") {
-        detail += '<div class="pf-actions"><button class="pf-close" data-id="' + s.id + '">Close position…</button></div>';
-      }
-      return '<div class="pf-item">' +
-        '<div class="pf-row">' +
-          '<span class="pf-label">' + label + '</span>' +
-          '<span class="pf-val tabular">' + val + '</span>' +
-          '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
-          '<button class="pf-jump" data-sym="' + s.symbol + '" title="View asset">↗</button>' +
-          '<button class="pf-del" data-id="' + s.id + '" title="Delete position">✕</button>' +
-        '</div>' +
-        '<div class="pf-detail" style="display:none">' + detail + '</div>' +
-      '</div>';
-    }).join("");
+    var h = deriveHoldings();
     return '<div class="portfolio">' +
-      '<div class="stage-head"><h2>Portfolio</h2><span class="hint">all open positions · click a row to expand its detail</span></div>' +
+      '<div class="stage-head"><h2>Portfolio</h2><span class="hint">open positions · click a row to expand</span></div>' +
       '<div class="pf-summary">' +
         '<div class="pos-stat"><div class="stat-label">Total value</div><div class="stat-value tabular">' + fmtMoney(totalValue) + '</div></div>' +
         '<div class="pos-stat"><div class="stat-label">Today</div><div class="stat-value tabular ' + (today >= 0 ? "pos" : "neg") + '">' + fmtSigned(today) + '</div></div>' +
         '<div class="pos-stat"><div class="stat-label">Total return</div><div class="stat-value tabular ' + (total >= 0 ? "pos" : "neg") + '">' + fmtSigned(total) + '</div></div>' +
         '<div class="pos-stat"><div class="stat-label">Realized P&L</div><div class="stat-value tabular ' + (realized >= 0 ? "pos" : "neg") + '">' + fmtSigned(realized) + '</div></div>' +
       '</div>' +
-      '<div class="pf-rows">' + (rows || '<div class="position-placeholder">No open positions.</div>') + '</div>' +
+      renderSharesSection(h.shares) +
+      renderOptionsSection(h.strategies) +
       '</div>';
+  }
+
+  function closeHolding(pid, legIds, label) {
+    var price = window.prompt("Exit price for " + label + "? (blank = no price)", "");
+    if (price === null) return;
+    var body = { status: "CLOSED" };
+    if (String(price).trim() !== "") body.exit_price = Number(price);
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    return Promise.all(legIds.map(function (lid) {
+      return fetch(base + "/positions/" + pid + "/instruments/" + lid, {
+        method: "PATCH",
+        headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+        body: JSON.stringify(body)
+      });
+    })).then(function () {
+      return Promise.all([loadPortfolio(), loadClosedPositions()]).then(paint);
+    });
+  }
+
+  function deleteHolding(pid, legIds, label) {
+    if (!window.confirm("Delete " + label + "?")) return;
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    return Promise.all(legIds.map(function (lid) {
+      return fetch(base + "/positions/" + pid + "/instruments/" + lid, { method: "DELETE", headers: authHeaders() });
+    })).then(function () {
+      return Promise.all([loadPortfolio(), loadClosedPositions()]).then(paint);
+    });
   }
 
   function wirePortfolio() {
     Array.prototype.forEach.call(document.querySelectorAll(".pf-row"), function (row) {
       row.addEventListener("click", function (e) {
-        if (e.target.closest(".pf-del") || e.target.closest(".pf-jump")) return;
+        if (e.target.closest(".pf-del") || e.target.closest(".pf-jump") || e.target.closest(".pf-close")) return;
         var detail = row.parentElement.querySelector(".pf-detail");
         if (detail) detail.style.display = detail.style.display === "none" ? "" : "none";
       });
@@ -549,38 +656,16 @@
         loadSymbol(selected, false).then(paint);
       });
     });
-    Array.prototype.forEach.call(document.querySelectorAll(".pf-del"), function (b) {
-      b.addEventListener("click", function () {
-        var id = b.dataset.id;
-        if (!window.confirm("Delete this position and all its legs?")) return;
-        var base = baseInput.value.trim().replace(/\/$/, "");
-        fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
-          .then(function () {
-            return Promise.all([loadPortfolio(), loadClosedPositions()]);
-          }).then(paint);
-      });
-    });
-
     Array.prototype.forEach.call(document.querySelectorAll(".pf-close"), function (b) {
       b.addEventListener("click", function (e) {
         e.stopPropagation();
-        var id = b.dataset.id;
-        var entry = portfolio.filter(function (x) { return String(x.summary.id) === String(id); })[0];
-        var sym = entry ? entry.summary.symbol : "";
-        var def = "";
-        if (entry && entry.valuation && entry.valuation.underlying) def = entry.valuation.underlying.current;
-        var price = window.prompt("Exit price for " + sym + "? (blank = no price)", def || "");
-        if (price === null) return;
-        var body = { status: "CLOSED" };
-        if (String(price).trim() !== "") body.exit_price = Number(price);
-        var base = baseInput.value.trim().replace(/\/$/, "");
-        fetch(base + "/positions/" + id, {
-          method: "PATCH",
-          headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
-          body: JSON.stringify(body)
-        }).then(function () {
-          return Promise.all([loadPortfolio(), loadClosedPositions()]).then(paint);
-        });
+        closeHolding(b.dataset.pid, JSON.parse(b.dataset.legs || "[]"), b.dataset.label || "");
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-del"), function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        deleteHolding(b.dataset.pid, JSON.parse(b.dataset.legs || "[]"), b.dataset.label || "");
       });
     });
   }
