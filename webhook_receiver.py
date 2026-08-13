@@ -103,6 +103,7 @@ def init_db():
             bar_time TEXT,
             rsi REAL,
             ema21_distance_atr REAL,
+            session TEXT,
             received_at TEXT NOT NULL
         )
     """)
@@ -262,8 +263,8 @@ def webhook():
         INSERT INTO alerts (symbol, timeframe, phase, health, score, confidence,
             momentum, status, action, exhaustion_warning, reload_quality,
             htf_phase, campaign_alignment, last_fail_type, close, bar_event,
-            bar_time, rsi, ema21_distance_atr, received_at)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            bar_time, rsi, ema21_distance_atr, session, received_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """, (
         symbol, timeframe, payload.get("phase"), payload.get("health"),
         payload.get("score"), payload.get("confidence"), payload.get("momentum"),
@@ -271,7 +272,8 @@ def webhook():
         int(bool(payload.get("exhaustion_warning"))), payload.get("reload_quality"),
         payload.get("htf_phase"), payload.get("campaign_alignment"),
         payload.get("last_fail_type"), payload.get("close"), event,
-        payload.get("time"), payload.get("rsi"), payload.get("ema21_distance_atr"), now,
+        payload.get("time"), payload.get("rsi"), payload.get("ema21_distance_atr"),
+        payload.get("session"), now,
     ))
 
     row = conn.execute(
@@ -318,6 +320,7 @@ def _shape_state(symbol, timeframe, latest, watch):
         "campaign_alignment": latest["campaign_alignment"], "last_fail_type": latest["last_fail_type"],
         "close": latest["close"], "bar_time": latest["bar_time"],
         "rsi": latest["rsi"], "ema21_distance_atr": latest["ema21_distance_atr"],
+        "session": latest["session"] if "session" in latest.keys() else None,
         "next_event_after_signal": watch["next_event_after_signal"] if watch else None,
         "signal_event": watch["signal_event"] if watch else None,
         "signal_time": watch["signal_time"] if watch else None,
@@ -365,6 +368,61 @@ def get_state_all(symbol):
             states.append(_shape_state(symbol, tf, latest, watch))
     conn.close()
     return jsonify({"symbol": symbol, "timeframe_count": len(states), "states": states})
+
+
+# Symbols excluded from the asset list: internal pipeline smoke-test rows,
+# not real market data. Same allowlist as scripts/cleanup_test_symbols.py.
+_TEST_SYMBOLS = {"PUBTEST", "TEST", "TEST2", "TEST_PING"}
+
+
+@app.route("/assets", methods=["GET"])
+def get_assets():
+    """Phase 1 landing page: list of real symbols with any recorded alerts.
+
+    Read-only aggregate over the existing alerts table -- no new state,
+    no coordinator dependency. Test-symbol rows are excluded so the page
+    doesn't need to know about pipeline-internal smoke-test data.
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    conn = get_db()
+    rows = conn.execute("""
+        SELECT symbol,
+               COUNT(DISTINCT timeframe) AS timeframe_count,
+               COUNT(*) AS alert_count,
+               MAX(received_at) AS last_updated
+        FROM alerts
+        GROUP BY symbol
+        ORDER BY symbol
+    """).fetchall()
+    conn.close()
+    assets = [
+        {
+            "symbol": r["symbol"],
+            "timeframe_count": r["timeframe_count"],
+            "alert_count": r["alert_count"],
+            "last_updated": r["last_updated"],
+        }
+        for r in rows if r["symbol"] not in _TEST_SYMBOLS
+    ]
+    return jsonify({"asset_count": len(assets), "assets": assets})
+
+
+@app.after_request
+def _add_cors_headers(response):
+    """Permissive CORS on GET read endpoints only.
+
+    The DNA Asset Landing Page is a static, read-only render layer that may
+    be served from a different origin than the API (e.g. opened as a local
+    file, or hosted separately from Railway). These endpoints are already
+    gated by state_is_authorized() (STATE_API_TOKEN or loopback) -- CORS
+    here only affects which browser origins may read the response, not
+    whether the request itself is authorized.
+    """
+    if request.method == "GET":
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "Authorization"
+    return response
 
 
 @app.route("/history/<symbol>/<timeframe>", methods=["GET"])

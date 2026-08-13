@@ -1,0 +1,12 @@
+-- Migration 001: add `session` column to the `alerts` table.
+--
+-- Non-destructive: nullable, no DEFAULT, so existing rows keep their data and
+-- simply read NULL for session. Safe to run on a live DB without data loss.
+-- Purpose: store the "session" tag (RTH/PRE/POST) now being emitted by
+-- Pine v12.6.20's webhook payload, so Track 2's coverage matrix can split
+-- RTH vs ETH on stored alerts instead of guessing from time-of-day.
+--
+-- SQLite does not support `ADD COLUMN IF NOT EXISTS`; apply this exactly once.
+-- To verify idempotency before re-applying, check:
+--     PRAGMA table_info(alerts);   -- look for a `session` row
+ALTER TABLE alerts ADD COLUMN session TEXT;

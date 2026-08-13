@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Asset Landing Page — Phase 1</title>
+<style>
+body{margin:0;background:#141414;color:#e6e6e6;font-family:-apple-system,system-ui,"Segoe UI",sans-serif;font-size:14px;line-height:1.45}
+header{padding:20px 26px;border-bottom:1px solid #2a2a2a;background:#1a1a1a}
+header h1{margin:0;font-size:18px}
+header p{margin:2px 0;color:#9a9a9a;font-size:13px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.controls input{background:#141414;border:1px solid #333;color:#e6e6e6;border-radius:6px;padding:6px 9px;font-size:12.5px;font-family:inherit}
+.controls input[data-role="base"]{width:280px}
+.controls input[data-role="token"]{width:220px}
+.controls button{background:#2a2a2a;border:1px solid #3a3a3a;color:#e6e6e6;border-radius:6px;padding:6px 14px;font-size:12.5px;cursor:pointer}
+.controls button:hover{background:#333}
+.controls .status{font-size:12px;color:#9a9a9a}
+main{padding:22px 26px}
+.section-title{font-size:12.5px;color:#9a9a9a;text-transform:uppercase;letter-spacing:.04em;margin:0 0 12px}
+.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.asset-card{border:1px solid #2a2a2a;border-radius:8px;background:#1b1b1b;padding:14px 16px}
+.asset-card h2{margin:0 0 2px;font-size:16px;letter-spacing:.02em}
+.asset-card .asset-meta{color:#8a8a8a;font-size:11.5px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{color:#8a8a8a;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;text-align:left;padding:4px 6px;border-bottom:1px solid #2a2a2a}
+td{padding:5px 6px;border-bottom:1px solid #232323;vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tf{color:#e6e6e6;font-weight:600}
+.badge{display:inline-block;padding:1px 8px;border-radius:9px;font-size:10.5px;font-weight:700;color:#141414;background:#777}
+.badge.pos{background:#00a240}
+.badge.neg{background:#e02e2a}
+.badge.warn{background:#f3903b}
+.badge.neu{background:#5a6a7a}
+.num{color:#cfcfcf;font-variant-numeric:tabular-nums}
+.stale{color:#c9a227}
+.empty,.error{color:#8a8a8a;padding:30px 0;text-align:center;font-size:13px}
+.error{color:#e07a7a}
+.footer-note{margin-top:22px;padding-top:14px;border-top:1px solid #2a2a2a;color:#777;font-size:11.5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>DNA Asset Landing Page — Phase 1</h1>
+  <p>Thin, honest, read-only view straight off Railway's raw <code>alerts</code> table. Per-timeframe facts only — no WATCHING / ARMED / SUGGESTED language, that belongs to the coordinator's verdict once Phase 2 exists.</p>
+  <div class="controls">
+    <input data-role="base" type="text" placeholder="API base URL, e.g. http://localhost:5000">
+    <input data-role="token" type="password" placeholder="Bearer token (optional, prod only)">
+    <button data-role="load">Load</button>
+    <label style="display:flex;align-items:center;gap:5px;color:#9a9a9a;font-size:12px;cursor:pointer">
+      <input data-role="auto" type="checkbox"> auto-refresh (30s)
+    </label>
+    <span class="status" data-role="status"></span>
+  </div>
+</header>
+<main>
+  <p class="section-title">Assets</p>
+  <div class="asset-grid" data-role="grid">
+    <div class="empty">Enter the API base URL above and click Load.</div>
+  </div>
+  <div class="footer-note">
+    Data source: live <code>alerts</code> table via <code>/assets</code> + <code>/state_all/&lt;symbol&gt;</code>. No synthesis, no coordinator dependency — this is not a verdict, just what each timeframe currently reports.
+  </div>
+</main>
+<script>
+(function () {
+  var baseInput = document.querySelector('[data-role="base"]');
+  var tokenInput = document.querySelector('[data-role="token"]');
+  var loadBtn = document.querySelector('[data-role="load"]');
+  var autoCheckbox = document.querySelector('[data-role="auto"]');
+  var statusEl = document.querySelector('[data-role="status"]');
+  var grid = document.querySelector('[data-role="grid"]');
+  var autoTimer = null;
+
+  // Base URL / token live only in this tab's localStorage -- never written
+  // into this file, never sent anywhere but the API base the user typed in.
+  baseInput.value = localStorage.getItem('dna_api_base') || 'http://localhost:5000';
+  tokenInput.value = localStorage.getItem('dna_api_token') || '';
+
+  function authHeaders() {
+    var token = tokenInput.value.trim();
+    return token ? { Authorization: 'Bearer ' + token } : {};
+  }
+
+  function fmtAge(raw) {
+    if (!raw) return { text: '—', stale: false };
+    var then;
+    if (/^\d+$/.test(String(raw).trim())) {
+      // bar_time comes from Pine's `time` built-in: UNIX epoch milliseconds.
+      then = new Date(Number(raw));
+    } else {
+      // Fallback for ISO-formatted timestamps (e.g. received_at).
+      var iso = String(raw);
+      then = new Date(iso.replace(' ', 'T') + (iso.endsWith('Z') ? '' : 'Z'));
+    }
+    if (isNaN(then.getTime())) return { text: String(raw), stale: false };
+    var mins = Math.round((Date.now() - then.getTime()) / 60000);
+    var stale = mins > 24 * 60;
+    if (mins < 1) return { text: 'just now', stale: stale };
+    if (mins < 60) return { text: mins + 'm ago', stale: stale };
+    if (mins < 60 * 24) return { text: Math.round(mins / 60) + 'h ago', stale: stale };
+    return { text: Math.round(mins / (60 * 24)) + 'd ago', stale: stale };
+  }
+
+  function badgeClass(phase) {
+    var p = (phase || '').toUpperCase();
+    if (['FAILED', 'CATASTROPHIC FAIL', 'STRONG FAIL', 'MODERATE FAIL', 'FAIL'].indexOf(p) !== -1) return 'neg';
+    if (['STRONG START', 'CAMPAIGN START', 'RELOAD', 'FIRE ADD', 'EXPANSION'].indexOf(p) !== -1) return 'pos';
+    if (['FAIL TEST', 'START TEST', 'IGNITION TEST', 'PEAK', 'RECOVERY WATCH'].indexOf(p) !== -1) return 'warn';
+    return 'neu';
+  }
+
+  function tfSortKey(tf) {
+    var order = { '1': 0, '3': 1, '5': 2, '15': 3, '30': 4, '60': 5, '120': 6, '180': 7, '240': 8, 'D': 9, 'W': 10 };
+    return order.hasOwnProperty(tf) ? order[tf] : 99;
+  }
+
+  function renderCard(assetSummary, stateAllPayload) {
+    var card = document.createElement('div');
+    card.className = 'asset-card';
+
+    var h2 = document.createElement('h2');
+    h2.textContent = assetSummary.symbol;
+    card.appendChild(h2);
+
+    var meta = document.createElement('div');
+    meta.className = 'asset-meta';
+    meta.textContent = assetSummary.timeframe_count + ' timeframe(s) · ' + assetSummary.alert_count + ' alerts recorded';
+    card.appendChild(meta);
+
+    var table = document.createElement('table');
+    var thead = document.createElement('thead');
+    thead.innerHTML = '<tr><th>TF</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr>';
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    var states = (stateAllPayload && stateAllPayload.states) || [];
+    states.sort(function (a, b) { return tfSortKey(a.timeframe) - tfSortKey(b.timeframe); });
+
+    if (states.length === 0) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td colspan="6" class="empty">no state rows</td>';
+      tbody.appendChild(tr);
+    }
+
+    states.forEach(function (s) {
+      var tr = document.createElement('tr');
+      var age = fmtAge(s.bar_time);
+      tr.innerHTML =
+        '<td class="tf">' + s.timeframe + '</td>' +
+        '<td><span class="badge ' + badgeClass(s.phase) + '">' + (s.phase || '—') + '</span></td>' +
+        '<td class="num">' + (s.health != null ? s.health + '%' : '—') + '</td>' +
+        '<td class="num">' + (s.confidence != null ? s.confidence + '%' : '—') + '</td>' +
+        '<td>' + (s.recent_event || '—') + '</td>' +
+        '<td class="' + (age.stale ? 'stale' : 'num') + '">' + age.text + '</td>';
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    card.appendChild(table);
+    return card;
+  }
+
+  function load() {
+    var base = baseInput.value.trim().replace(/\/$/, '');
+    if (!base) { statusEl.textContent = 'enter an API base URL'; return; }
+    localStorage.setItem('dna_api_base', base);
+    localStorage.setItem('dna_api_token', tokenInput.value.trim());
+
+    statusEl.textContent = 'loading…';
+    grid.innerHTML = '';
+
+    fetch(base + '/assets', { headers: authHeaders() })
+      .then(function (r) {
+        if (r.status === 401) throw new Error('unauthorized — check the bearer token');
+        if (!r.ok) throw new Error('GET /assets -> HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var assets = data.assets || [];
+        if (assets.length === 0) {
+          grid.innerHTML = '<div class="empty">no assets with recorded alerts yet</div>';
+          statusEl.textContent = '0 assets';
+          return;
+        }
+        statusEl.textContent = assets.length + ' asset(s) — loading per-timeframe state…';
+        var fetches = assets.map(function (a) {
+          return fetch(base + '/state_all/' + encodeURIComponent(a.symbol), { headers: authHeaders() })
+            .then(function (r) { return r.ok ? r.json() : { states: [] }; })
+            .catch(function () { return { states: [] }; })
+            .then(function (payload) { return { summary: a, payload: payload }; });
+        });
+        Promise.all(fetches).then(function (results) {
+          results.forEach(function (r) {
+            grid.appendChild(renderCard(r.summary, r.payload));
+          });
+          statusEl.textContent = assets.length + ' asset(s) loaded';
+        });
+      })
+      .catch(function (err) {
+        grid.innerHTML = '<div class="error">' + err.message + ' — check the API base URL, CORS, and (if configured) the bearer token.</div>';
+        statusEl.textContent = 'error';
+      });
+  }
+
+  function setAutoRefresh(on) {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    if (on) { autoTimer = setInterval(load, 30000); }
+  }
+
+  loadBtn.addEventListener('click', load);
+  baseInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') load(); });
+  tokenInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') load(); });
+  autoCheckbox.addEventListener('change', function () { setAutoRefresh(autoCheckbox.checked); });
+
+  // Stop polling when the tab is hidden -- no point hammering the API for
+  // a page nobody's looking at, and it avoids surprise background traffic.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { setAutoRefresh(false); autoCheckbox.checked = false; }
+  });
+})();
+</script>
+</body>
+</html>
