@@ -79,7 +79,8 @@
   .asset-row.watch{border-left-color:var(--warning)}
   .asset-row.opportunity{border-left-color:var(--positive)}
   .asset-row.expanded{grid-column:1 / -1; border-color:var(--accent); border-left-color:var(--accent); background:var(--accent-glow)}
-  .asset-row-head{width:100%; height:100%; text-align:left; background:transparent; border:none; padding:20px 22px; cursor:pointer; display:flex; flex-direction:column; gap:8px; font-family:inherit; color:inherit}
+  .asset-row-head{width:100%; text-align:left; background:transparent; border:none; padding:20px 22px; cursor:pointer; display:flex; flex-direction:column; gap:8px; font-family:inherit; color:inherit}
+  .asset-row:not(.expanded) .asset-row-head{height:100%}
   .asset-row.expanded .asset-row-head{flex-direction:row; align-items:center; flex-wrap:wrap; padding-bottom:16px}
   .asset-row-head:hover{background:var(--surface-2)}
   .asset-row.expanded .asset-row-head:hover{background:transparent}
@@ -106,6 +107,11 @@
   .verdict.opportunity .em{color:var(--positive)}
   .verdict.quiet .em{color:var(--muted)}
   .verdict-sub{font-size:12.5px; color:var(--faint); margin-bottom:26px}
+
+  /* ---- price chart: real OHLC closes + entry/Trade-Box reference lines ---- */
+  .chart-wrap{border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:14px 16px 10px; margin-bottom:20px}
+  .chart-canvas{width:100%; height:230px; display:block}
+  .chart-status{font-family:var(--font-display); font-size:11px; color:var(--faint); margin-top:6px}
 
   .flow{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
   @media (max-width:900px){ .flow{grid-template-columns:1fr} }
@@ -1026,6 +1032,10 @@
     var verdictHtml = '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
       '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
 
+    var chartHtml = '<div class="chart-wrap">' +
+      '<canvas class="chart-canvas" data-sym="' + sym + '" width="900" height="230"></canvas>' +
+      '<div class="chart-status" data-sym="' + sym + '">loading chart…</div></div>';
+
     var openPosHtml = '<div class="open-wrap">' +
       '<button class="open-pos-btn" data-sym="' + sym + '">+ Open a position in ' + sym + '</button>' +
       '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div>' +
@@ -1076,7 +1086,7 @@
         '<td class="tabular">' + ag.text + '</td></tr>';
     }).join("");
 
-    return verdictHtml + openPosHtml + holdingsHtml +
+    return verdictHtml + chartHtml + openPosHtml + holdingsHtml +
       '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
       '<div class="flow">' + flowHtml + '</div>' +
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
@@ -1085,6 +1095,135 @@
       '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div></div></details>' +
       '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). Positions are a manual log; nothing here opens or closes anything automatically.</p>';
+  }
+
+  // --- Chart: real OHLC closes for the expanded asset, with the position's
+  // actual entry price and DNA's own Trade Box entry/stop/target drawn as
+  // reference lines when they exist. Canvas must already be in the DOM
+  // (paint() calls this after app.innerHTML is set), and bars come from the
+  // /ohlc endpoint DeepSeek already shipped -- OHLC ladder uses 5/15/60/1D
+  // style labels, not the coordinator tier keys, so map to the shortest
+  // timeframe this asset actually has data for.
+  var ohlcCache = {};
+  var OHLC_TF_MAP = { "3": "3m", "5": "5m", "15": "15m", "30": "30m", "60": "1H", "120": "2H", "180": "3H", "240": "4H", "D": "D" };
+
+  function loadOhlc(sym, tf) {
+    var key = sym + ":" + tf;
+    if (ohlcCache[key]) return Promise.resolve(ohlcCache[key]);
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    return fetch(base + "/ohlc/" + encodeURIComponent(sym) + "/" + encodeURIComponent(tf), { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; })
+      .then(function (d) { if (d && d.bars) ohlcCache[key] = d; return d; });
+  }
+
+  function drawChart(sym) {
+    var canvas = document.querySelector('.chart-canvas[data-sym="' + sym + '"]');
+    var statusEl2 = document.querySelector('.chart-status[data-sym="' + sym + '"]');
+    if (!canvas) return;
+    var c = cache[sym];
+    var states = (c && c.states) || [];
+    var sorted = states.slice().sort(function (a, b) { return tfKey(a.timeframe) - tfKey(b.timeframe); });
+    var candidates = sorted.map(function (r) { return OHLC_TF_MAP[String(r.timeframe)]; }).filter(Boolean);
+    if (!candidates.length) candidates = ["15m"];
+
+    function tryNext(i) {
+      if (i >= candidates.length) { if (statusEl2) statusEl2.textContent = "No chart data available for " + sym + "."; return; }
+      loadOhlc(sym, candidates[i]).then(function (d) {
+        if (!d || !d.bars || !d.bars.length) return tryNext(i + 1);
+        render(d, candidates[i]);
+      });
+    }
+
+    function render(d, tfLbl) {
+      var bars = d.bars;
+      var ctx = canvas.getContext("2d");
+      var rect = canvas.getBoundingClientRect();
+      var w = Math.max(rect.width, 300), h = 230;
+      canvas.width = w * devicePixelRatio; canvas.height = h * devicePixelRatio;
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+
+      var pad = { l: 52, r: 14, t: 12, b: 10 };
+      var plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
+
+      // Reference lines: this asset's actual position entry, and DNA's own
+      // Trade Box entry/stop/target if a box is currently open on any
+      // reporting timeframe. Real values only -- never invented.
+      var refs = [];
+      var holdings = deriveHoldings();
+      holdings.shares.filter(function (s) { return s.symbol === sym; }).forEach(function (s) {
+        refs.push({ price: s.avg_cost, label: "Your entry (shares)", color: "var(--accent)" });
+      });
+      var activeRow = sorted.filter(function (r) { return r.active_trade; })[0];
+      if (activeRow) {
+        if (activeRow.active_entry != null) refs.push({ price: activeRow.active_entry, label: "DNA entry", color: "var(--accent)" });
+        if (activeRow.active_stop != null) refs.push({ price: activeRow.active_stop, label: "DNA stop", color: "var(--critical)" });
+        if (activeRow.active_target != null) refs.push({ price: activeRow.active_target, label: "DNA target", color: "var(--positive)" });
+      }
+
+      var closes = bars.map(function (b) { return b.c; });
+      var allPrices = closes.concat(refs.map(function (r) { return r.price; }));
+      var min = Math.min.apply(null, allPrices), max = Math.max.apply(null, allPrices);
+      if (min === max) { min -= 1; max += 1; }
+      var pad2 = (max - min) * 0.08;
+      min -= pad2; max += pad2;
+
+      function y(price) { return pad.t + plotH * (1 - (price - min) / (max - min)); }
+      function x(i) { return pad.l + plotW * (i / Math.max(1, bars.length - 1)); }
+
+      var style = getComputedStyle(document.documentElement);
+      var lineColor = style.getPropertyValue("--accent").trim() || "#0E9E85";
+      var gridColor = style.getPropertyValue("--line").trim() || "#ddd";
+      var textColor = style.getPropertyValue("--faint").trim() || "#888";
+
+      // Gridlines + price labels (4 bands)
+      ctx.font = "10px " + (style.getPropertyValue("--font-display") || "monospace");
+      ctx.fillStyle = textColor;
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 1;
+      for (var g = 0; g <= 3; g++) {
+        var gy = pad.t + (plotH * g / 3);
+        ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
+        var price = max - (max - min) * (g / 3);
+        ctx.fillText("$" + price.toFixed(2), 2, gy + 3);
+      }
+
+      // Close-price line, filled area beneath for legibility
+      ctx.beginPath();
+      bars.forEach(function (b, i) { var px2 = x(i), py = y(b.c); i === 0 ? ctx.moveTo(px2, py) : ctx.lineTo(px2, py); });
+      ctx.strokeStyle = lineColor; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.lineTo(x(bars.length - 1), pad.t + plotH); ctx.lineTo(x(0), pad.t + plotH); ctx.closePath();
+      ctx.fillStyle = lineColor + "22"; ctx.fill();
+
+      // Reference lines on top, dashed, labeled at the right edge
+      refs.forEach(function (r) {
+        var ry = y(r.price);
+        ctx.save();
+        ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = "rgb(" + colorVar(r.color) + ")"; ctx.globalAlpha = 0.85;
+        ctx.beginPath(); ctx.moveTo(pad.l, ry); ctx.lineTo(w - pad.r, ry); ctx.stroke();
+        ctx.restore();
+        ctx.fillStyle = "rgb(" + colorVar(r.color) + ")";
+        ctx.fillText(r.label + " $" + Number(r.price).toFixed(2), pad.l + 4, ry - 3);
+      });
+
+      function colorVar(token) {
+        var m = token.match(/var\((--[\w-]+)\)/);
+        var raw = m ? style.getPropertyValue(m[1]).trim() : token;
+        if (raw.indexOf("#") === 0) {
+          var hex = raw.replace("#", "");
+          if (hex.length === 3) hex = hex.split("").map(function (ch) { return ch + ch; }).join("");
+          var n = parseInt(hex, 16);
+          return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(",");
+        }
+        return raw.replace(/[^\d,]/g, "");
+      }
+
+      if (statusEl2) statusEl2.textContent = sym + " · " + tfLbl + " · " + bars.length + " bars · source: massive" + (d.cached ? " (cached)" : "");
+    }
+
+    tryNext(0);
   }
 
   function paint() {
@@ -1101,6 +1240,7 @@
       });
     });
     wirePosition();
+    if (selected) drawChart(selected);
   }
 
   function loadSymbol(sym, repaint) {
