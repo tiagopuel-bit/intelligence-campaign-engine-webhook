@@ -519,6 +519,24 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(self.client.delete(f"/positions/{pid}/instruments/{iid}",
                                             headers=self._state_headers()).status_code, 404)
 
+    def test_close_position_records_exit_price(self):
+        pid = self._create_position(symbol="CLOSE").get_json()["id"]
+        self.client.post(f"/positions/{pid}/instruments",
+                         data=json.dumps({"type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+                                          "quantity": 1, "entry_price": 0.30, "entry_time": "2026-08-13T14:30:00Z"}),
+                         content_type="application/json", headers=self._state_headers())
+        r = self.client.patch(f"/positions/{pid}",
+                              data=json.dumps({"status": "CLOSED", "exit_price": 3.0}),
+                              content_type="application/json", headers=self._state_headers())
+        self.assertEqual(r.status_code, 200)
+        d = r.get_json()
+        self.assertEqual(d["status"], "CLOSED")
+        self.assertIsNotNone(d["closed_at"])
+        statuses = {i["status"] for i in d["instruments"]}
+        self.assertEqual(statuses, {"CLOSED"})
+        self.assertTrue(all(i["exit_price"] == 3.0 for i in d["instruments"]))
+        self.assertTrue(all(i["exit_time"] is not None for i in d["instruments"]))
+
     # =========================================================================
     # Options chain + valuation (near-live Massive enrichment)
     # =========================================================================

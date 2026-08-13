@@ -917,14 +917,33 @@ def update_position(position_id):
     clean, err = positions.validate_position_update(payload)
     if err:
         return jsonify({"error": err}), 400
+
+    # Optional exit price/time: when closing, these are applied to every open
+    # leg so the close records what the position was actually exited at.
+    exit_price = None
+    if payload.get("exit_price") not in (None, ""):
+        try:
+            exit_price = float(payload["exit_price"])
+        except (TypeError, ValueError):
+            return jsonify({"error": "exit_price must be a number"}), 400
+        if exit_price <= 0:
+            return jsonify({"error": "exit_price must be > 0"}), 400
+    exit_time = (payload.get("exit_time") or "").strip() or None
+
     now = datetime.now(timezone.utc).isoformat()
     conn = get_db()
     row = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
     if row is None:
         conn.close()
         return jsonify({"error": "position not found"}), 404
-    if clean.get("status") == "CLOSED" and "closed_at" not in clean:
-        clean["closed_at"] = now
+    if clean.get("status") == "CLOSED":
+        if "closed_at" not in clean:
+            clean["closed_at"] = now
+        conn.execute(
+            "UPDATE position_instruments SET status='CLOSED', exit_price=?, exit_time=?, updated_at=? "
+            "WHERE position_id=? AND status='OPEN'",
+            (exit_price, exit_time or now, now, position_id),
+        )
     sets = [f"{key}=?" for key in clean]
     params = list(clean.values()) + [now, position_id]
     conn.execute(f"UPDATE positions SET {', '.join(sets)}, updated_at=? WHERE id=?", params)

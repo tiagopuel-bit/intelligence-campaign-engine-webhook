@@ -160,19 +160,19 @@
   .portfolio{margin-bottom:34px}
   .pf-summary{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:10px}
   .pf-rows{display:flex; flex-direction:column; gap:6px}
-  .pf-row{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:9px 13px; cursor:pointer}
+  .pf-item{border:1px solid var(--line); border-radius:9px; background:var(--surface)}
+  .pf-row{display:flex; align-items:center; gap:12px; padding:9px 13px; cursor:pointer}
   .pf-row:hover{border-color:var(--accent)}
-  .pf-sym{font-family:var(--font-display); font-weight:700; font-size:14px}
-  .pf-dir{font-size:11px; font-weight:700}
-  .pf-dir.pos{color:var(--positive)}
-  .pf-dir.neg{color:var(--critical)}
-  .pf-legs{font-size:11.5px; color:var(--muted)}
+  .pf-label{font-family:var(--font-display); font-weight:600; font-size:13px}
   .pf-val{margin-left:auto; font-family:var(--font-display); font-size:13px}
   .pf-pnl{font-family:var(--font-display); font-weight:700; font-size:13px; min-width:72px; text-align:right}
   .pf-pnl.pos{color:var(--positive)}
   .pf-pnl.neg{color:var(--critical)}
+  .pf-jump{background:transparent; color:var(--faint); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-size:12px}
+  .pf-jump:hover{color:var(--accent); border-color:var(--accent)}
   .pf-del{background:transparent; color:var(--faint); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-size:12px}
   .pf-del:hover{color:var(--critical); border-color:var(--critical)}
+  .pf-detail{border-top:1px dashed var(--line); padding:12px 14px}
 
   /* ---- stage 3: what to do ---- */
   .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
@@ -414,7 +414,36 @@
 
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
-  var portfolio = [];
+  var portfolio = [], realized = 0;
+
+  function realizedPnl(p) {
+    var sum = 0;
+    (p.instruments || []).forEach(function (i) {
+      if (i.exit_price != null && i.entry_price != null) {
+        var mult = i.instrument_type === "SHARE" ? 1 : 100;
+        sum += (i.exit_price - i.entry_price) * i.quantity * mult;
+      }
+    });
+    return sum;
+  }
+
+  function loadClosedPositions() {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    return fetch(base + "/positions?status=CLOSED", { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : { positions: [] }; })
+      .catch(function () { return { positions: [] }; })
+      .then(function (d) {
+        var summaries = d.positions || [];
+        return Promise.all(summaries.map(function (p) {
+          return fetch(base + "/positions/" + p.id, { headers: authHeaders() })
+            .then(function (r) { return r.ok ? r.json() : p; })
+            .catch(function () { return p; });
+        }));
+      })
+      .then(function (details) {
+        realized = details.reduce(function (acc, p) { return acc + realizedPnl(p); }, 0);
+      });
+  }
 
   function loadPortfolio() {
     var base = baseInput.value.trim().replace(/\/$/, "");
@@ -433,6 +462,23 @@
       .then(function (list) { portfolio = list; });
   }
 
+  function fmtExpiry(iso) {
+    if (!iso) return "";
+    var d = new Date(String(iso).replace(" ", "T") + "Z");
+    if (isNaN(d.getTime())) return String(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }).toUpperCase();
+  }
+
+  function contractLabels(v) {
+    if (!v) return "…";
+    var parts = [];
+    (v.options || []).forEach(function (o) {
+      parts.push("$" + o.contract.strike + " " + o.contract.type + " " + fmtExpiry(o.contract.expiration));
+    });
+    if (v.stock && v.stock.shares) parts.push(v.stock.shares + " shares");
+    return parts.join(" · ");
+  }
+
   function renderPortfolio() {
     var totalValue = 0, today = 0, total = 0;
     portfolio.forEach(function (p) {
@@ -444,25 +490,30 @@
     });
     var rows = portfolio.map(function (p) {
       var s = p.summary, v = p.valuation ? p.valuation.summary : null;
-      var dir = s.direction === "LONG" ? "▲" : "▼";
-      var legs = v ? (v.options_contracts + " contracts" + (v.stock_shares ? " + " + v.stock_shares + " shares" : "")) : "…";
+      var label = s.symbol + " " + s.direction + (p.valuation ? " — " + contractLabels(p.valuation) : "");
       var val = v ? fmtMoney(v.total_value) : "—";
       var pnl = v ? v.total_pnl : null;
-      return '<div class="pf-row" data-sym="' + s.symbol + '">' +
-        '<span class="pf-sym">' + s.symbol + '</span>' +
-        '<span class="pf-dir ' + (s.direction === "LONG" ? "pos" : "neg") + '">' + dir + ' ' + s.direction + '</span>' +
-        '<span class="pf-legs">' + legs + '</span>' +
-        '<span class="pf-val tabular">' + val + '</span>' +
-        '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
-        '<button class="pf-del" data-id="' + s.id + '" title="Delete position">✕</button>' +
-        '</div>';
+      var detail = (p.valuation && p.valuation.summary)
+        ? renderValuationBody(s.symbol, p.valuation)
+        : '<div class="position-placeholder">No valuation available.</div>';
+      return '<div class="pf-item">' +
+        '<div class="pf-row">' +
+          '<span class="pf-label">' + label + '</span>' +
+          '<span class="pf-val tabular">' + val + '</span>' +
+          '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
+          '<button class="pf-jump" data-sym="' + s.symbol + '" title="View asset">↗</button>' +
+          '<button class="pf-del" data-id="' + s.id + '" title="Delete position">✕</button>' +
+        '</div>' +
+        '<div class="pf-detail" style="display:none">' + detail + '</div>' +
+      '</div>';
     }).join("");
     return '<div class="portfolio">' +
-      '<div class="stage-head"><h2>Portfolio</h2><span class="hint">all open positions · click a row to jump to it</span></div>' +
+      '<div class="stage-head"><h2>Portfolio</h2><span class="hint">all open positions · click a row to expand its detail</span></div>' +
       '<div class="pf-summary">' +
         '<div class="pos-stat"><div class="stat-label">Total value</div><div class="stat-value tabular">' + fmtMoney(totalValue) + '</div></div>' +
         '<div class="pos-stat"><div class="stat-label">Today</div><div class="stat-value tabular ' + (today >= 0 ? "pos" : "neg") + '">' + fmtSigned(today) + '</div></div>' +
         '<div class="pos-stat"><div class="stat-label">Total return</div><div class="stat-value tabular ' + (total >= 0 ? "pos" : "neg") + '">' + fmtSigned(total) + '</div></div>' +
+        '<div class="pos-stat"><div class="stat-label">Realized P&L</div><div class="stat-value tabular ' + (realized >= 0 ? "pos" : "neg") + '">' + fmtSigned(realized) + '</div></div>' +
       '</div>' +
       '<div class="pf-rows">' + (rows || '<div class="position-placeholder">No open positions.</div>') + '</div>' +
       '</div>';
@@ -471,10 +522,15 @@
   function wirePortfolio() {
     Array.prototype.forEach.call(document.querySelectorAll(".pf-row"), function (row) {
       row.addEventListener("click", function (e) {
-        if (e.target.closest(".pf-del")) return;
-        var sym = row.dataset.sym;
-        selected = sym;
-        Promise.all([loadSymbol(sym, false), loadPositions(sym)]).then(paint);
+        if (e.target.closest(".pf-del") || e.target.closest(".pf-jump")) return;
+        var detail = row.parentElement.querySelector(".pf-detail");
+        if (detail) detail.style.display = detail.style.display === "none" ? "" : "none";
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-jump"), function (b) {
+      b.addEventListener("click", function () {
+        selected = b.dataset.sym;
+        Promise.all([loadSymbol(selected, false), loadPositions(selected)]).then(paint);
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll(".pf-del"), function (b) {
@@ -485,7 +541,7 @@
         fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
           .then(function () {
             posCache = {};
-            return Promise.all([loadPortfolio(), selected ? loadPositions(selected) : Promise.resolve()]);
+            return Promise.all([loadPortfolio(), loadClosedPositions(), selected ? loadPositions(selected) : Promise.resolve()]);
           }).then(paint);
       });
     });
@@ -739,13 +795,22 @@
     Array.prototype.forEach.call(document.querySelectorAll(".pos-close"), function (b) {
       b.addEventListener("click", function () {
         var id = b.dataset.id;
-        if (!window.confirm("Close this " + sym + " position?")) return;
+        var def = "";
+        var pos = (posCache[sym] || []).filter(function (x) { return String(x.id) === String(id); })[0];
+        if (pos && pos.valuation && pos.valuation.underlying) def = pos.valuation.underlying.current;
+        var price = window.prompt("Exit price for " + sym + "? (blank = no price)", def || "");
+        if (price === null) return;
+        var body = { status: "CLOSED" };
+        if (String(price).trim() !== "") body.exit_price = Number(price);
         var base = baseInput.value.trim().replace(/\/$/, "");
         fetch(base + "/positions/" + id, {
           method: "PATCH",
           headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
-          body: JSON.stringify({ status: "CLOSED" })
-        }).then(function () { return loadPositions(sym).then(paint); });
+          body: JSON.stringify(body)
+        }).then(function () {
+          posCache = {};
+          return Promise.all([loadPortfolio(), loadClosedPositions(), loadPositions(sym)]).then(paint);
+        });
       });
     });
 
@@ -757,7 +822,7 @@
         fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
           .then(function () {
             posCache = {};
-            return Promise.all([loadPortfolio(), loadPositions(sym)]).then(paint);
+            return Promise.all([loadPortfolio(), loadClosedPositions(), loadPositions(sym)]).then(paint);
           });
       });
     });
@@ -876,7 +941,7 @@
             return LEVEL_ORDER[cache[x.symbol].assess.level] - LEVEL_ORDER[cache[y.symbol].assess.level];
           });
           if (!selected || !cache[selected]) selected = ranked[0].symbol;
-          return Promise.all([loadPortfolio(), loadPositions(selected)]);
+          return Promise.all([loadPortfolio(), loadClosedPositions(), loadPositions(selected)]);
         }).then(function () { paint(); });
       })
       .catch(function (e) {
