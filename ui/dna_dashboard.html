@@ -379,14 +379,35 @@
   function actionsFor(sym, a) {
     var out = [], t = a.tiers;
 
+    // Reload-quality context, computed up front so critical cards can fold
+    // it in directly instead of leaving "this is a recovery that failed"
+    // stranded in a separate card the reader might not connect to the
+    // breakdown they're already looking at.
+    var messyByTf = {};
+    Object.keys(t).forEach(function (k) {
+      (t[k].rows || []).forEach(function (r) { if (r.reload_quality === "MESSY") messyByTf[String(r.timeframe)] = r; });
+    });
+    var mergedTfs = {};
+    function messyNote(tf) {
+      return " This follows a recovery attempt on " + tfLabel(tf) + " that didn't hold — not a fresh, unrelated breakdown.";
+    }
+
     if (t.backbone.tone === "neg" || t.owner.tone === "neg") {
-      out.push({ level: "critical", ic: "✕", title: "Protect, don't add",
-        text: "The campaign structure itself is " + (t.owner.tone === "neg" ? t.owner.text : t.backbone.text) + " on " + sym + ". Adding into this is fighting the higher timeframe.",
-        why: (t.owner.tone === "neg" ? t.owner.lead : t.backbone.lead).timeframe ? "from " + tfLabel((t.owner.tone === "neg" ? t.owner.lead : t.backbone.lead).timeframe) : "" });
+      var leadRow = t.owner.tone === "neg" ? t.owner.lead : t.backbone.lead;
+      var leadText = t.owner.tone === "neg" ? t.owner.text : t.backbone.text;
+      var leadTf = leadRow ? String(leadRow.timeframe) : null;
+      var isMessy = leadTf && messyByTf[leadTf];
+      if (isMessy) mergedTfs[leadTf] = true;
+      out.push({ level: "critical", ic: "✕", title: isMessy ? "Protect, don't add — recovery didn't hold" : "Protect, don't add",
+        text: "The campaign structure itself is " + leadText + " on " + sym + ". Adding into this is fighting the higher timeframe." + (isMessy ? messyNote(leadTf) : ""),
+        why: leadTf ? "from " + tfLabel(leadTf) : "" });
     } else if (t.confirm.tone === "neg") {
-      out.push({ level: "critical", ic: "!", title: "Confirmation broke",
-        text: "The confirmation timeframes turned " + t.confirm.text + " while the campaign above is still intact. This is where a position gets challenged — worth a look before it propagates up.",
-        why: "from " + tfLabel(t.confirm.lead.timeframe) });
+      var confirmTf = String(t.confirm.lead.timeframe);
+      var confirmMessy = messyByTf[confirmTf];
+      if (confirmMessy) mergedTfs[confirmTf] = true;
+      out.push({ level: "critical", ic: "!", title: confirmMessy ? "Confirmation broke — recovery didn't hold" : "Confirmation broke",
+        text: "The confirmation timeframes turned " + t.confirm.text + " while the campaign above is still intact. This is where a position gets challenged — worth a look before it propagates up." + (confirmMessy ? messyNote(confirmTf) : ""),
+        why: "from " + tfLabel(confirmTf) });
     }
 
     TIERS.forEach(function (tier) {
@@ -408,13 +429,13 @@
         why: "unconfirmed by " + TIERS[2].tfs.map(tfLabel).join("/") });
     }
 
-    var messy = [];
-    Object.keys(t).forEach(function (k) {
-      (t[k].rows || []).forEach(function (r) { if (r.reload_quality === "MESSY") messy.push(r); });
-    });
-    if (messy.length) {
+    // Only surface remaining messy-reload timeframes that weren't already
+    // folded into a critical card above -- avoids saying the same thing twice.
+    var leftoverMessy = Object.keys(messyByTf).filter(function (tf) { return !mergedTfs[tf]; });
+    if (leftoverMessy.length) {
+      var mr = messyByTf[leftoverMessy[0]];
       out.push({ level: "watch", ic: "↺", title: "Last recovery didn't hold",
-        text: "A failure followed the last recovery on " + tfLabel(messy[0].timeframe) + " within the tracking window. Treat the recovery as unsettled rather than done.",
+        text: "A failure followed the last recovery on " + tfLabel(mr.timeframe) + " within the tracking window. Treat the recovery as unsettled rather than done.",
         why: "reload quality: messy" });
     }
 
