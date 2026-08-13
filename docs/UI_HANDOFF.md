@@ -156,7 +156,27 @@ Rolls link legs both ways via `rolled_from_id` / `rolled_to_id`.
   `renderPosition`, `renderPositionRow`, `renderValuationBody`, `contractLabels`,
   `statCard`. Remove or ignore.
 
-## 6. Suggested next UI work (not started)
+## 6. Historical backfill (source tagging + reconstructed phase)
+
+- `alerts` now has a **`source`** column: `'live_webhook'` (default) vs
+  `'backfill_replay'`. Exposed via `/state_all` (per-state `source`), `/history`
+  (per-row `source`), and `/assets` (`source_counts`). The frontend should render
+  backfilled rows distinctly — a replayed reading is **never** a real alert.
+- Backfill scope is now **AMC, GME, VALE, RBLX, SPY, PYPL** (full ladder 3m→1W),
+  via `webhook/backfill.py` + `POST /backfill` (bearer-gated, optional
+  `{"symbols": [...]}` body, idempotent re-run). `GET /backfill/status` to poll.
+- **`phase` IS now populated on backfilled rows** — the replay engine
+  (`webhook/lib/pine_replay_v12_6_19.py`) was additively extended to output
+  `campaignPhase`, faithfully porting the Pine v12.6.19 phase chain (lines
+  856-888). **Caveat:** this phase is a *reconstruction*, not fidelity-tested
+  (Checkpoint 2B validated events/geometry only; Pine never exported phase, so
+  there is no ground truth). Treat it as advisory. `source='backfill_replay'`
+  still distinguishes it from live.
+- Still NULL on backfilled rows (version-gap, never faked): `session`, `active_*`
+  (trade box), `momentum`, `status`, `action`, `htf_phase`, `campaign_alignment`,
+  `last_fail_type`, `exhaustion_warning`, `reload_quality`.
+
+## 7. Suggested next UI work (not started)
 
 - **Closed-trades report** — the data is already recorded (`exit_price`/`exit_time`
   per leg); add a "closed" view / realized-P&L history to the dashboard.

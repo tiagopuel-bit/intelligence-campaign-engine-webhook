@@ -216,6 +216,10 @@ def replay(df: pd.DataFrame, tf_minutes: int) -> pd.DataFrame:
     pendingWasCampaignActive = False
     peakManageCount = peakSupportCount = 0; peakSequenceLastBar = None
     persistentHealth = 0.0; healthEmaState = NA; prevCampaignHealth = 0
+    # ADDITIVE (not in Checkpoint 2B fidelity scope): faithful port of Pine's
+    # persistent campaignPhase var, so the backfill can populate `phase`.
+    campaignPhase = "WAIT"
+    phase_out = np.full(n, "WAIT", dtype=object)
 
     def since(b, i):
         return 100000 if b is None else i - b
@@ -441,6 +445,44 @@ def replay(df: pd.DataFrame, tf_minutes: int) -> pd.DataFrame:
 
         fireAddEvent = campaignActive and accumulateEvent and addEvent
 
+        # ---- campaignPhase (faithful port of Pine v12.6.19 lines 856-888) ----
+        # Runs after events + fireAddEvent and before the event-memory
+        # campaignActive update, exactly like Pine. No else: the phase persists
+        # when no branch matches.
+        if startTestEvent:
+            campaignPhase = "START TEST"
+        elif ignitionTestEvent:
+            campaignPhase = "IGNITION TEST"
+        elif failTestEvent:
+            campaignPhase = "FAIL TEST"
+        elif reloadDisplayEvent:
+            campaignPhase = "RELOAD"
+        elif pendingActive:
+            campaignPhase = "RESOLVING"
+        elif failEvent:
+            campaignPhase = "FAILED"
+        elif peakEvent:
+            campaignPhase = "PEAK"
+        elif fireAddEvent:
+            campaignPhase = "FIRE ADD"
+        elif strongStartEvent:
+            campaignPhase = "STRONG START"
+        elif campaignStartEvent:
+            campaignPhase = "CAMPAIGN START"
+        elif recoveryWatchActive:
+            campaignPhase = "RECOVERY WATCH"
+        elif manageCore[i] or premiumActive:
+            campaignPhase = "MANAGE" if manageCore[i] else "PREMIUM"
+        elif campaignActive and continuationContext and campaignScore[i] >= addMinScore:
+            campaignPhase = "EXPANSION"
+        elif campaignActive and bsIgn <= memoryBars:
+            campaignPhase = "IGNITION"
+        elif campaignActive and bottomContext[i]:
+            campaignPhase = "ACCUMULATION"
+        elif resetEvent:
+            campaignPhase = "RESET"
+        phase_out[i] = campaignPhase
+
         # ---- record stateful continuous series ----
         strengthPct = campaignStrength * 100.0 / strengthMax if strengthMax > 0 else 0.0
         rawPhaseConfidence = (campaignHealth * 0.42 + campaignScore[i] * 0.25
@@ -531,6 +573,7 @@ def replay(df: pd.DataFrame, tf_minutes: int) -> pd.DataFrame:
     })
     for k, v in st.items():
         feat[k] = v
+    feat["campaignPhase"] = phase_out  # ADDITIVE reconstructed phase (not fidelity-tested)
     return pd.concat([res, feat], axis=1)
 
 

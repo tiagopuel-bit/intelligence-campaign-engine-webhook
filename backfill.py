@@ -22,7 +22,7 @@ import requests
 from lib import pine_replay_v12_6_19 as replay
 from massive_ohlc import BASE_URL, api_key, limiter
 
-SYMBOLS = ("AMC", "GME", "VALE")
+SYMBOLS = ("AMC", "GME", "VALE", "RBLX", "SPY", "PYPL")
 
 # (db timeframe label, tf_minutes, multiplier, span)
 LADDER = [
@@ -144,8 +144,10 @@ def _replay_one(symbol: str, label: str, tf_minutes: int, mult: int, span: str,
         if event is None:
             continue
         bar_time = str(_epoch_ms(out["t_utc"].iloc[i]))
+        phase = out["campaignPhase"].iloc[i]
+        phase = str(phase) if phase and not pd.isna(phase) else None
         row = (
-            symbol, label, None,  # phase
+            symbol, label, phase,
             int(out["campaignHealth"].iloc[i]) if not pd.isna(out["campaignHealth"].iloc[i]) else None,
             int(out["campaignScore"].iloc[i]) if not pd.isna(out["campaignScore"].iloc[i]) else None,
             int(out["phaseConfidence"].iloc[i]) if not pd.isna(out["phaseConfidence"].iloc[i]) else None,
