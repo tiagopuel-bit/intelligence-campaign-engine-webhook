@@ -36,6 +36,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import massive_ohlc
+import positions
 
 
 # -- Database path -----------------------------------------------------------
@@ -153,6 +154,43 @@ def init_db():
             PRIMARY KEY (symbol, timeframe)
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS positions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            symbol TEXT NOT NULL,
+            direction TEXT NOT NULL CHECK(direction IN ('LONG','SHORT')),
+            status TEXT NOT NULL DEFAULT 'OPEN' CHECK(status IN ('OPEN','CLOSED')),
+            opened_at TEXT NOT NULL,
+            closed_at TEXT,
+            origin_timeframe TEXT,
+            origin_event TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS position_instruments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            position_id INTEGER NOT NULL REFERENCES positions(id) ON DELETE CASCADE,
+            instrument_type TEXT NOT NULL CHECK(instrument_type IN ('SHARE','CALL','PUT')),
+            strike REAL,
+            expiration TEXT,
+            quantity REAL NOT NULL,
+            entry_price REAL NOT NULL,
+            entry_time TEXT NOT NULL,
+            exit_price REAL,
+            exit_time TEXT,
+            status TEXT NOT NULL DEFAULT 'OPEN' CHECK(status IN ('OPEN','CLOSED','ROLLED')),
+            rolled_from_id INTEGER REFERENCES position_instruments(id),
+            rolled_to_id INTEGER REFERENCES position_instruments(id),
+            notes TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+    """)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_positions_symbol_status ON positions(symbol, status)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_instruments_position ON position_instruments(position_id)")
     _ensure_trade_box_columns(conn)
     conn.commit()
     conn.close()
@@ -609,6 +647,234 @@ def export_csv():
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment; filename=dna_alerts.csv"},
     )
+
+
+# -- Positions (beta) --------------------------------------------------------
+
+def _dna_context(conn, symbol, opened_at):
+    """Most recent alert per timeframe for a symbol, since the position opened.
+
+    Reuses the get_state_all() query pattern (DISTINCT timeframe + latest alert
+    per timeframe, shaped by _shape_state) with a received_at >= opened_at
+    filter, per the positions task packet.
+    """
+    timeframes = [r["timeframe"] for r in conn.execute(
+        "SELECT DISTINCT timeframe FROM alerts WHERE symbol=? AND received_at>=?",
+        (symbol, opened_at),
+    ).fetchall()]
+    states = []
+    for tf in timeframes:
+        latest = conn.execute(
+            "SELECT * FROM alerts WHERE symbol=? AND timeframe=? AND received_at>=? ORDER BY id DESC LIMIT 1",
+            (symbol, tf, opened_at),
+        ).fetchone()
+        watch = conn.execute(
+            "SELECT * FROM watch_state WHERE symbol=? AND timeframe=?", (symbol, tf),
+        ).fetchone()
+        if latest is not None:
+            states.append(_shape_state(symbol, tf, latest, watch))
+    return {"symbol": symbol, "timeframe_count": len(states), "states": states}
+
+
+def _position_detail(conn, position_id):
+    row = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
+    if row is None:
+        return None
+    instruments = conn.execute(
+        "SELECT * FROM position_instruments WHERE position_id=? ORDER BY id", (position_id,),
+    ).fetchall()
+    shaped = [positions.shape_instrument(r) for r in instruments]
+    open_count = sum(1 for i in shaped if i["status"] == "OPEN")
+    detail = positions.shape_position(row, len(shaped), open_count)
+    detail["instruments"] = shaped
+    detail["dna_context"] = _dna_context(conn, row["symbol"], row["opened_at"])
+    return detail
+
+
+@app.route("/positions", methods=["POST"])
+def create_position():
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    payload = request.get_json(silent=True)
+    position, err = positions.validate_position_payload(payload)
+    if err:
+        return jsonify({"error": err}), 400
+    instrument, err = positions.validate_instrument_payload(payload.get("instrument"))
+    if err:
+        return jsonify({"error": err}), 400
+
+    now = datetime.now(timezone.utc).isoformat()
+    conn = get_db()
+    cur = conn.execute("""
+        INSERT INTO positions (symbol, direction, status, opened_at, origin_timeframe,
+            origin_event, notes, created_at, updated_at)
+        VALUES (?,?,?,?,?,?,?,?,?)
+    """, (
+        position["symbol"], position["direction"], "OPEN", instrument["entry_time"],
+        position["origin_timeframe"], position["origin_event"], position["notes"], now, now,
+    ))
+    position_id = cur.lastrowid
+    conn.execute("""
+        INSERT INTO position_instruments (position_id, instrument_type, strike, expiration,
+            quantity, entry_price, entry_time, status, notes, created_at, updated_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?)
+    """, (
+        position_id, instrument["instrument_type"], instrument["strike"],
+        instrument["expiration"], instrument["quantity"], instrument["entry_price"],
+        instrument["entry_time"], "OPEN", instrument["notes"], now, now,
+    ))
+    conn.commit()
+    detail = _position_detail(conn, position_id)
+    conn.close()
+    return jsonify(detail), 201
+
+
+@app.route("/positions", methods=["GET"])
+def list_positions():
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    query = "SELECT * FROM positions"
+    clauses, params = [], []
+    symbol = request.args.get("symbol")
+    if symbol:
+        clean = positions.clean_symbol(symbol)
+        if clean is None:
+            return jsonify({"error": "invalid symbol filter"}), 400
+        clauses.append("symbol=?")
+        params.append(clean)
+    status = request.args.get("status")
+    if status:
+        status = status.strip().upper()
+        if status not in positions.POSITION_STATUSES:
+            return jsonify({"error": "invalid status filter"}), 400
+        clauses.append("status=?")
+        params.append(status)
+    if clauses:
+        query += " WHERE " + " AND ".join(clauses)
+    query += " ORDER BY id DESC"
+
+    conn = get_db()
+    rows = conn.execute(query, params).fetchall()
+    out = []
+    for row in rows:
+        count = conn.execute(
+            "SELECT COUNT(*) n FROM position_instruments WHERE position_id=?", (row["id"],),
+        ).fetchone()["n"]
+        open_count = conn.execute(
+            "SELECT COUNT(*) n FROM position_instruments WHERE position_id=? AND status='OPEN'",
+            (row["id"],),
+        ).fetchone()["n"]
+        out.append(positions.shape_position(row, count, open_count))
+    conn.close()
+    return jsonify({"count": len(out), "positions": out})
+
+
+@app.route("/positions/<int:position_id>", methods=["GET"])
+def get_position(position_id):
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    conn = get_db()
+    detail = _position_detail(conn, position_id)
+    conn.close()
+    if detail is None:
+        return jsonify({"error": "position not found"}), 404
+    return jsonify(detail)
+
+
+@app.route("/positions/<int:position_id>", methods=["PATCH"])
+def update_position(position_id):
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    payload = request.get_json(silent=True)
+    clean, err = positions.validate_position_update(payload)
+    if err:
+        return jsonify({"error": err}), 400
+    now = datetime.now(timezone.utc).isoformat()
+    conn = get_db()
+    row = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": "position not found"}), 404
+    if clean.get("status") == "CLOSED" and "closed_at" not in clean:
+        clean["closed_at"] = now
+    sets = [f"{key}=?" for key in clean]
+    params = list(clean.values()) + [now, position_id]
+    conn.execute(f"UPDATE positions SET {', '.join(sets)}, updated_at=? WHERE id=?", params)
+    conn.commit()
+    detail = _position_detail(conn, position_id)
+    conn.close()
+    return jsonify(detail)
+
+
+@app.route("/positions/<int:position_id>/instruments", methods=["POST"])
+def add_instrument(position_id):
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    payload = request.get_json(silent=True)
+    instrument, err = positions.validate_instrument_payload(payload)
+    if err:
+        return jsonify({"error": err}), 400
+    conn = get_db()
+    pos = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
+    if pos is None:
+        conn.close()
+        return jsonify({"error": "position not found"}), 404
+    if instrument["rolled_from_id"] is not None:
+        src = conn.execute(
+            "SELECT id FROM position_instruments WHERE id=? AND position_id=?",
+            (instrument["rolled_from_id"], position_id),
+        ).fetchone()
+        if src is None:
+            conn.close()
+            return jsonify({"error": "rolled_from_id does not reference an instrument of this position"}), 400
+    now = datetime.now(timezone.utc).isoformat()
+    cur = conn.execute("""
+        INSERT INTO position_instruments (position_id, instrument_type, strike, expiration,
+            quantity, entry_price, entry_time, status, rolled_from_id, notes, created_at, updated_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+    """, (
+        position_id, instrument["instrument_type"], instrument["strike"],
+        instrument["expiration"], instrument["quantity"], instrument["entry_price"],
+        instrument["entry_time"], "OPEN", instrument["rolled_from_id"], instrument["notes"], now, now,
+    ))
+    iid = cur.lastrowid
+    conn.commit()
+    row = conn.execute("SELECT * FROM position_instruments WHERE id=?", (iid,)).fetchone()
+    conn.close()
+    return jsonify(positions.shape_instrument(row)), 201
+
+
+@app.route("/positions/<int:position_id>/instruments/<int:iid>", methods=["PATCH"])
+def update_instrument(position_id, iid):
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    payload = request.get_json(silent=True)
+    clean, err = positions.validate_instrument_update(payload)
+    if err:
+        return jsonify({"error": err}), 400
+    conn = get_db()
+    row = conn.execute(
+        "SELECT * FROM position_instruments WHERE id=? AND position_id=?", (iid, position_id),
+    ).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": "instrument not found"}), 404
+    if clean.get("rolled_to_id") is not None:
+        dst = conn.execute(
+            "SELECT id FROM position_instruments WHERE id=? AND position_id=?",
+            (clean["rolled_to_id"], position_id),
+        ).fetchone()
+        if dst is None:
+            conn.close()
+            return jsonify({"error": "rolled_to_id does not reference an instrument of this position"}), 400
+    now = datetime.now(timezone.utc).isoformat()
+    sets = [f"{key}=?" for key in clean]
+    params = list(clean.values()) + [now, iid]
+    conn.execute(f"UPDATE position_instruments SET {', '.join(sets)}, updated_at=? WHERE id=?", params)
+    conn.commit()
+    updated = conn.execute("SELECT * FROM position_instruments WHERE id=?", (iid,)).fetchone()
+    conn.close()
+    return jsonify(positions.shape_instrument(updated))
 
 
 init_db()

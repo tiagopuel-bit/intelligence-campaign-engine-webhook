@@ -347,6 +347,144 @@ class WebhookReceiverTests(unittest.TestCase):
                     "active_target", "active_trade_source", "active_trade_open_pct"):
             self.assertIn(col, cols)
 
+    # =========================================================================
+    # Positions (beta) — manual log, no broker
+    # =========================================================================
+
+    def _create_position(self, symbol="AMC", **overrides):
+        body = {
+            "symbol": symbol,
+            "direction": "LONG",
+            "origin_timeframe": "15",
+            "origin_event": "STRONG START",
+            "notes": "demo",
+            "instrument": {
+                "type": "SHARE",
+                "quantity": 100,
+                "entry_price": 2.53,
+                "entry_time": "2026-08-13T14:30:00Z",
+            },
+        }
+        body.update(overrides)
+        return self.client.post("/positions", data=json.dumps(body),
+                                content_type="application/json",
+                                headers=self._state_headers())
+
+    def test_positions_requires_auth(self):
+        resp = self.client.post("/positions", data="{}", content_type="application/json")
+        self.assertEqual(resp.status_code, 401)
+        resp = self.client.get("/positions")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_position_create_and_get(self):
+        resp = self._create_position()
+        self.assertEqual(resp.status_code, 201)
+        d = resp.get_json()
+        self.assertEqual(d["symbol"], "AMC")
+        self.assertEqual(d["direction"], "LONG")
+        self.assertEqual(d["status"], "OPEN")
+        self.assertEqual(d["opened_at"], "2026-08-13T14:30:00Z")
+        self.assertEqual(d["instrument_count"], 1)
+        self.assertEqual(d["open_instrument_count"], 1)
+        self.assertEqual(len(d["instruments"]), 1)
+        self.assertEqual(d["instruments"][0]["instrument_type"], "SHARE")
+        self.assertEqual(d["instruments"][0]["entry_price"], 2.53)
+        self.assertIn("dna_context", d)
+
+        got = self.client.get(f"/positions/{d['id']}", headers=self._state_headers())
+        self.assertEqual(got.status_code, 200)
+        self.assertEqual(got.get_json()["id"], d["id"])
+
+    def test_position_validation(self):
+        resp = self._create_position(direction="SIDEWAYS")
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("direction", resp.get_json()["error"])
+
+        resp = self.client.post("/positions", data=json.dumps({"symbol": "AMC", "direction": "LONG"}),
+                                content_type="application/json", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("instrument", resp.get_json()["error"])
+
+        resp = self._create_position(symbol="BAD SYMBOL!")
+        self.assertEqual(resp.status_code, 400)
+
+        # Option leg must have a strike; SHARE must not.
+        resp = self._create_position(instrument={"type": "CALL", "quantity": 1,
+                                                 "entry_price": 2.53, "entry_time": "2026-08-13T14:30:00Z"})
+        self.assertEqual(resp.status_code, 400)
+        self.assertIn("strike", resp.get_json()["error"])
+
+    def test_position_list_and_filter(self):
+        self._create_position(symbol="FLTZ")
+        self._create_position(symbol="FLTZ", direction="SHORT")
+        self._create_position(symbol="FLTZ")
+        allp = self.client.get("/positions?symbol=FLTZ", headers=self._state_headers()).get_json()
+        self.assertEqual(allp["count"], 3)
+        closed_id = allp["positions"][0]["id"]
+        self.client.patch(f"/positions/{closed_id}", data=json.dumps({"status": "CLOSED"}),
+                          content_type="application/json", headers=self._state_headers())
+
+        openp = self.client.get("/positions?symbol=FLTZ&status=OPEN",
+                                headers=self._state_headers()).get_json()
+        self.assertEqual(openp["count"], 2)
+        closed = self.client.get("/positions?symbol=FLTZ&status=CLOSED",
+                                 headers=self._state_headers()).get_json()
+        self.assertEqual(closed["count"], 1)
+        self.assertIsNotNone(closed["positions"][0]["closed_at"])
+
+    def test_position_add_and_close_instrument(self):
+        pid = self._create_position().get_json()["id"]
+        add = self.client.post(f"/positions/{pid}/instruments",
+                               data=json.dumps({"type": "SHARE", "quantity": 50,
+                                                "entry_price": 2.60, "entry_time": "2026-08-13T15:00:00Z"}),
+                               content_type="application/json", headers=self._state_headers())
+        self.assertEqual(add.status_code, 201)
+        iid = add.get_json()["id"]
+
+        patch = self.client.patch(f"/positions/{pid}/instruments/{iid}",
+                                  data=json.dumps({"exit_price": 2.80, "exit_time": "2026-08-13T16:00:00Z",
+                                                   "status": "CLOSED"}),
+                                  content_type="application/json", headers=self._state_headers())
+        self.assertEqual(patch.status_code, 200)
+        self.assertEqual(patch.get_json()["status"], "CLOSED")
+        self.assertEqual(patch.get_json()["exit_price"], 2.80)
+
+        detail = self.client.get(f"/positions/{pid}", headers=self._state_headers()).get_json()
+        self.assertEqual(detail["instrument_count"], 2)
+        self.assertEqual(detail["open_instrument_count"], 1)
+
+    def test_position_roll_linking(self):
+        pid = self._create_position().get_json()["id"]
+        first = self.client.get(f"/positions/{pid}", headers=self._state_headers()).get_json()["instruments"][0]
+        # opened half of a roll
+        new = self.client.post(f"/positions/{pid}/instruments",
+                               data=json.dumps({"type": "CALL", "strike": 3.0, "expiration": "2026-09-18",
+                                                "quantity": 1, "entry_price": 0.30,
+                                                "entry_time": "2026-08-13T17:00:00Z",
+                                                "rolled_from_id": first["id"]}),
+                               content_type="application/json", headers=self._state_headers())
+        self.assertEqual(new.status_code, 201)
+        self.assertEqual(new.get_json()["rolled_from_id"], first["id"])
+
+        # closed half of a roll
+        closed = self.client.patch(f"/positions/{pid}/instruments/{first['id']}",
+                                   data=json.dumps({"status": "ROLLED", "exit_price": 2.70,
+                                                    "exit_time": "2026-08-13T17:00:00Z",
+                                                    "rolled_to_id": new.get_json()["id"]}),
+                                   content_type="application/json", headers=self._state_headers())
+        self.assertEqual(closed.status_code, 200)
+        self.assertEqual(closed.get_json()["status"], "ROLLED")
+        self.assertEqual(closed.get_json()["rolled_to_id"], new.get_json()["id"])
+
+    def test_position_not_found(self):
+        resp = self.client.get("/positions/99999", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 404)
+        resp = self.client.post("/positions/99999/instruments",
+                                data=json.dumps({"type": "SHARE", "quantity": 1,
+                                                 "entry_price": 2.53, "entry_time": "2026-08-13T14:30:00Z"}),
+                                content_type="application/json", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 404)
+
     def test_poll_can_build_campaign_state(self):
         self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
         from poll_and_recommend import build_campaign_state
