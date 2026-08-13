@@ -419,9 +419,10 @@ def _add_cors_headers(response):
     here only affects which browser origins may read the response, not
     whether the request itself is authorized.
     """
-    if request.method == "GET":
+    if request.method in ("GET", "OPTIONS"):
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Headers"] = "Authorization"
+        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
     return response
 
 
