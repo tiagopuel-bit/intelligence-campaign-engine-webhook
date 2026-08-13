@@ -32,6 +32,7 @@ import hmac
 import os
 import ipaddress
 import uuid
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -93,6 +94,7 @@ _ALERT_MIGRATION_COLUMNS = {
     "active_target": "REAL",
     "active_trade_source": "TEXT",
     "active_trade_open_pct": "REAL",
+    "source": "TEXT NOT NULL DEFAULT 'live_webhook'",  # migration 004 (backfill provenance)
 }
 
 
@@ -142,6 +144,7 @@ def init_db():
             active_target REAL,
             active_trade_source TEXT,
             active_trade_open_pct REAL,
+            source TEXT NOT NULL DEFAULT 'live_webhook',
             received_at TEXT NOT NULL
         )
     """)
@@ -451,6 +454,7 @@ def _shape_state(symbol, timeframe, latest, watch):
         "active_target": latest["active_target"] if "active_target" in latest.keys() else None,
         "active_trade_source": latest["active_trade_source"] if "active_trade_source" in latest.keys() else None,
         "active_trade_open_pct": latest["active_trade_open_pct"] if "active_trade_open_pct" in latest.keys() else None,
+        "source": latest["source"] if "source" in latest.keys() else "live_webhook",
         "next_event_after_signal": watch["next_event_after_signal"] if watch else None,
         "signal_event": watch["signal_event"] if watch else None,
         "signal_time": watch["signal_time"] if watch else None,
@@ -464,7 +468,7 @@ def get_state(symbol, timeframe):
         return jsonify({"error": "unauthorized"}), 401
     conn = get_db()
     latest = conn.execute("""
-        SELECT * FROM alerts WHERE symbol=? AND timeframe=? ORDER BY id DESC LIMIT 1
+        SELECT * FROM alerts WHERE symbol=? AND timeframe=? ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1
     """, (symbol, timeframe)).fetchone()
     watch = conn.execute("""
         SELECT * FROM watch_state WHERE symbol=? AND timeframe=?
@@ -489,7 +493,7 @@ def get_state_all(symbol):
     states = []
     for tf in timeframes:
         latest = conn.execute("""
-            SELECT * FROM alerts WHERE symbol=? AND timeframe=? ORDER BY id DESC LIMIT 1
+            SELECT * FROM alerts WHERE symbol=? AND timeframe=? ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1
         """, (symbol, tf)).fetchone()
         watch = conn.execute("""
             SELECT * FROM watch_state WHERE symbol=? AND timeframe=?
@@ -520,7 +524,9 @@ def get_assets():
         SELECT symbol,
                COUNT(DISTINCT timeframe) AS timeframe_count,
                COUNT(*) AS alert_count,
-               MAX(received_at) AS last_updated
+               MAX(received_at) AS last_updated,
+               SUM(CASE WHEN source = 'backfill_replay' THEN 1 ELSE 0 END) AS backfill_count,
+               SUM(CASE WHEN source = 'live_webhook' THEN 1 ELSE 0 END) AS live_count
         FROM alerts
         GROUP BY symbol
         ORDER BY symbol
@@ -532,6 +538,10 @@ def get_assets():
             "timeframe_count": r["timeframe_count"],
             "alert_count": r["alert_count"],
             "last_updated": r["last_updated"],
+            "source_counts": {
+                "live_webhook": r["live_count"] or 0,
+                "backfill_replay": r["backfill_count"] or 0,
+            },
         }
         for r in rows if r["symbol"] not in _TEST_SYMBOLS
     ]
@@ -602,11 +612,44 @@ def get_history(symbol, timeframe):
         return jsonify({"error": "unauthorized"}), 401
     conn = get_db()
     rows = conn.execute("""
-        SELECT bar_event, phase, health, close, bar_time, received_at
-        FROM alerts WHERE symbol=? AND timeframe=? ORDER BY id DESC LIMIT 50
+        SELECT bar_event, phase, health, close, bar_time, received_at, source
+        FROM alerts WHERE symbol=? AND timeframe=? ORDER BY CAST(bar_time AS INTEGER) DESC LIMIT 50
     """, (symbol, timeframe)).fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])
+
+
+# -- Historical backfill (replay v12.6.19 over Massive OHLC) -----------------
+
+_backfill_state = {"status": "idle", "report": None}
+
+
+def _run_backfill_job():
+    global _backfill_state
+    _backfill_state = {"status": "running", "report": None}
+    try:
+        import backfill
+        report = backfill.run_backfill(str(DB_PATH))
+        _backfill_state = {"status": "done", "report": report}
+    except Exception as exc:  # noqa: BLE001
+        _backfill_state = {"status": "error", "report": str(exc)}
+
+
+@app.route("/backfill", methods=["POST"])
+def trigger_backfill():
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    if _backfill_state.get("status") == "running":
+        return jsonify({"status": "already_running"}), 409
+    threading.Thread(target=_run_backfill_job, daemon=True).start()
+    return jsonify({"status": "started"})
+
+
+@app.route("/backfill/status", methods=["GET"])
+def backfill_status():
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    return jsonify(_backfill_state)
 
 
 @app.route("/export/db", methods=["GET"])
@@ -688,7 +731,7 @@ def _dna_context(conn, symbol, opened_at):
     states = []
     for tf in timeframes:
         latest = conn.execute(
-            "SELECT * FROM alerts WHERE symbol=? AND timeframe=? AND received_at>=? ORDER BY id DESC LIMIT 1",
+            "SELECT * FROM alerts WHERE symbol=? AND timeframe=? AND received_at>=? ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
             (symbol, tf, opened_at),
         ).fetchone()
         watch = conn.execute(

@@ -345,7 +345,7 @@ class WebhookReceiverTests(unittest.TestCase):
         cols = {r[1] for r in conn.execute("PRAGMA table_info(alerts)")}
         conn.close()
         for col in ("session", "active_trade", "active_entry", "active_stop",
-                    "active_target", "active_trade_source", "active_trade_open_pct"):
+                    "active_target", "active_trade_source", "active_trade_open_pct", "source"):
             self.assertIn(col, cols)
 
     def test_ensure_alert_columns_repairs_old_table(self):
@@ -357,7 +357,7 @@ class WebhookReceiverTests(unittest.TestCase):
         cols = {r[1] for r in old.execute("PRAGMA table_info(alerts)")}
         old.close()
         for col in ("session", "active_trade", "active_entry", "active_stop",
-                    "active_target", "active_trade_source", "active_trade_open_pct"):
+                    "active_target", "active_trade_source", "active_trade_open_pct", "source"):
             self.assertIn(col, cols)
 
     # =========================================================================
