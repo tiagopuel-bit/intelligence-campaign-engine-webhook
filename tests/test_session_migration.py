@@ -1,63 +1,60 @@
-"""Test the session-capture migration against a LOCAL COPY of the DB.
+"""Test the session-capture migration SQL (001) against a synthetic old-schema table.
 
-Copies dna_alerts.db to a temp file (never touches the live store), applies the
-ALTER TABLE, and asserts: (a) the column exists, (b) row count is unchanged,
-(c) existing rows read NULL session (no data loss), (d) a new INSERT with a
-session value works.
+The manual migrations/*.sql files are documentation/fallback now -- webhook_receiver
+auto-applies missing columns at startup (see _ensure_alert_columns). This test keeps
+verifying that migration 001's SQL still does what it says: adds `session`, keeps row
+count, and existing rows read NULL.
 """
 from __future__ import annotations
 
-import shutil
 import sqlite3
-import tempfile
 import unittest
 from pathlib import Path
 
-DB = Path(__file__).resolve().parents[1] / "dna_alerts.db"
 MIGRATION = Path(__file__).resolve().parents[1] / "migrations" / "001_add_session_column.sql"
 
 
-@unittest.skipUnless(DB.exists(), "no local dna_alerts.db to copy")
 class TestSessionMigration(unittest.TestCase):
-    def test_migration_on_copy(self):
-        with tempfile.TemporaryDirectory() as td:
-            copy = Path(td) / "dna_alerts_copy.db"
-            shutil.copy2(DB, copy)
+    def test_migration_on_old_schema(self):
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        conn.execute("""
+            CREATE TABLE alerts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                symbol TEXT NOT NULL,
+                timeframe TEXT NOT NULL,
+                close REAL,
+                received_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("INSERT INTO alerts (symbol, timeframe, close, received_at) "
+                     "VALUES ('TEST_MIG', '5', 2.5, '2026-08-12T00:00:00+00:00')")
+        conn.commit()
 
-            conn = sqlite3.connect(copy)
-            conn.row_factory = sqlite3.Row
+        before = conn.execute("SELECT COUNT(*) n FROM alerts").fetchone()["n"]
+        cols_before = {r["name"] for r in conn.execute("PRAGMA table_info(alerts)")}
+        self.assertNotIn("session", cols_before)
 
-            # Pre-state: row count + column list.
-            before = conn.execute("SELECT COUNT(*) n FROM alerts").fetchone()["n"]
-            cols_before = {r["name"] for r in conn.execute("PRAGMA table_info(alerts)")}
-            self.assertNotIn("session", cols_before)
+        conn.execute(MIGRATION.read_text())
+        conn.commit()
 
-            # Apply migration.
-            conn.execute(MIGRATION.read_text())
-            conn.commit()
+        after = conn.execute("SELECT COUNT(*) n FROM alerts").fetchone()["n"]
+        cols_after = {r["name"] for r in conn.execute("PRAGMA table_info(alerts)")}
+        self.assertIn("session", cols_after)
+        self.assertEqual(before, after, "row count changed (data loss!)")
 
-            # Post-state.
-            after = conn.execute("SELECT COUNT(*) n FROM alerts").fetchone()["n"]
-            cols_after = {r["name"] for r in conn.execute("PRAGMA table_info(alerts)")}
-            self.assertIn("session", cols_after)
-            self.assertEqual(before, after, "row count changed (data loss!)")
+        null_session = conn.execute(
+            "SELECT COUNT(*) n FROM alerts WHERE session IS NULL").fetchone()["n"]
+        self.assertEqual(null_session, after)
 
-            # Existing rows read NULL session (no fabricated value).
-            null_session = conn.execute(
-                "SELECT COUNT(*) n FROM alerts WHERE session IS NULL").fetchone()["n"]
-            self.assertEqual(null_session, after)
-
-            # A new INSERT with a session value works.
-            conn.execute(
-                "INSERT INTO alerts (symbol, timeframe, session, received_at) "
-                "VALUES ('TEST_MIG', '5', 'RTH', '2026-08-12T00:00:00+00:00')")
-            conn.commit()
-            got = conn.execute(
-                "SELECT session FROM alerts WHERE symbol='TEST_MIG'").fetchone()["session"]
-            self.assertEqual(got, "RTH")
-            conn.execute("DELETE FROM alerts WHERE symbol='TEST_MIG'")
-            conn.commit()
-            conn.close()
+        conn.execute(
+            "INSERT INTO alerts (symbol, timeframe, session, received_at) "
+            "VALUES ('TEST_MIG2', '5', 'RTH', '2026-08-12T00:00:00+00:00')")
+        conn.commit()
+        got = conn.execute(
+            "SELECT session FROM alerts WHERE symbol='TEST_MIG2'").fetchone()["session"]
+        self.assertEqual(got, "RTH")
+        conn.close()
 
 
 if __name__ == "__main__":

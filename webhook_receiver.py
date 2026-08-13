@@ -82,11 +82,12 @@ def get_db():
     return conn
 
 
-# Columns added by Pine v12.6.21's additive webhook payload (Trade Box zones).
-# Kept here so both the CREATE TABLE (fresh DBs) and the idempotent migration
-# (existing DBs) stay in sync.
-_TRADE_BOX_COLUMNS = {
-    "active_trade": "INTEGER",
+# Columns added to the alerts table over time via migrations. Kept here so both
+# the CREATE TABLE (fresh DBs) and the idempotent migration (existing DBs) stay
+# in sync -- and so an old DB that predates a column is repaired on startup.
+_ALERT_MIGRATION_COLUMNS = {
+    "session": "TEXT",  # migration 001 (Pine v12.6.20)
+    "active_trade": "INTEGER",  # migration 003 (Pine v12.6.21)
     "active_entry": "REAL",
     "active_stop": "REAL",
     "active_target": "REAL",
@@ -95,8 +96,8 @@ _TRADE_BOX_COLUMNS = {
 }
 
 
-def _ensure_trade_box_columns(conn):
-    """Idempotently add Trade Box columns to an existing alerts table.
+def _ensure_alert_columns(conn):
+    """Idempotently add any migrated alerts columns that are missing.
 
     SQLite has no `ADD COLUMN IF NOT EXISTS`, so we consult PRAGMA table_info
     and only ALTER what is missing. Safe to run on every startup against a
@@ -104,7 +105,7 @@ def _ensure_trade_box_columns(conn):
     columns.
     """
     existing = {row["name"] for row in conn.execute("PRAGMA table_info(alerts)")}
-    for name, ddl in _TRADE_BOX_COLUMNS.items():
+    for name, ddl in _ALERT_MIGRATION_COLUMNS.items():
         if name not in existing:
             conn.execute(f"ALTER TABLE alerts ADD COLUMN {name} {ddl}")
 
@@ -192,7 +193,7 @@ def init_db():
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_positions_symbol_status ON positions(symbol, status)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_instruments_position ON position_instruments(position_id)")
-    _ensure_trade_box_columns(conn)
+    _ensure_alert_columns(conn)
     conn.commit()
     conn.close()
 

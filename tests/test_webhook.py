@@ -344,7 +344,19 @@ class WebhookReceiverTests(unittest.TestCase):
         conn = sqlite3.connect(webhook_receiver.DB_PATH)
         cols = {r[1] for r in conn.execute("PRAGMA table_info(alerts)")}
         conn.close()
-        for col in ("active_trade", "active_entry", "active_stop",
+        for col in ("session", "active_trade", "active_entry", "active_stop",
+                    "active_target", "active_trade_source", "active_trade_open_pct"):
+            self.assertIn(col, cols)
+
+    def test_ensure_alert_columns_repairs_old_table(self):
+        import sqlite3
+        old = sqlite3.connect(":memory:")
+        old.row_factory = sqlite3.Row
+        old.execute("CREATE TABLE alerts (id INTEGER PRIMARY KEY, symbol TEXT, timeframe TEXT, close REAL, received_at TEXT)")
+        webhook_receiver._ensure_alert_columns(old)
+        cols = {r[1] for r in old.execute("PRAGMA table_info(alerts)")}
+        old.close()
+        for col in ("session", "active_trade", "active_entry", "active_stop",
                     "active_target", "active_trade_source", "active_trade_open_pct"):
             self.assertIn(col, cols)
 
