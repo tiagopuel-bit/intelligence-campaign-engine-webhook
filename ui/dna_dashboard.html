@@ -68,24 +68,34 @@
 
 
   /* ---- asset accordion: the list IS the detail view, one row expands at a time ---- */
-  .asset-list{display:flex; flex-direction:column; gap:10px; margin-bottom:34px}
-  .asset-row{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--faint); border-radius:11px; overflow:hidden; transition:border-color .14s}
+  /* 3-up grid of bigger cards. An expanded card spans the full row (grid-
+     column 1/-1) and pushes whatever follows it onto the next row -- no JS
+     layout logic needed, CSS grid auto-flow handles it. */
+  .asset-list{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:34px}
+  @media (max-width:980px){ .asset-list{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .asset-list{grid-template-columns:1fr} }
+  .asset-row{background:var(--surface); border:1px solid var(--line); border-left:4px solid var(--faint); border-radius:13px; overflow:hidden; transition:border-color .14s, background .14s}
   .asset-row.critical{border-left-color:var(--critical)}
   .asset-row.watch{border-left-color:var(--warning)}
   .asset-row.opportunity{border-left-color:var(--positive)}
-  .asset-row.expanded{border-color:var(--accent); border-left-color:var(--accent)}
-  .asset-row-head{width:100%; text-align:left; background:transparent; border:none; padding:14px 16px; cursor:pointer; display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-family:inherit; color:inherit}
+  .asset-row.expanded{grid-column:1 / -1; border-color:var(--accent); border-left-color:var(--accent); background:var(--accent-glow)}
+  .asset-row-head{width:100%; height:100%; text-align:left; background:transparent; border:none; padding:20px 22px; cursor:pointer; display:flex; flex-direction:column; gap:8px; font-family:inherit; color:inherit}
+  .asset-row.expanded .asset-row-head{flex-direction:row; align-items:center; flex-wrap:wrap; padding-bottom:16px}
   .asset-row-head:hover{background:var(--surface-2)}
-  .ar-sym{font-family:var(--font-display); font-weight:700; font-size:16px; min-width:64px}
-  .ar-price{font-family:var(--font-display); font-size:12.5px; color:var(--muted); min-width:60px}
-  .ar-state{font-family:var(--font-display); font-size:11.5px; font-weight:700; letter-spacing:.02em; min-width:110px}
+  .asset-row.expanded .asset-row-head:hover{background:transparent}
+  .ar-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; width:100%}
+  .asset-row.expanded .ar-top{width:auto; gap:14px}
+  .ar-sym{font-family:var(--font-display); font-weight:700; font-size:19px}
+  .ar-price{font-family:var(--font-display); font-size:13px; color:var(--muted)}
+  .ar-state{font-family:var(--font-display); font-size:12px; font-weight:700; letter-spacing:.02em}
   .asset-row.critical .ar-state{color:var(--critical)}
   .asset-row.watch .ar-state{color:var(--warning)}
   .asset-row.opportunity .ar-state{color:var(--positive)}
   .asset-row.quiet .ar-state{color:var(--faint)}
-  .ar-why{color:var(--muted); font-size:12.5px; flex:1 1 200px}
-  .ar-chev{font-family:var(--font-display); color:var(--faint); transition:transform .15s; margin-left:auto}
-  .asset-row.expanded .ar-chev{transform:rotate(90deg)}
+  .ar-why{color:var(--muted); font-size:13px; line-height:1.4}
+  .asset-row.expanded .ar-why{flex:1 1 200px}
+  .ar-chev{display:none}
+  .asset-row.expanded .ar-chev{display:block; font-family:var(--font-display); color:var(--accent); transform:rotate(90deg); margin-left:auto}
   .asset-row-body{padding:2px 18px 20px; border-top:1px solid var(--line)}
 
   /* ---- inside an expanded accordion row ---- */
@@ -735,14 +745,16 @@
         var expanded = as.symbol === selected;
         if (!c) {
           return '<div class="asset-row quiet"><button class="asset-row-head" data-sym="' + as.symbol + '">' +
-            '<span class="ar-sym">' + as.symbol + '</span><span class="ar-why">loading…</span></button></div>';
+            '<span class="ar-top"><span class="ar-sym">' + as.symbol + '</span></span><span class="ar-why">loading…</span></button></div>';
         }
         var a = c.assess, states = c.states;
         var px = states.length ? states.slice().sort(function (p, q) { return tfKey(p.timeframe) - tfKey(q.timeframe); })[0].close : null;
         var head = '<button class="asset-row-head" data-sym="' + as.symbol + '">' +
-          '<span class="ar-sym">' + as.symbol + '</span>' +
-          (px != null ? '<span class="ar-price tabular">$' + px + '</span>' : '') +
-          '<span class="ar-state">' + a.headline + '</span>' +
+          '<span class="ar-top">' +
+            '<span class="ar-sym">' + as.symbol + '</span>' +
+            (px != null ? '<span class="ar-price tabular">$' + px + '</span>' : '') +
+            '<span class="ar-state">' + a.headline + '</span>' +
+          '</span>' +
           '<span class="ar-why">' + a.why + '</span>' +
           '<span class="ar-chev">›</span></button>';
         var body = expanded ? '<div class="asset-row-body">' + renderAssetBody(as.symbol) + '</div>' : '';
