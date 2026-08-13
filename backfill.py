@@ -68,10 +68,12 @@ INSERT_SQL = """
 
 
 def _fetch(symbol: str, mult: int, span: str, start: str, end: str) -> list[dict]:
+    import time
+
     rows: list[dict] = []
     url = f"{BASE_URL}/v2/aggs/ticker/{symbol}/range/{mult}/{span}/{start}/{end}"
     params = {"adjusted": "true", "sort": "asc", "limit": "50000", "apiKey": api_key()}
-    for attempt in range(4):
+    while url:
         limiter.wait()
         response = requests.get(url, params=params, timeout=90)
         if response.status_code == 429:
@@ -79,7 +81,6 @@ def _fetch(symbol: str, mult: int, span: str, start: str, end: str) -> list[dict
                 delay = min(65.0, max(1.0, float(response.headers.get("Retry-After", 60))))
             except ValueError:
                 delay = 60.0
-            import time
             time.sleep(delay)
             continue
         if response.status_code != 200:
@@ -88,10 +89,10 @@ def _fetch(symbol: str, mult: int, span: str, start: str, end: str) -> list[dict
         rows.extend(payload.get("results", []))
         nxt = payload.get("next_url")
         if not nxt:
-            return rows
+            break
         url = nxt + ("&" if "?" in nxt else "?") + f"apiKey={api_key()}"
         params = {}
-    raise RuntimeError("Massive rate limited after retries")
+    return rows
 
 
 def _to_df(rows: list[dict]) -> pd.DataFrame:
