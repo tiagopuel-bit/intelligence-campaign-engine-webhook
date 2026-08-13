@@ -414,7 +414,7 @@
 
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
-  var portfolio = [], realized = 0;
+  var portfolio = [], realized = 0, portfolioById = {};
 
   function realizedPnl(p) {
     var sum = 0;
@@ -459,7 +459,11 @@
             .then(function (v) { return { summary: p, valuation: v }; });
         }));
       })
-      .then(function (list) { portfolio = list; });
+      .then(function (list) {
+        portfolio = list;
+        portfolioById = {};
+        list.forEach(function (p) { portfolioById[p.summary.id] = p.valuation; });
+      });
   }
 
   function fmtExpiry(iso) {
@@ -584,15 +588,27 @@
       .then(function (d) {
         var summaries = d.positions || [];
         return Promise.all(summaries.map(function (p) {
-          var detailP = fetch(base + "/positions/" + p.id, { headers: authHeaders() })
+          return fetch(base + "/positions/" + p.id, { headers: authHeaders() })
             .then(function (r) { return r.ok ? r.json() : p; })
-            .catch(function () { return p; });
-          var valP = fetch(base + "/positions/" + p.id + "/valuation", { headers: authHeaders() })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .catch(function () { return null; });
-          return Promise.all([detailP, valP]).then(function (res) {
-            var detail = res[0]; detail.valuation = res[1]; return detail;
-          });
+            .catch(function () { return p; })
+            .then(function (detail) {
+              // Reuse the portfolio's valuation for open positions (already
+              // fetched), skip it for closed ones -- avoids double Massive
+              // calls on every load.
+              if (p.status === "OPEN") {
+                if (portfolioById[p.id] !== undefined) {
+                  detail.valuation = portfolioById[p.id];
+                } else {
+                  return fetch(base + "/positions/" + p.id + "/valuation", { headers: authHeaders() })
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .catch(function () { return null; })
+                    .then(function (v) { detail.valuation = v; return detail; });
+                }
+              } else {
+                detail.valuation = null;
+              }
+              return detail;
+            });
         }));
       })
       .then(function (detailed) { posCache[sym] = detailed; });

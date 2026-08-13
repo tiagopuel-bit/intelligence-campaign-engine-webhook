@@ -22,7 +22,7 @@ from massive_ohlc import api_key, limiter
 
 BASE_URL = "https://api.massive.com"
 CHAIN_TTL_SECONDS = 3600
-QUOTE_TTL_SECONDS = 300
+QUOTE_TTL_SECONDS = 900
 
 
 class UpstreamError(Exception):
