@@ -112,6 +112,22 @@
   .chip.neg{color:var(--critical); background:var(--critical-glow); border-color:transparent}
   .chip.stale{opacity:.45}
 
+  /* ---- DNA's own Trade Box (Pine-side, not your logged position) ---- */
+  .tradebox-wrap{margin-bottom:26px}
+  .tradebox{display:flex; flex-direction:column; gap:8px}
+  .tb-card{border:1px solid var(--accent); background:var(--accent-glow); border-radius:11px; padding:15px 17px}
+  .tb-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px}
+  .tb-tf{font-family:var(--font-display); font-weight:700; font-size:14px}
+  .tb-source{font-family:var(--font-display); font-size:11px; color:var(--accent); text-align:right}
+  .tb-levels{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden}
+  @media (max-width:640px){ .tb-levels{grid-template-columns:repeat(2,1fr)} }
+  .tb-cell{background:var(--surface); padding:9px 12px}
+  .tb-cell .label{margin-bottom:3px}
+  .tb-cell .v{font-family:var(--font-display); font-weight:700; font-size:14px}
+  .tb-cell .v.pos{color:var(--positive)}
+  .tb-cell .v.neg{color:var(--critical)}
+  .tb-none{color:var(--faint); font-size:12.5px; padding:14px 16px; border:1px dashed var(--line); border-radius:10px}
+
   /* ---- stage 3: what to do ---- */
   .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
   .action{display:grid; grid-template-columns:26px 1fr; gap:12px; align-items:start; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
@@ -370,6 +386,37 @@
       }).join("") + '</div>';
   }
 
+  // DNA's own Trade Box (Pine-side, per timeframe) -- distinct from a
+  // manually logged position. Only shows up once v12.6.21 is actually
+  // deployed to a chart; until then active_trade is false/null everywhere,
+  // which renders as the "no box open" state below, not an error.
+  function tradeBoxesFor(states) {
+    return states
+      .filter(function (r) { return r.active_trade; })
+      .sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); });
+  }
+
+  function renderTradeBox(sym, states) {
+    var boxes = tradeBoxesFor(states);
+    var body = boxes.length
+      ? boxes.map(function (r) {
+          var pl = r.active_trade_open_pct;
+          var plStr = (pl != null && pl !== "N/A") ? (pl >= 0 ? "+" : "") + Number(pl).toFixed(1) + "%" : "—";
+          var plTone = pl != null && pl !== "N/A" ? (pl >= 0 ? "pos" : "neg") : "";
+          return '<div class="tb-card"><div class="tb-top"><span class="tb-tf">' + tfLabel(r.timeframe) + ' box open</span>' +
+            '<span class="tb-source">' + (r.active_trade_source || "—") + '</span></div>' +
+            '<div class="tb-levels">' +
+              '<div class="tb-cell"><div class="label">Entry</div><div class="v">' + (r.active_entry != null ? "$" + r.active_entry : "—") + '</div></div>' +
+              '<div class="tb-cell"><div class="label">Stop</div><div class="v">' + (r.active_stop != null ? "$" + r.active_stop : "—") + '</div></div>' +
+              '<div class="tb-cell"><div class="label">Target</div><div class="v">' + (r.active_target != null ? "$" + r.active_target : "—") + '</div></div>' +
+              '<div class="tb-cell"><div class="label">Open P/L</div><div class="v ' + plTone + '">' + plStr + '</div></div>' +
+            '</div></div>';
+        }).join("")
+      : '<div class="tb-none">No DNA Trade Box currently open on ' + sym + ', on any timeframe. This is the engine\'s own signal-driven box, not a position you\'ve logged.</div>';
+    return '<div class="tradebox-wrap"><div class="stage-head"><h2>DNA Trade Box</h2><span class="hint">engine-tracked, not your logged position</span></div>' +
+      '<div class="tradebox">' + body + '</div></div>';
+  }
+
   function renderDetail(sym) {
     var c = cache[sym];
     if (!c) return '<div class="msg">loading ' + sym + '…</div>';
@@ -423,6 +470,7 @@
         (px != null ? '<span class="px tabular">$' + px + '</span>' : "") + '</div>' +
       '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
       '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>' +
+      renderTradeBox(sym, states) +
       '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
       '<div class="flow">' + flowHtml + '</div>' +
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
