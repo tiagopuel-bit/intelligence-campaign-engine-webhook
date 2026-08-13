@@ -586,7 +586,7 @@ def _add_cors_headers(response):
     """
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, DELETE, OPTIONS"
     return response
 
 
@@ -1003,6 +1003,39 @@ def update_instrument(position_id, iid):
     updated = conn.execute("SELECT * FROM position_instruments WHERE id=?", (iid,)).fetchone()
     conn.close()
     return jsonify(positions.shape_instrument(updated))
+
+
+@app.route("/positions/<int:position_id>", methods=["DELETE"])
+def delete_position(position_id):
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    conn = get_db()
+    row = conn.execute("SELECT id FROM positions WHERE id=?", (position_id,)).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": "position not found"}), 404
+    conn.execute("DELETE FROM position_instruments WHERE position_id=?", (position_id,))
+    conn.execute("DELETE FROM positions WHERE id=?", (position_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"deleted": position_id})
+
+
+@app.route("/positions/<int:position_id>/instruments/<int:iid>", methods=["DELETE"])
+def delete_instrument(position_id, iid):
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    conn = get_db()
+    row = conn.execute(
+        "SELECT id FROM position_instruments WHERE id=? AND position_id=?", (iid, position_id),
+    ).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": "instrument not found"}), 404
+    conn.execute("DELETE FROM position_instruments WHERE id=?", (iid,))
+    conn.commit()
+    conn.close()
+    return jsonify({"deleted": iid})
 
 
 @app.route("/positions/<int:position_id>/valuation", methods=["GET"])

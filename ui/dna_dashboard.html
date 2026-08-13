@@ -133,7 +133,7 @@
   .pos-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:8px}
   .pos-status{font-family:var(--font-display); font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
   .pos-date{font-size:11.5px; color:var(--faint)}
-  .pos-close{margin-left:auto; background:var(--critical-glow); color:var(--critical); border:1px solid color-mix(in srgb,var(--critical) 40%,transparent); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600}
+  .pos-close{background:var(--critical-glow); color:var(--critical); border:1px solid color-mix(in srgb,var(--critical) 40%,transparent); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600}
   .pos-close:hover{background:color-mix(in srgb,var(--critical) 18%,transparent)}
   .pos-legs{display:flex; flex-wrap:wrap; gap:5px}
   .pos-stats{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:11px}
@@ -151,6 +151,28 @@
   .pos-opt-detail{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:5px 14px; margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); font-size:11.5px; color:var(--muted)}
   .pos-opt-detail b{font-family:var(--font-display); color:var(--faint); font-weight:600; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; display:block}
   .pos-und{font-size:11px; color:var(--faint); margin-top:8px; font-family:var(--font-display)}
+  .stat-value.pos{color:var(--positive)}
+  .stat-value.neg{color:var(--critical)}
+  .pos-del{margin-left:auto; background:transparent; color:var(--faint); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-size:12px}
+  .pos-del:hover{color:var(--critical); border-color:var(--critical)}
+
+  /* ---- portfolio (top of dashboard) ---- */
+  .portfolio{margin-bottom:34px}
+  .pf-summary{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:10px}
+  .pf-rows{display:flex; flex-direction:column; gap:6px}
+  .pf-row{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:9px 13px; cursor:pointer}
+  .pf-row:hover{border-color:var(--accent)}
+  .pf-sym{font-family:var(--font-display); font-weight:700; font-size:14px}
+  .pf-dir{font-size:11px; font-weight:700}
+  .pf-dir.pos{color:var(--positive)}
+  .pf-dir.neg{color:var(--critical)}
+  .pf-legs{font-size:11.5px; color:var(--muted)}
+  .pf-val{margin-left:auto; font-family:var(--font-display); font-size:13px}
+  .pf-pnl{font-family:var(--font-display); font-weight:700; font-size:13px; min-width:72px; text-align:right}
+  .pf-pnl.pos{color:var(--positive)}
+  .pf-pnl.neg{color:var(--critical)}
+  .pf-del{background:transparent; color:var(--faint); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-size:12px}
+  .pf-del:hover{color:var(--critical); border-color:var(--critical)}
 
   /* ---- stage 3: what to do ---- */
   .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
@@ -392,6 +414,82 @@
 
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
+  var portfolio = [];
+
+  function loadPortfolio() {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    return fetch(base + "/positions?status=OPEN", { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : { positions: [] }; })
+      .catch(function () { return { positions: [] }; })
+      .then(function (d) {
+        var summaries = d.positions || [];
+        return Promise.all(summaries.map(function (p) {
+          return fetch(base + "/positions/" + p.id + "/valuation", { headers: authHeaders() })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; })
+            .then(function (v) { return { summary: p, valuation: v }; });
+        }));
+      })
+      .then(function (list) { portfolio = list; });
+  }
+
+  function renderPortfolio() {
+    var totalValue = 0, today = 0, total = 0;
+    portfolio.forEach(function (p) {
+      if (p.valuation && p.valuation.summary) {
+        totalValue += p.valuation.summary.total_value || 0;
+        today += p.valuation.summary.total_today_pnl || 0;
+        total += p.valuation.summary.total_pnl || 0;
+      }
+    });
+    var rows = portfolio.map(function (p) {
+      var s = p.summary, v = p.valuation ? p.valuation.summary : null;
+      var dir = s.direction === "LONG" ? "▲" : "▼";
+      var legs = v ? (v.options_contracts + " contracts" + (v.stock_shares ? " + " + v.stock_shares + " shares" : "")) : "…";
+      var val = v ? fmtMoney(v.total_value) : "—";
+      var pnl = v ? v.total_pnl : null;
+      return '<div class="pf-row" data-sym="' + s.symbol + '">' +
+        '<span class="pf-sym">' + s.symbol + '</span>' +
+        '<span class="pf-dir ' + (s.direction === "LONG" ? "pos" : "neg") + '">' + dir + ' ' + s.direction + '</span>' +
+        '<span class="pf-legs">' + legs + '</span>' +
+        '<span class="pf-val tabular">' + val + '</span>' +
+        '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
+        '<button class="pf-del" data-id="' + s.id + '" title="Delete position">✕</button>' +
+        '</div>';
+    }).join("");
+    return '<div class="portfolio">' +
+      '<div class="stage-head"><h2>Portfolio</h2><span class="hint">all open positions · click a row to jump to it</span></div>' +
+      '<div class="pf-summary">' +
+        '<div class="pos-stat"><div class="stat-label">Total value</div><div class="stat-value tabular">' + fmtMoney(totalValue) + '</div></div>' +
+        '<div class="pos-stat"><div class="stat-label">Today</div><div class="stat-value tabular ' + (today >= 0 ? "pos" : "neg") + '">' + fmtSigned(today) + '</div></div>' +
+        '<div class="pos-stat"><div class="stat-label">Total return</div><div class="stat-value tabular ' + (total >= 0 ? "pos" : "neg") + '">' + fmtSigned(total) + '</div></div>' +
+      '</div>' +
+      '<div class="pf-rows">' + (rows || '<div class="position-placeholder">No open positions.</div>') + '</div>' +
+      '</div>';
+  }
+
+  function wirePortfolio() {
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-row"), function (row) {
+      row.addEventListener("click", function (e) {
+        if (e.target.closest(".pf-del")) return;
+        var sym = row.dataset.sym;
+        selected = sym;
+        Promise.all([loadSymbol(sym, false), loadPositions(sym)]).then(paint);
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-del"), function (b) {
+      b.addEventListener("click", function () {
+        var id = b.dataset.id;
+        if (!window.confirm("Delete this position and all its legs?")) return;
+        var base = baseInput.value.trim().replace(/\/$/, "");
+        fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
+          .then(function () {
+            posCache = {};
+            return Promise.all([loadPortfolio(), selected ? loadPositions(selected) : Promise.resolve()]);
+          }).then(paint);
+      });
+    });
+  }
 
   function renderTriage() {
     var ranked = assets.slice().sort(function (x, y) {
@@ -502,7 +600,8 @@
     var dir = p.direction === "LONG" ? "▲ LONG" : "▼ SHORT";
     var dirCls = p.direction === "LONG" ? "pos" : "neg";
     var open = p.status === "OPEN";
-    var closeBtn = open ? '<button class="pos-close" data-id="' + p.id + '">Close position</button>' : "";
+    var actions = (open ? '<button class="pos-close" data-id="' + p.id + '">Close</button>' : "") +
+      '<button class="pos-del" data-id="' + p.id + '" title="Delete position">✕</button>';
     var body;
     if (p.valuation && p.valuation.summary) {
       body = renderValuationBody(p.symbol, p.valuation);
@@ -520,7 +619,7 @@
     return '<div class="pos-card' + (open ? "" : " closed") + '">' +
       '<div class="pos-top"><span class="chip ' + dirCls + '">' + dir + '</span>' +
       '<span class="pos-status">' + p.status + '</span>' +
-      '<span class="pos-date">opened ' + age(p.opened_at).text + '</span>' + closeBtn + '</div>' + body + '</div>';
+      '<span class="pos-date">opened ' + age(p.opened_at).text + '</span>' + actions + '</div>' + body + '</div>';
   }
 
   function renderPositionForm(sym) {
@@ -649,6 +748,19 @@
         }).then(function () { return loadPositions(sym).then(paint); });
       });
     });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".pos-del"), function (b) {
+      b.addEventListener("click", function () {
+        var id = b.dataset.id;
+        if (!window.confirm("Delete this " + sym + " position and all its legs?")) return;
+        var base = baseInput.value.trim().replace(/\/$/, "");
+        fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
+          .then(function () {
+            posCache = {};
+            return Promise.all([loadPortfolio(), loadPositions(sym)]).then(paint);
+          });
+      });
+    });
   }
 
   function renderDetail(sym) {
@@ -716,7 +828,8 @@
   }
 
   function paint() {
-    app.innerHTML = renderTriage() + (selected ? renderDetail(selected) : "");
+    app.innerHTML = renderPortfolio() + renderTriage() + (selected ? renderDetail(selected) : "");
+    wirePortfolio();
     Array.prototype.forEach.call(document.querySelectorAll(".tri-card"), function (b) {
       b.addEventListener("click", function () {
         selected = b.dataset.sym;
@@ -763,7 +876,7 @@
             return LEVEL_ORDER[cache[x.symbol].assess.level] - LEVEL_ORDER[cache[y.symbol].assess.level];
           });
           if (!selected || !cache[selected]) selected = ranked[0].symbol;
-          return loadPositions(selected);
+          return Promise.all([loadPortfolio(), loadPositions(selected)]);
         }).then(function () { paint(); });
       })
       .catch(function (e) {

@@ -496,6 +496,29 @@ class WebhookReceiverTests(unittest.TestCase):
                                 content_type="application/json", headers=self._state_headers())
         self.assertEqual(resp.status_code, 404)
 
+    def test_position_delete(self):
+        pid = self._create_position(symbol="DELTEST").get_json()["id"]
+        self.client.post(f"/positions/{pid}/instruments",
+                         data=json.dumps({"type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+                                          "quantity": 1, "entry_price": 0.30, "entry_time": "2026-08-13T14:30:00Z"}),
+                         content_type="application/json", headers=self._state_headers())
+        r = self.client.delete(f"/positions/{pid}", headers=self._state_headers())
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(self.client.get(f"/positions/{pid}", headers=self._state_headers()).status_code, 404)
+
+    def test_instrument_delete(self):
+        pid = self._create_position(symbol="DELI").get_json()["id"]
+        iid = self.client.post(f"/positions/{pid}/instruments",
+                               data=json.dumps({"type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+                                                "quantity": 1, "entry_price": 0.30, "entry_time": "2026-08-13T14:30:00Z"}),
+                               content_type="application/json", headers=self._state_headers()).get_json()["id"]
+        r = self.client.delete(f"/positions/{pid}/instruments/{iid}", headers=self._state_headers())
+        self.assertEqual(r.status_code, 200)
+        detail = self.client.get(f"/positions/{pid}", headers=self._state_headers()).get_json()
+        self.assertEqual(detail["instrument_count"], 1)
+        self.assertEqual(self.client.delete(f"/positions/{pid}/instruments/{iid}",
+                                            headers=self._state_headers()).status_code, 404)
+
     # =========================================================================
     # Options chain + valuation (near-live Massive enrichment)
     # =========================================================================
