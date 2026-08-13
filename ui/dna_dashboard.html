@@ -66,26 +66,29 @@
   .stage-head h2{font-family:var(--font-display); font-size:12px; letter-spacing:.07em; text-transform:uppercase; margin:0; color:var(--text)}
   .stage-head .hint{font-size:12px; color:var(--faint)}
 
-  .triage{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; margin-bottom:38px}
-  .tri-card{text-align:left; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--faint); border-radius:10px; padding:12px 14px; transition:border-color .14s, background .14s}
-  .tri-card:hover{background:var(--surface-2)}
-  .tri-card.sel{border-color:var(--accent); border-left-color:var(--accent); background:var(--accent-glow)}
-  .tri-card.critical{border-left-color:var(--critical)}
-  .tri-card.watch{border-left-color:var(--warning)}
-  .tri-card.opportunity{border-left-color:var(--positive)}
-  .tri-top{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
-  .tri-sym{font-family:var(--font-display); font-weight:700; font-size:16px}
-  .tri-state{font-size:11px; font-weight:700; font-family:var(--font-display); letter-spacing:.02em}
-  .tri-card.critical .tri-state{color:var(--critical)}
-  .tri-card.watch .tri-state{color:var(--warning)}
-  .tri-card.opportunity .tri-state{color:var(--positive)}
-  .tri-card.quiet .tri-state{color:var(--faint)}
-  .tri-why{font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.4}
 
-  /* ---- stage 2: the selected asset's flow ---- */
-  .asset-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px}
-  .asset-head .sym{font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:-.01em}
-  .asset-head .px{font-family:var(--font-display); font-size:15px; color:var(--muted)}
+  /* ---- asset accordion: the list IS the detail view, one row expands at a time ---- */
+  .asset-list{display:flex; flex-direction:column; gap:10px; margin-bottom:34px}
+  .asset-row{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--faint); border-radius:11px; overflow:hidden; transition:border-color .14s}
+  .asset-row.critical{border-left-color:var(--critical)}
+  .asset-row.watch{border-left-color:var(--warning)}
+  .asset-row.opportunity{border-left-color:var(--positive)}
+  .asset-row.expanded{border-color:var(--accent); border-left-color:var(--accent)}
+  .asset-row-head{width:100%; text-align:left; background:transparent; border:none; padding:14px 16px; cursor:pointer; display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-family:inherit; color:inherit}
+  .asset-row-head:hover{background:var(--surface-2)}
+  .ar-sym{font-family:var(--font-display); font-weight:700; font-size:16px; min-width:64px}
+  .ar-price{font-family:var(--font-display); font-size:12.5px; color:var(--muted); min-width:60px}
+  .ar-state{font-family:var(--font-display); font-size:11.5px; font-weight:700; letter-spacing:.02em; min-width:110px}
+  .asset-row.critical .ar-state{color:var(--critical)}
+  .asset-row.watch .ar-state{color:var(--warning)}
+  .asset-row.opportunity .ar-state{color:var(--positive)}
+  .asset-row.quiet .ar-state{color:var(--faint)}
+  .ar-why{color:var(--muted); font-size:12.5px; flex:1 1 200px}
+  .ar-chev{font-family:var(--font-display); color:var(--faint); transition:transform .15s; margin-left:auto}
+  .asset-row.expanded .ar-chev{transform:rotate(90deg)}
+  .asset-row-body{padding:2px 18px 20px; border-top:1px solid var(--line)}
+
+  /* ---- inside an expanded accordion row ---- */
   .verdict{font-size:19px; line-height:1.45; max-width:60ch; margin:0 0 4px; text-wrap:balance}
   .verdict .em{font-weight:700}
   .verdict.critical .em{color:var(--critical)}
@@ -156,8 +159,11 @@
   .pos-del{margin-left:auto; background:transparent; color:var(--faint); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-size:12px}
   .pos-del:hover{color:var(--critical); border-color:var(--critical)}
 
-  /* ---- portfolio (top of dashboard) ---- */
-  .portfolio{margin-bottom:34px}
+  /* ---- portfolio strip: whole-account totals, one row, nothing more ---- */
+  .portfolio-strip{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:28px}
+  .portfolio-strip .pos-stat{flex:1; min-width:130px}
+
+  /* ---- per-asset holdings (inside an expanded accordion row) ---- */
   .pf-summary{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:10px}
   .pf-rows{display:flex; flex-direction:column; gap:6px}
   .pf-item{border:1px solid var(--line); border-radius:9px; background:var(--surface)}
@@ -626,7 +632,11 @@
       '<div class="pf-rows">' + rows + '</div></div>';
   }
 
-  function renderPortfolio() {
+  // Whole-account strip only -- four numbers, one row. Per-asset holdings
+  // moved into that asset's own expanded accordion row (renderAssetHoldings)
+  // so this never grows past a single line no matter how many positions
+  // exist across however many assets.
+  function renderPortfolioStrip() {
     var totalValue = 0, today = 0, total = 0;
     portfolio.forEach(function (p) {
       if (p.valuation && p.valuation.summary) {
@@ -635,18 +645,23 @@
         total += p.valuation.summary.total_pnl || 0;
       }
     });
-    var h = deriveHoldings();
-    return '<div class="portfolio">' +
-      '<div class="stage-head"><h2>Portfolio</h2><span class="hint">open positions · click a row to expand</span></div>' +
-      '<div class="pf-summary">' +
-        '<div class="pos-stat"><div class="stat-label">Total value</div><div class="stat-value tabular">' + fmtMoney(totalValue) + '</div></div>' +
-        '<div class="pos-stat"><div class="stat-label">Today</div><div class="stat-value tabular ' + (today >= 0 ? "pos" : "neg") + '">' + fmtSigned(today) + '</div></div>' +
-        '<div class="pos-stat"><div class="stat-label">Total return</div><div class="stat-value tabular ' + (total >= 0 ? "pos" : "neg") + '">' + fmtSigned(total) + '</div></div>' +
-        '<div class="pos-stat"><div class="stat-label">Realized P&L</div><div class="stat-value tabular ' + (realized >= 0 ? "pos" : "neg") + '">' + fmtSigned(realized) + '</div></div>' +
-      '</div>' +
-      renderSharesSection(h.shares) +
-      renderOptionsSection(h.strategies) +
+    return '<div class="portfolio-strip">' +
+      '<div class="pos-stat"><div class="stat-label">Total value</div><div class="stat-value tabular">' + fmtMoney(totalValue) + '</div></div>' +
+      '<div class="pos-stat"><div class="stat-label">Today</div><div class="stat-value tabular ' + (today >= 0 ? "pos" : "neg") + '">' + fmtSigned(today) + '</div></div>' +
+      '<div class="pos-stat"><div class="stat-label">Total return</div><div class="stat-value tabular ' + (total >= 0 ? "pos" : "neg") + '">' + fmtSigned(total) + '</div></div>' +
+      '<div class="pos-stat"><div class="stat-label">Realized P&L</div><div class="stat-value tabular ' + (realized >= 0 ? "pos" : "neg") + '">' + fmtSigned(realized) + '</div></div>' +
       '</div>';
+  }
+
+  // This asset's own holdings only -- same section renderers as before,
+  // just filtered to one symbol and dropped inside its accordion row
+  // instead of living in one global list.
+  function renderAssetHoldings(sym) {
+    var h = deriveHoldings();
+    var shares = h.shares.filter(function (s) { return s.symbol === sym; });
+    var strategies = h.strategies.filter(function (o) { return o.symbol === sym; });
+    if (!shares.length && !strategies.length) return "";
+    return renderSharesSection(shares) + renderOptionsSection(strategies);
   }
 
   function closeHolding(pid, legIds, label) {
@@ -704,20 +719,34 @@
     });
   }
 
-  function renderTriage() {
+  // The asset list IS the detail view now -- one row per tracked asset,
+  // ranked worst-first same as before. Collapsed by default; the selected
+  // one expands in place (renderAssetBody) instead of a separate section
+  // living elsewhere on the page. One expanded at a time, click to switch.
+  function renderAssetList() {
     var ranked = assets.slice().sort(function (x, y) {
       var ax = cache[x.symbol], ay = cache[y.symbol];
       var lx = ax ? LEVEL_ORDER[ax.assess.level] : 9, ly = ay ? LEVEL_ORDER[ay.assess.level] : 9;
       return lx - ly || x.symbol.localeCompare(y.symbol);
     });
-    return '<div class="stage-head"><h2>Needs attention</h2><span class="hint">ranked by urgency, worst first</span></div>' +
-      '<div class="triage">' + ranked.map(function (as) {
+    return '<div class="stage-head"><h2>Assets</h2><span class="hint">ranked by urgency · click one to open it</span></div>' +
+      '<div class="asset-list">' + ranked.map(function (as) {
         var c = cache[as.symbol];
-        if (!c) return '<button class="tri-card quiet" data-sym="' + as.symbol + '"><div class="tri-top"><span class="tri-sym">' + as.symbol + '</span></div><div class="tri-why">loading…</div></button>';
-        var a = c.assess;
-        return '<button class="tri-card ' + a.level + (as.symbol === selected ? " sel" : "") + '" data-sym="' + as.symbol + '">' +
-          '<div class="tri-top"><span class="tri-sym">' + as.symbol + '</span><span class="tri-state">' + a.headline + '</span></div>' +
-          '<div class="tri-why">' + a.why + '</div></button>';
+        var expanded = as.symbol === selected;
+        if (!c) {
+          return '<div class="asset-row quiet"><button class="asset-row-head" data-sym="' + as.symbol + '">' +
+            '<span class="ar-sym">' + as.symbol + '</span><span class="ar-why">loading…</span></button></div>';
+        }
+        var a = c.assess, states = c.states;
+        var px = states.length ? states.slice().sort(function (p, q) { return tfKey(p.timeframe) - tfKey(q.timeframe); })[0].close : null;
+        var head = '<button class="asset-row-head" data-sym="' + as.symbol + '">' +
+          '<span class="ar-sym">' + as.symbol + '</span>' +
+          (px != null ? '<span class="ar-price tabular">$' + px + '</span>' : '') +
+          '<span class="ar-state">' + a.headline + '</span>' +
+          '<span class="ar-why">' + a.why + '</span>' +
+          '<span class="ar-chev">›</span></button>';
+        var body = expanded ? '<div class="asset-row-body">' + renderAssetBody(as.symbol) + '</div>' : '';
+        return '<div class="asset-row ' + a.level + (expanded ? ' expanded' : '') + '">' + head + body + '</div>';
       }).join("") + '</div>';
   }
 
@@ -972,29 +1001,25 @@
 
   }
 
-  function renderAssetHeader(sym) {
-    var c = cache[sym];
-    if (!c) return '';
-    var a = c.assess, states = c.states;
-    var px = states.length ? states.slice().sort(function (p, q) { return tfKey(p.timeframe) - tfKey(q.timeframe); })[0].close : null;
-    return '<div class="asset-head"><span class="sym">' + sym + '</span>' +
-      (px != null ? '<span class="px tabular">$' + px + '</span>' : "") + '</div>' +
-      '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
-      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
-  }
-
-  function renderOpenPosition(sym) {
-    return '<div class="open-wrap">' +
-      '<button class="open-pos-btn">+ Open a position in ' + sym + '</button>' +
-      '<div class="open-pos-form" style="display:none">' + renderPositionForm(sym) + '</div>' +
-      '</div>';
-  }
-
-  function renderDetail(sym) {
+  // Everything for one expanded asset row: verdict, open-position control,
+  // this asset's own holdings (if any), the three-step flow, actions, and
+  // the raw table. Replaces what used to be three separate top-level
+  // sections (asset header / open-position / detail) scattered around the
+  // page -- now it all lives inside that one asset's accordion row.
+  function renderAssetBody(sym) {
     var c = cache[sym];
     if (!c) return '<div class="msg">loading ' + sym + '…</div>';
     var a = c.assess, t = a.tiers, states = c.states;
-    var px = states.length ? states.slice().sort(function (p, q) { return tfKey(p.timeframe) - tfKey(q.timeframe); })[0].close : null;
+
+    var verdictHtml = '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
+      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
+
+    var openPosHtml = '<div class="open-wrap">' +
+      '<button class="open-pos-btn" data-sym="' + sym + '">+ Open a position in ' + sym + '</button>' +
+      '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div>' +
+      '</div>';
+
+    var holdingsHtml = renderAssetHoldings(sym);
 
     // Three-step flow: campaign -> opportunity -> right now.
     var steps = [
@@ -1039,7 +1064,8 @@
         '<td class="tabular">' + ag.text + '</td></tr>';
     }).join("");
 
-    return '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
+    return verdictHtml + openPosHtml + holdingsHtml +
+      '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
       '<div class="flow">' + flowHtml + '</div>' +
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
       '<div class="actions">' + actHtml + '</div>' +
@@ -1050,13 +1076,15 @@
   }
 
   function paint() {
-    app.innerHTML = (selected ? renderAssetHeader(selected) : "") +
-      (selected ? renderOpenPosition(selected) : "") +
-      renderPortfolio() + renderTriage() + (selected ? renderDetail(selected) : "");
+    app.innerHTML = renderPortfolioStrip() + renderAssetList();
     wirePortfolio();
-    Array.prototype.forEach.call(document.querySelectorAll(".tri-card"), function (b) {
+    // Row header click: expanding a different row switches to it; clicking
+    // the already-expanded row's header collapses it back to the list.
+    Array.prototype.forEach.call(document.querySelectorAll(".asset-row-head"), function (b) {
       b.addEventListener("click", function () {
-        selected = b.dataset.sym;
+        var sym = b.dataset.sym;
+        selected = (selected === sym) ? null : sym;
+        if (!selected) { paint(); return; }
         loadSymbol(selected, false).then(function () { paint(); });
       });
     });
