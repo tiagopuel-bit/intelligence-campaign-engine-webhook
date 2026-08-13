@@ -376,6 +376,16 @@ class WebhookReceiverTests(unittest.TestCase):
         resp = self.client.get("/positions")
         self.assertEqual(resp.status_code, 401)
 
+    def test_cors_headers_cover_positions_writes(self):
+        resp = self.client.post("/positions", data="{}", content_type="application/json",
+                                headers=self._state_headers())
+        self.assertEqual(resp.headers.get("Access-Control-Allow-Origin"), "*")
+        self.assertIn("POST", resp.headers.get("Access-Control-Allow-Methods", ""))
+        self.assertIn("PATCH", resp.headers.get("Access-Control-Allow-Methods", ""))
+        self.assertIn("Content-Type", resp.headers.get("Access-Control-Allow-Headers", ""))
+        pre = self.client.options("/positions")
+        self.assertIn("POST", pre.headers.get("Access-Control-Allow-Methods", ""))
+
     def test_position_create_and_get(self):
         resp = self._create_position()
         self.assertEqual(resp.status_code, 201)

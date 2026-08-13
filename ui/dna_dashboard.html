@@ -127,6 +127,7 @@
   .pos-form button{background:var(--accent); color:#04211b; border:none; border-radius:7px; padding:7px 16px; font-weight:700; font-size:12.5px}
   .pos-form button:hover{filter:brightness(1.08)}
   .pos-form-err{width:100%; color:var(--critical); font-size:12px; font-family:var(--font-display)}
+  .pos-hint{width:100%; color:var(--faint); font-size:11px; line-height:1.5}
   .pos-card{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--positive); border-radius:10px; padding:12px 14px; margin-bottom:9px}
   .pos-card.closed{border-left-color:var(--faint); opacity:.72}
   .pos-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:8px}
@@ -442,15 +443,16 @@
 
   function renderPositionForm(sym) {
     return '<form class="pos-form" data-sym="' + sym + '">' +
-      '<select name="direction"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>' +
-      '<select name="type"><option value="SHARE">Shares</option><option value="CALL">Call</option><option value="PUT">Put</option></select>' +
-      '<input name="quantity" type="number" min="0" step="any" placeholder="qty" required>' +
-      '<input name="entry_price" type="number" min="0" step="any" placeholder="entry $" required>' +
-      '<input name="strike" type="number" min="0" step="any" placeholder="strike" class="opt-field" style="display:none">' +
-      '<input name="expiration" type="text" placeholder="expiry YYYY-MM-DD" class="opt-field" style="display:none">' +
-      '<input name="entry_time" type="datetime-local">' +
-      '<input name="notes" type="text" placeholder="notes">' +
+      '<select name="direction" title="Trade direction"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>' +
+      '<select name="type" title="Instrument — pick Call/Put to reveal strike + expiry"><option value="SHARE">Shares</option><option value="CALL">Call</option><option value="PUT">Put</option></select>' +
+      '<input name="quantity" type="number" min="0" step="any" placeholder="qty" title="Number of shares or contracts" required>' +
+      '<input name="entry_price" type="number" min="0" step="any" placeholder="entry $" title="Entry price per share/contract" required>' +
+      '<input name="strike" type="number" min="0" step="any" placeholder="strike $" title="Option strike price" class="opt-field" style="display:none">' +
+      '<input name="expiration" type="text" placeholder="option expiry (YYYY-MM-DD)" title="Option expiration date" class="opt-field" style="display:none">' +
+      '<input name="entry_time" type="datetime-local" title="When you entered the position — leave blank to use now">' +
+      '<input name="notes" type="text" placeholder="notes" title="Optional note">' +
       '<button type="submit">Open position</button>' +
+      '<div class="pos-hint">"entry time" is when you entered the trade (blank = now). Strike + expiry only appear for Call/Put.</div>' +
       '<div class="pos-form-err" style="display:none"></div>' +
       '</form>';
   }

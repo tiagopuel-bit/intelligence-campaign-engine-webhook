@@ -557,19 +557,19 @@ def get_ohlc(symbol, timeframe):
 
 @app.after_request
 def _add_cors_headers(response):
-    """Permissive CORS on GET read endpoints only.
+    """Permissive CORS for the static dashboard/landing pages.
 
-    The DNA Asset Landing Page is a static, read-only render layer that may
-    be served from a different origin than the API (e.g. opened as a local
-    file, or hosted separately from Railway). These endpoints are already
-    gated by state_is_authorized() (STATE_API_TOKEN or loopback) -- CORS
-    here only affects which browser origins may read the response, not
-    whether the request itself is authorized.
+    These pages may be opened from any origin (a local file, or hosted
+    separately from Railway) and talk to the API in the browser. Every
+    endpoint below is gated by state_is_authorized() (STATE_API_TOKEN or
+    loopback) -- CORS here only affects which browser origins may read or
+    send a request, not whether the request itself is authorized. POST/PATCH
+    are the positions write endpoints; Content-Type must be allowed so the
+    browser's JSON preflight (OPTIONS) is not blocked.
     """
-    if request.method in ("GET", "OPTIONS"):
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Headers"] = "Authorization"
-        response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Authorization, Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PATCH, OPTIONS"
     return response
 
 
