@@ -303,6 +303,50 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(massive_ohlc.resolve_timeframe("5"), "5m")
         self.assertIsNone(massive_ohlc.resolve_timeframe("99m"))
 
+    # =========================================================================
+    # Trade Box zone fields (Pine v12.6.21 additive payload)
+    # =========================================================================
+
+    def test_trade_box_fields_roundtrip(self):
+        self._post(self._strong_start_payload(
+            symbol="TBZONE", timeframe="240",
+            active_trade=1, active_entry=2.53, active_stop=2.38, active_target=3.01,
+            active_trade_source="BREAKOUT", active_trade_open_pct=0.5,
+        ))
+        resp = self.client.get("/state/TBZONE/240", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertEqual(data["active_trade"], True)
+        self.assertEqual(data["active_entry"], 2.53)
+        self.assertEqual(data["active_stop"], 2.38)
+        self.assertEqual(data["active_target"], 3.01)
+        self.assertEqual(data["active_trade_source"], "BREAKOUT")
+        self.assertEqual(data["active_trade_open_pct"], 0.5)
+
+    def test_trade_box_na_fields_parse_to_none(self):
+        self._post(self._strong_start_payload(
+            symbol="TBNA", timeframe="240",
+            active_trade=0, active_entry="N/A", active_stop="N/A", active_target="N/A",
+            active_trade_source="N/A", active_trade_open_pct="N/A",
+        ))
+        resp = self.client.get("/state/TBNA/240", headers=self._state_headers())
+        data = resp.get_json()
+        self.assertEqual(data["active_trade"], False)
+        self.assertIsNone(data["active_entry"])
+        self.assertIsNone(data["active_stop"])
+        self.assertIsNone(data["active_target"])
+        self.assertIsNone(data["active_trade_source"])
+        self.assertIsNone(data["active_trade_open_pct"])
+
+    def test_trade_box_columns_present_after_init(self):
+        import sqlite3
+        conn = sqlite3.connect(webhook_receiver.DB_PATH)
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(alerts)")}
+        conn.close()
+        for col in ("active_trade", "active_entry", "active_stop",
+                    "active_target", "active_trade_source", "active_trade_open_pct"):
+            self.assertIn(col, cols)
+
     def test_poll_can_build_campaign_state(self):
         self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
         from poll_and_recommend import build_campaign_state

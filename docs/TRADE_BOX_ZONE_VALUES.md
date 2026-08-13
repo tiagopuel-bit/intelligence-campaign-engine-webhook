@@ -1,6 +1,6 @@
 # Trade Box Zone Values — Source Confirmation
 
-**Status:** CONFIRMED — Pine additive fields required (not present today).
+**Status:** SHIPPED — `DNA_v12.6.21.pine` emits the fields; receiver columns + `/state_all` output wired (2026-08-13).
 
 ## Question (from `CHART_OHLC_TASK_PACKET.md`)
 

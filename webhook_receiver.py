@@ -80,6 +80,33 @@ def get_db():
     return conn
 
 
+# Columns added by Pine v12.6.21's additive webhook payload (Trade Box zones).
+# Kept here so both the CREATE TABLE (fresh DBs) and the idempotent migration
+# (existing DBs) stay in sync.
+_TRADE_BOX_COLUMNS = {
+    "active_trade": "INTEGER",
+    "active_entry": "REAL",
+    "active_stop": "REAL",
+    "active_target": "REAL",
+    "active_trade_source": "TEXT",
+    "active_trade_open_pct": "REAL",
+}
+
+
+def _ensure_trade_box_columns(conn):
+    """Idempotently add Trade Box columns to an existing alerts table.
+
+    SQLite has no `ADD COLUMN IF NOT EXISTS`, so we consult PRAGMA table_info
+    and only ALTER what is missing. Safe to run on every startup against a
+    live DB: existing rows keep their data and simply read NULL for the new
+    columns.
+    """
+    existing = {row["name"] for row in conn.execute("PRAGMA table_info(alerts)")}
+    for name, ddl in _TRADE_BOX_COLUMNS.items():
+        if name not in existing:
+            conn.execute(f"ALTER TABLE alerts ADD COLUMN {name} {ddl}")
+
+
 def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = get_db()
@@ -106,6 +133,12 @@ def init_db():
             rsi REAL,
             ema21_distance_atr REAL,
             session TEXT,
+            active_trade INTEGER,
+            active_entry REAL,
+            active_stop REAL,
+            active_target REAL,
+            active_trade_source TEXT,
+            active_trade_open_pct REAL,
             received_at TEXT NOT NULL
         )
     """)
@@ -120,6 +153,7 @@ def init_db():
             PRIMARY KEY (symbol, timeframe)
         )
     """)
+    _ensure_trade_box_columns(conn)
     conn.commit()
     conn.close()
 
@@ -239,6 +273,40 @@ def compute_extension_label(rsi: float | None, ema21_distance_atr: float | None)
     return "FRESH"
 
 
+def _parse_float_or_none(value) -> float | None:
+    """Parse a Trade Box numeric field; Pine emits "N/A" when the box is closed."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        value = value.strip()
+        if value in ("", "N/A", "NONE", "NaN", "na", "null"):
+            return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_int_flag(value) -> int:
+    """Parse active_trade, which Pine emits as a bare JSON 1/0."""
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, (int, float)):
+        return 1 if value else 0
+    if isinstance(value, str):
+        return 1 if value.strip().lower() in ("1", "true", "yes") else 0
+    return 0
+
+
+def _parse_str_or_none(value) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        value = value.strip()
+        return None if value in ("", "N/A", "null") else value
+    return str(value)
+
+
 # -- Routes ------------------------------------------------------------------
 
 @app.route("/webhook", methods=["POST"])
@@ -265,8 +333,10 @@ def webhook():
         INSERT INTO alerts (symbol, timeframe, phase, health, score, confidence,
             momentum, status, action, exhaustion_warning, reload_quality,
             htf_phase, campaign_alignment, last_fail_type, close, bar_event,
-            bar_time, rsi, ema21_distance_atr, session, received_at)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            bar_time, rsi, ema21_distance_atr, session, active_trade,
+            active_entry, active_stop, active_target, active_trade_source,
+            active_trade_open_pct, received_at)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """, (
         symbol, timeframe, payload.get("phase"), payload.get("health"),
         payload.get("score"), payload.get("confidence"), payload.get("momentum"),
@@ -275,7 +345,14 @@ def webhook():
         payload.get("htf_phase"), payload.get("campaign_alignment"),
         payload.get("last_fail_type"), payload.get("close"), event,
         payload.get("time"), payload.get("rsi"), payload.get("ema21_distance_atr"),
-        payload.get("session"), now,
+        payload.get("session"),
+        _parse_int_flag(payload.get("active_trade")),
+        _parse_float_or_none(payload.get("active_entry")),
+        _parse_float_or_none(payload.get("active_stop")),
+        _parse_float_or_none(payload.get("active_target")),
+        _parse_str_or_none(payload.get("active_trade_source")),
+        _parse_float_or_none(payload.get("active_trade_open_pct")),
+        now,
     ))
 
     row = conn.execute(
@@ -323,6 +400,12 @@ def _shape_state(symbol, timeframe, latest, watch):
         "close": latest["close"], "bar_time": latest["bar_time"],
         "rsi": latest["rsi"], "ema21_distance_atr": latest["ema21_distance_atr"],
         "session": latest["session"] if "session" in latest.keys() else None,
+        "active_trade": bool(latest["active_trade"]) if "active_trade" in latest.keys() else False,
+        "active_entry": latest["active_entry"] if "active_entry" in latest.keys() else None,
+        "active_stop": latest["active_stop"] if "active_stop" in latest.keys() else None,
+        "active_target": latest["active_target"] if "active_target" in latest.keys() else None,
+        "active_trade_source": latest["active_trade_source"] if "active_trade_source" in latest.keys() else None,
+        "active_trade_open_pct": latest["active_trade_open_pct"] if "active_trade_open_pct" in latest.keys() else None,
         "next_event_after_signal": watch["next_event_after_signal"] if watch else None,
         "signal_event": watch["signal_event"] if watch else None,
         "signal_time": watch["signal_time"] if watch else None,
