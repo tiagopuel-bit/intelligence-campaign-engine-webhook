@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import webhook_receiver
 import massive_ohlc
 import massive_options
-from webhook_receiver import app, init_db, compute_extension_label
+from webhook_receiver import app, init_db, compute_extension_label, infer_event_from_payload
 from unittest import mock
 
 TEST_SECRET = "test-manual-secret"
@@ -642,6 +642,14 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertIsNone(compute_extension_label(None, None))
         self.assertIsNone(compute_extension_label(50.0, None))
         self.assertIsNone(compute_extension_label(None, 0.5))
+
+    def test_infer_event_uses_event_field_not_action(self):
+        # Empty event + action "BUILD" must NOT be mislabeled as STRONG START.
+        self.assertIsNone(infer_event_from_payload({"event": "", "action": "BUILD", "phase": "ACCUMULATION"}))
+        self.assertEqual(infer_event_from_payload({"event": "STRONG START", "action": "BUILD"}), "STRONG START")
+        # Legacy payload without an event field keeps the old inference.
+        self.assertEqual(infer_event_from_payload({"action": "BUILD"}), "STRONG START")
+        self.assertIsNone(infer_event_from_payload({"event": "", "action": "HOLD"}))
 
     def test_compute_extension_label_fresh(self):
         self.assertEqual(compute_extension_label(40.0, 0.5), "FRESH")

@@ -293,8 +293,13 @@ def _safe_log(method: str, req_id: str) -> None:
 # -- Payload helpers ---------------------------------------------------------
 
 def infer_event_from_payload(payload: dict) -> str | None:
-    if payload.get("event"):
-        return payload["event"]
+    # v12.6.13+ always sends "event" (empty string = no discrete event). Use it
+    # verbatim. Do NOT infer from "action": "BUILD" is a persistent
+    # recommendation during ACCUMULATION/EXPANSION and was mislabeling every
+    # health-change alert as "STRONG START".
+    if "event" in payload:
+        return payload.get("event") or None
+    # Legacy payloads (pre-v12.6.13) carry no "event" field; infer as before.
     if payload.get("last_fail_type") not in (None, "NONE", ""):
         return payload["last_fail_type"]
     action = (payload.get("action") or "").upper()
