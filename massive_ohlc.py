@@ -62,19 +62,32 @@ _SYMBOL_RE = re.compile(r"^[A-Z0-9.\-]{1,10}$")
 
 
 class _Limiter:
-    """Process-wide fixed-interval limiter for the Massive free plan."""
+    """Token-bucket limiter for the Massive free plan.
+
+    Sustains the same N-requests-per-minute ceiling as a fixed interval, but
+    allows the first N requests to fire immediately (a burst) instead of
+    spacing every single call out by 60/N seconds. This keeps a cold dashboard
+    load from serializing to ~12s per contract; the long-term rate is
+    unchanged and a 429 still triggers the retry/backoff path.
+    """
 
     def __init__(self, requests_per_minute: int) -> None:
+        self._capacity = float(requests_per_minute)
         self._interval = 60.0 / requests_per_minute
-        self._last = 0.0
+        self._tokens = self._capacity
+        self._last = time.monotonic()
         self._lock = threading.Lock()
 
     def wait(self) -> None:
         with self._lock:
-            delay = self._interval - (time.monotonic() - self._last)
-            if delay > 0:
-                time.sleep(delay)
-            self._last = time.monotonic()
+            now = time.monotonic()
+            self._tokens = min(self._capacity, self._tokens + (now - self._last) / self._interval)
+            self._last = now
+            if self._tokens < 1.0:
+                time.sleep((1.0 - self._tokens) * self._interval)
+                self._tokens = 1.0
+                self._last = time.monotonic()
+            self._tokens -= 1.0
 
 
 # Public limiter so other Massive consumers (options) share the same
