@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Asset Page — Dev (Live)</title>
+<style>
+  :root{
+    --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
+    --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
+    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.16);
+    --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
+    --font-display: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", "Fira Code", Menlo, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
+      --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
+      --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.14);
+      --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
+    --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
+    --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.14);
+    --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
+  }
+  :root[data-theme="light"]{
+    --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
+    --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
+    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.16);
+    --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0}
+  .page{background:var(--ink); color:var(--text); font-family:var(--font-body); font-size:14.5px; line-height:1.5; min-height:100%}
+  .label{font-family:var(--font-display); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+  .tabular{font-variant-numeric:tabular-nums}
+  button{font-family:inherit}
+  input{font-family:var(--font-display)}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .hero{position:relative; border-bottom:1px solid var(--line); padding:22px clamp(18px,4vw,44px) 20px}
+  .hero-inner{max-width:1440px; margin:0 auto}
+  .live-chip{display:inline-flex; align-items:center; gap:6px; font-family:var(--font-display); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent); border-radius:3px; padding:3px 8px; margin-bottom:10px}
+  .live-chip .dot{width:5px; height:5px; border-radius:50%; background:currentColor; animation:pulse 2s ease-in-out infinite}
+  @media (prefers-reduced-motion:reduce){ .live-chip .dot{animation:none} }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  h1.title{font-family:var(--font-display); font-weight:600; font-size:20px; margin:0}
+  .hero-sub{max-width:70ch; color:var(--muted); font-size:13px; margin-top:5px}
+
+  .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px}
+  .controls input{background:var(--surface); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:7px 10px; font-size:12.5px}
+  .controls input[data-role="base"]{width:300px}
+  .controls input[data-role="token"]{width:220px}
+  .controls button{background:var(--surface-2); border:1px solid var(--line); color:var(--text); border-radius:6px; padding:7px 16px; font-size:12.5px; cursor:pointer}
+  .controls button:hover{border-color:var(--faint)}
+  .controls .status{font-size:12px; color:var(--muted); font-family:var(--font-display)}
+  .controls label{display:flex; align-items:center; gap:5px; color:var(--muted); font-size:12px; cursor:pointer; font-family:var(--font-body)}
+
+  main{max-width:1440px; margin:0 auto; padding:22px clamp(18px,4vw,48px) 60px}
+
+  .position-strip{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:26px}
+  .position-card{flex:0 0 128px; text-align:left; cursor:pointer; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:10px 12px; transition:border-color .15s ease, background .15s ease}
+  .position-card:hover{border-color:var(--faint)}
+  .position-card.active{border-color:var(--accent); background:var(--accent-glow)}
+  .position-card .sym{font-family:var(--font-display); font-weight:700; font-size:15px}
+  .position-card .meta{font-size:10.5px; color:var(--faint); margin-top:2px}
+  .pill{display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; margin-top:8px}
+  .pill .dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .pill.pos{background:var(--accent-glow); color:var(--accent)}
+  .pill.neu{background:var(--surface-2); color:var(--muted)}
+  .pill.neg{background:color-mix(in srgb, var(--critical) 14%, transparent); color:var(--critical)}
+  .pill.warn{background:color-mix(in srgb, var(--warning) 14%, transparent); color:var(--warning)}
+
+  .main-grid{display:grid; grid-template-columns:minmax(0,0.95fr) minmax(0,1.05fr); gap:20px; align-items:start}
+  @media (max-width:980px){ .main-grid{grid-template-columns:1fr} }
+  .col{min-width:0}
+
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:20px 22px; margin-bottom:20px}
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px}
+  .panel-head h2{margin:0; font-size:13px; font-family:var(--font-display); letter-spacing:.03em; display:flex; align-items:center; gap:8px}
+  .panel-head .dna-mark{width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; background:var(--accent-glow); color:var(--accent); font-size:12px; flex:none}
+  .panel-head .tf-tag{font-size:10.5px; color:var(--faint); font-weight:400}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden}
+  @media (max-width:520px){ .stat-grid{grid-template-columns:repeat(2,1fr)} }
+  .stat{background:var(--surface); padding:13px 16px}
+  .stat .label{margin-bottom:6px}
+  .stat .value{font-family:var(--font-display); font-weight:700; font-size:16px}
+  .stat .value.phase-lead{font-size:19px}
+  .stat .sub{font-size:11px; color:var(--faint); margin-top:2px}
+
+  .insight-list{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-top:16px}
+  .insight-card{background:var(--surface); padding:14px 16px; display:grid; grid-template-columns:22px 1fr; gap:12px; align-items:start}
+  .insight-card .mark{width:22px; height:22px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px; margin-top:1px}
+  .insight-card.pos .mark{background:var(--accent-glow); color:var(--accent)}
+  .insight-card.warn .mark{background:color-mix(in srgb, var(--warning) 16%, transparent); color:var(--warning)}
+  .insight-card.neg .mark{background:color-mix(in srgb, var(--critical) 16%, transparent); color:var(--critical)}
+  .insight-card.neu .mark{background:var(--surface-2); color:var(--muted)}
+  .insight-card .title{font-size:12.5px; font-weight:700; margin-bottom:3px}
+  .insight-card.pos .title{color:var(--accent)}
+  .insight-card.warn .title{color:var(--warning)}
+  .insight-card.neg .title{color:var(--critical)}
+  .insight-card .text{font-size:13px; line-height:1.55; color:var(--text)}
+  .insight-card .aside{font-size:11px; color:var(--faint); margin-top:5px}
+  .insight-empty{padding:14px 4px; color:var(--faint); font-size:12.5px}
+  .insight-method{font-size:11px; color:var(--faint); margin-top:12px; line-height:1.5}
+
+  .placeholder-panel{border:1px dashed var(--line); border-radius:12px; padding:26px 22px; color:var(--muted); font-size:13px; line-height:1.6}
+  .placeholder-panel strong{color:var(--text)}
+
+  .tech-toggle{display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:transparent; border:1px dashed var(--line); border-radius:10px; padding:11px 15px; color:var(--muted); font-size:12px; cursor:pointer}
+  .tech-toggle:hover{border-color:var(--faint); color:var(--text)}
+  .tech-toggle .chev{font-family:var(--font-display); transition:transform .15s ease}
+  .tech-toggle[aria-expanded="true"] .chev{transform:rotate(90deg)}
+  .tech-body{display:none; margin-top:12px}
+  .tech-body.open{display:block}
+  .ladder-scroll{overflow-x:auto; border:1px solid var(--line); border-radius:10px}
+  table.ladder{border-collapse:collapse; width:100%; min-width:560px}
+  .ladder th{font-family:var(--font-display); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); background:var(--surface-2)}
+  .ladder td{padding:8px 12px; border-bottom:1px solid var(--line); background:var(--surface); font-size:12px}
+  .ladder tr:last-child td{border-bottom:none}
+  .ladder tr.stale td{opacity:.5}
+  .phase-badge{display:inline-block; font-family:var(--font-display); font-size:10px; font-weight:600; padding:2px 7px; border-radius:3px}
+  .phase-badge.pos{color:var(--positive); background:color-mix(in srgb, var(--positive) 14%, transparent)}
+  .phase-badge.warn{color:var(--warning); background:color-mix(in srgb, var(--warning) 14%, transparent)}
+  .phase-badge.neg{color:var(--critical); background:color-mix(in srgb, var(--critical) 14%, transparent)}
+  .phase-badge.neu{color:var(--muted); background:var(--surface-2)}
+
+  .empty,.error{color:var(--faint); padding:40px 0; text-align:center; font-size:13px}
+  .error{color:var(--critical)}
+
+  footer{max-width:1440px; margin:0 auto; padding:0 clamp(18px,4vw,48px) 50px; color:var(--faint); font-size:11px; line-height:1.6}
+  footer .rule{height:1px; background:var(--line); margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="live-chip"><span class="dot"></span>Live — dev build</span>
+      <h1 class="title">DNA Asset Page</h1>
+      <p class="hero-sub">Same page as the design draft, wired to real data: campaign stats, insight cards, and the technical ladder are all live off the <code>alerts</code> table. Position &amp; Options stays a placeholder — no broker/position data source exists yet.</p>
+      <div class="controls">
+        <input data-role="base" type="text" placeholder="API base URL">
+        <input data-role="token" type="password" placeholder="Bearer token (optional, prod only)">
+        <button data-role="load">Load</button>
+        <label><input data-role="auto" type="checkbox"> auto-refresh (30s)</label>
+        <span class="status" data-role="status"></span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="position-strip" id="position-strip"></div>
+    <div id="content"></div>
+  </main>
+
+  <footer>
+    <div class="rule"></div>
+    <p><strong style="color:var(--muted)">What this is:</strong> a live dev build of the DNA Asset Page design. Phase/health/confidence/momentum/alignment/reload-quality per timeframe are real, pulled from <code>/assets</code> + <code>/state_all/&lt;symbol&gt;</code>. The insight cards are a rule-based plain-English translation of those same real fields (see the note under each list) — not a fabricated narrative, not a predictive model. Position &amp; Options is not shown because no position-tracking backend exists yet (Phase 3, not built).</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var baseInput = document.querySelector('[data-role="base"]');
+  var tokenInput = document.querySelector('[data-role="token"]');
+  var loadBtn = document.querySelector('[data-role="load"]');
+  var autoCheckbox = document.querySelector('[data-role="auto"]');
+  var statusEl = document.querySelector('[data-role="status"]');
+  var strip = document.getElementById("position-strip");
+  var content = document.getElementById("content");
+  var autoTimer = null;
+
+  var assets = [];
+  var activeSymbol = null;
+  var techOpen = false;
+
+  baseInput.value = localStorage.getItem('dna_api_base') || 'https://dna-tradingview-webhook-production.up.railway.app';
+  tokenInput.value = localStorage.getItem('dna_api_token') || '';
+
+  function authHeaders() {
+    var token = tokenInput.value.trim();
+    return token ? { Authorization: 'Bearer ' + token } : {};
+  }
+
+  var TF_ORDER = { "1": 0, "3": 1, "5": 2, "15": 3, "30": 4, "60": 5, "120": 6, "180": 7, "240": 8, "D": 9, "W": 10 };
+  function tfSortKey(tf) { return TF_ORDER.hasOwnProperty(tf) ? TF_ORDER[tf] : 99; }
+  function tfLabel(tf) {
+    if (tf === "D" || tf === "W") return tf;
+    var n = parseInt(tf, 10);
+    if (isNaN(n)) return tf;
+    return n >= 60 ? (n / 60) + "H" : n + "m";
+  }
+
+  function fmtAge(raw) {
+    if (!raw) return { text: "—", stale: true, mins: Infinity };
+    var then;
+    if (/^\d+$/.test(String(raw).trim())) { then = new Date(Number(raw)); }
+    else { var iso = String(raw); then = new Date(iso.replace(' ', 'T') + (iso.endsWith('Z') ? '' : 'Z')); }
+    if (isNaN(then.getTime())) return { text: String(raw), stale: false, mins: 0 };
+    var mins = Math.round((Date.now() - then.getTime()) / 60000);
+    var stale = mins > 24 * 60;
+    var text = mins < 1 ? "just now" : mins < 60 ? mins + "m ago" : mins < 60 * 24 ? Math.round(mins / 60) + "h ago" : Math.round(mins / (60 * 24)) + "d ago";
+    return { text: text, stale: stale, mins: mins };
+  }
+
+  var BULLISH = ["EXPANSION", "IGNITION", "STRONG START", "CAMPAIGN START", "FIRE ADD", "RELOAD", "ACCUMULATE", "ACCUMULATION"];
+  var STRETCHED = ["PREMIUM", "PEAK"];
+  var FAILISH = ["FAILED", "FAIL", "MODERATE FAIL", "STRONG FAIL", "CATASTROPHIC FAIL", "FAIL TEST"];
+  var QUIET = ["WAIT", "RESOLVING", "START TEST", "IGNITION TEST", "RECOVERY WATCH", "MANAGE"];
+
+  function phaseTone(phase) {
+    var p = (phase || "").toUpperCase();
+    if (FAILISH.indexOf(p) !== -1) return "neg";
+    if (STRETCHED.indexOf(p) !== -1) return "warn";
+    if (BULLISH.indexOf(p) !== -1) return "pos";
+    return "neu";
+  }
+
+  function healthColor(h) {
+    if (h == null) return "var(--faint)";
+    if (h >= 65) return "var(--positive)";
+    if (h >= 45) return "var(--warning)";
+    return "var(--critical)";
+  }
+
+  // Rule-based, plain-English translation of the real per-timeframe fields
+  // already returned by /state_all -- not a fabricated narrative. Picks the
+  // shortest available timeframe as "primary" (most immediate read) and
+  // scans the rest for anything worth a separate card.
+  function buildInsights(states, primary) {
+    var out = [];
+    if (!primary) return out;
+    var tone = phaseTone(primary.phase);
+    var age = fmtAge(primary.bar_time);
+
+    if (tone === "neg") {
+      out.push({
+        tone: "neg", mark: "✕", title: "Recent breakdown on " + tfLabel(primary.timeframe),
+        text: (primary.last_fail_type && primary.last_fail_type !== "NONE" ? primary.last_fail_type : primary.phase) + " flagged " + age.text + " on the " + tfLabel(primary.timeframe) + " chart, health at " + (primary.health != null ? primary.health + "%" : "an unknown level") + "."
+      });
+    } else if (tone === "warn") {
+      out.push({
+        tone: "warn", mark: "⚠", title: "Technically stretched on " + tfLabel(primary.timeframe),
+        text: "The " + tfLabel(primary.timeframe) + " chart is reading " + primary.phase + " — DNA's own extension/exhaustion-adjacent signal, an early pause warning, not a sell signal on its own.",
+        aside: "Unrelated to options premium/IV pricing — that's a separate, not-yet-built feature."
+      });
+    } else if (tone === "pos") {
+      out.push({
+        tone: "pos", mark: "▲", title: "Building on " + tfLabel(primary.timeframe),
+        text: primary.phase + " on the " + tfLabel(primary.timeframe) + " chart, health " + (primary.health != null ? primary.health + "%" : "n/a") + ", confidence " + (primary.confidence != null ? primary.confidence + "%" : "n/a") + (primary.recent_event ? " — last event " + primary.recent_event + " " + age.text + "." : ".")
+      });
+    } else {
+      out.push({
+        tone: "neu", mark: "•", title: "Quiet on " + tfLabel(primary.timeframe),
+        text: "Nothing decisive on the " + tfLabel(primary.timeframe) + " chart right now (" + primary.phase + "). Not a warning, just no active signal."
+      });
+    }
+
+    if (primary.campaign_alignment) {
+      var align = primary.campaign_alignment;
+      if (align === "CONFIRMED") {
+        out.push({ tone: "pos", mark: "▲▲", title: "Confirmed across timeframes", text: "The next timeframe up agrees with " + tfLabel(primary.timeframe) + " — structure lining up across scales, not just a local move." });
+      } else if (align === "UNCONFIRMED") {
+        out.push({ tone: "warn", mark: "▲·", title: "Not confirmed by the bigger picture yet", text: "The " + tfLabel(primary.timeframe) + " chart is reading bullish, but the timeframe above hasn't caught up yet. Not a red flag by itself — just unproven at every zoom level." });
+      } else if (align === "BASING") {
+        out.push({ tone: "neu", mark: "·▲", title: "Likely a pause, not a breakdown", text: "This timeframe is weak, but the one above is still bullish — reads more like a pullback inside a good trend than a real breakdown." });
+      }
+    }
+
+    if (primary.reload_quality === "MESSY") {
+      out.push({ tone: "warn", mark: "⚠", title: "Last reload didn't hold cleanly", text: "A Fail followed the last Reload within the tracking window — worth extra caution before treating the recovery as settled." });
+    }
+
+    if (age.stale) {
+      out.push({ tone: "neu", mark: "•", title: "This data is stale", text: "Last update on " + tfLabel(primary.timeframe) + " was " + age.text + " — could mean the campaign is genuinely quiet, or that the webhook missed something. Silence alone can't tell the two apart." });
+    }
+
+    return out;
+  }
+
+  function pickPrimary(states) {
+    if (!states || states.length === 0) return null;
+    var sorted = states.slice().sort(function (a, b) { return tfSortKey(a.timeframe) - tfSortKey(b.timeframe); });
+    return sorted[0];
+  }
+
+  function renderStrip() {
+    strip.innerHTML = "";
+    assets.forEach(function (a) {
+      var card = document.createElement("button");
+      card.className = "position-card" + (a.symbol === activeSymbol ? " active" : "");
+      card.innerHTML =
+        '<div class="sym">' + a.symbol + '</div>' +
+        '<div class="meta">' + a.timeframe_count + ' tf · ' + a.alert_count + ' alerts</div>';
+      card.addEventListener("click", function () { activeSymbol = a.symbol; techOpen = false; loadSymbol(); });
+      strip.appendChild(card);
+    });
+  }
+
+  function renderPlaceholderPositionPanel() {
+    return '<div class="placeholder-panel"><strong>Position &amp; Options</strong> isn\'t shown here — there\'s no real broker or position-tracking data source wired up yet (Phase 3, not built). Showing invented numbers next to real DNA data would be misleading, so this stays empty until that backend exists.</div>';
+  }
+
+  function renderContent(symbol, states) {
+    var primary = pickPrimary(states);
+    var sorted = states.slice().sort(function (a, b) { return tfSortKey(a.timeframe) - tfSortKey(b.timeframe); });
+
+    var statHtml = "";
+    if (primary) {
+      var stats = [
+        { label: "Phase", value: primary.phase || "—", lead: true, tone: phaseTone(primary.phase) },
+        { label: "Confidence", value: (primary.confidence != null ? primary.confidence + "%" : "—") },
+        { label: "Health", value: (primary.health != null ? primary.health + "%" : "—") },
+        { label: "Momentum", value: primary.momentum || "—" },
+        { label: "Alignment", value: primary.campaign_alignment || "—" },
+        { label: "Last event", value: primary.recent_event || "—", sub: fmtAge(primary.bar_time).text }
+      ];
+      statHtml = stats.map(function (s) {
+        var color = s.tone === "pos" ? "var(--positive)" : s.tone === "warn" ? "var(--warning)" : s.tone === "neg" ? "var(--critical)" : "var(--text)";
+        return '<div class="stat"><div class="label">' + s.label + '</div><div class="value' + (s.lead ? " phase-lead" : "") + '" style="color:' + color + '">' + s.value + '</div>' + (s.sub ? '<div class="sub">' + s.sub + '</div>' : '') + '</div>';
+      }).join("");
+    }
+
+    var insights = buildInsights(states, primary);
+    var insightHtml = insights.length
+      ? insights.map(function (ins) {
+          return '<div class="insight-card ' + ins.tone + '"><div class="mark">' + ins.mark + '</div><div><div class="title">' + ins.title + '</div><div class="text">' + ins.text + '</div>' + (ins.aside ? '<div class="aside">' + ins.aside + '</div>' : '') + '</div></div>';
+        }).join("")
+      : '<div class="insight-empty">No timeframe data yet for ' + symbol + '.</div>';
+
+    var ladderRows = sorted.map(function (r) {
+      var age = fmtAge(r.bar_time);
+      return '<tr class="' + (age.stale ? "stale" : "") + '"><td style="font-family:var(--font-display);font-weight:600">' + tfLabel(r.timeframe) + '</td>' +
+        '<td><span class="phase-badge ' + phaseTone(r.phase) + '">' + (r.phase || "—") + '</span></td>' +
+        '<td class="tabular">' + (r.health != null ? r.health + "%" : "—") + '</td>' +
+        '<td class="tabular">' + (r.confidence != null ? r.confidence + "%" : "—") + '</td>' +
+        '<td>' + (r.recent_event || "—") + '</td>' +
+        '<td class="tabular">' + age.text + '</td></tr>';
+    }).join("");
+
+    content.innerHTML =
+      '<div class="main-grid">' +
+        '<div class="col">' +
+          '<div class="panel">' +
+            '<div class="panel-head"><h2><span class="dna-mark">🧬</span>What DNA is seeing<span class="tf-tag">· primary: ' + (primary ? tfLabel(primary.timeframe) : "—") + '</span></h2></div>' +
+            '<div class="stat-grid">' + statHtml + '</div>' +
+            '<div class="insight-list">' + insightHtml + '</div>' +
+            '<div class="insight-method">Insights are a rule-based read of the real fields above (phase / health / confidence / alignment / reload quality), not a model or a prediction. See the primary-timeframe note above each card set.</div>' +
+          '</div>' +
+          '<button class="tech-toggle" id="tech-toggle" aria-expanded="' + techOpen + '"><span class="chev">›</span> Show all ' + sorted.length + ' timeframes</button>' +
+          '<div class="tech-body' + (techOpen ? " open" : "") + '" id="tech-body">' +
+            '<div class="ladder-scroll"><table class="ladder"><thead><tr><th>TF</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr></thead><tbody>' + ladderRows + '</tbody></table></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="col"><div class="panel">' + renderPlaceholderPositionPanel() + '</div></div>' +
+      '</div>';
+
+    var toggle = document.getElementById("tech-toggle");
+    if (toggle) toggle.addEventListener("click", function () { techOpen = !techOpen; renderContent(symbol, states); });
+  }
+
+  function loadSymbol() {
+    if (!activeSymbol) return;
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    renderStrip();
+    content.innerHTML = '<div class="empty">loading ' + activeSymbol + '…</div>';
+    fetch(base + '/state_all/' + encodeURIComponent(activeSymbol), { headers: authHeaders() })
+      .then(function (r) {
+        if (r.status === 401) throw new Error("unauthorized — check the bearer token");
+        if (!r.ok) throw new Error("GET /state_all/" + activeSymbol + " -> HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (data) { renderContent(activeSymbol, data.states || []); })
+      .catch(function (err) { content.innerHTML = '<div class="error">' + err.message + '</div>'; });
+  }
+
+  function load() {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    if (!base) { statusEl.textContent = "enter an API base URL"; return; }
+    localStorage.setItem("dna_api_base", base);
+    localStorage.setItem("dna_api_token", tokenInput.value.trim());
+    statusEl.textContent = "loading…";
+    strip.innerHTML = "";
+    content.innerHTML = "";
+
+    fetch(base + "/assets", { headers: authHeaders() })
+      .then(function (r) {
+        if (r.status === 401) throw new Error("unauthorized — check the bearer token");
+        if (!r.ok) throw new Error("GET /assets -> HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        assets = data.assets || [];
+        if (assets.length === 0) {
+          content.innerHTML = '<div class="empty">no assets with recorded alerts yet</div>';
+          statusEl.textContent = "0 assets";
+          return;
+        }
+        if (!activeSymbol || !assets.some(function (a) { return a.symbol === activeSymbol; })) {
+          activeSymbol = assets[0].symbol;
+        }
+        statusEl.textContent = assets.length + " asset(s)";
+        loadSymbol();
+      })
+      .catch(function (err) {
+        content.innerHTML = '<div class="error">' + err.message + '</div>';
+        statusEl.textContent = "error";
+      });
+  }
+
+  function setAutoRefresh(on) {
+    if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+    if (on) { autoTimer = setInterval(load, 30000); }
+  }
+
+  loadBtn.addEventListener("click", load);
+  baseInput.addEventListener("keydown", function (e) { if (e.key === "Enter") load(); });
+  tokenInput.addEventListener("keydown", function (e) { if (e.key === "Enter") load(); });
+  autoCheckbox.addEventListener("change", function () { setAutoRefresh(autoCheckbox.checked); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) { setAutoRefresh(false); autoCheckbox.checked = false; }
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>
