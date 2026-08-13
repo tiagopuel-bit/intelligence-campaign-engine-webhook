@@ -35,6 +35,8 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+import massive_ohlc
+
 
 # -- Database path -----------------------------------------------------------
 
@@ -406,6 +408,30 @@ def get_assets():
         for r in rows if r["symbol"] not in _TEST_SYMBOLS
     ]
     return jsonify({"asset_count": len(assets), "assets": assets})
+
+
+@app.route("/ohlc/<symbol>/<timeframe>", methods=["GET"])
+def get_ohlc(symbol, timeframe):
+    """Near-live RAW OHLC bars for the landing-page price chart.
+
+    Read-only, gated by state_is_authorized() exactly like /state_all. Bars
+    come from the Massive free plan via massive_ohlc.get_ohlc, which caches
+    per (symbol, timeframe) and rate-limits the vendor. Supports the ladder
+    3m/5m/15m/30m/1H/2H/3H/4H/D (and the webhook's numeric labels 5/15/30/
+    60/120/180/240/1D).
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    try:
+        bars, meta = massive_ohlc.get_ohlc(symbol, timeframe)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except massive_ohlc._UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+    if not bars:
+        return jsonify({"error": f"no bars for {symbol} {timeframe}"}), 404
+    return jsonify({**meta, "bars": bars})
 
 
 @app.after_request

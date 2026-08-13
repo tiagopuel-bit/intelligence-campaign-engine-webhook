@@ -8,7 +8,9 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import webhook_receiver
+import massive_ohlc
 from webhook_receiver import app, init_db, compute_extension_label
+from unittest import mock
 
 TEST_SECRET = "test-manual-secret"
 TEST_STATE_TOKEN = "test-state-token"
@@ -241,6 +243,65 @@ class WebhookReceiverTests(unittest.TestCase):
     def test_unknown_state_all_returns_404(self):
         resp = self.client.get("/state_all/NOEXISTATALL", headers=self._state_headers())
         self.assertEqual(resp.status_code, 404)
+
+    # =========================================================================
+    # OHLC endpoint (near-live Massive bars for the landing-page chart)
+    # =========================================================================
+
+    def test_ohlc_requires_auth(self):
+        resp = self.client.get("/ohlc/AMC/15m")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_ohlc_rejects_unknown_timeframe(self):
+        resp = self.client.get("/ohlc/AMC/99m", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 400)
+
+    def test_ohlc_rejects_invalid_symbol(self):
+        resp = self.client.get("/ohlc/BAD!SYM/15m", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 400)
+
+    def test_ohlc_returns_shaped_bars(self):
+        rows = [
+            {"t": 1786348800000, "o": 2.58, "h": 2.60, "l": 2.57, "c": 2.59, "v": 2838},
+            {"t": 1786348980000, "o": 2.59, "h": 2.61, "l": 2.58, "c": 2.60, "v": 3000},
+        ]
+        massive_ohlc._cache.clear()
+        with mock.patch("massive_ohlc._fetch_raw", return_value=rows), \
+             mock.patch.dict(os.environ, {"MASSIVE_API_KEY": "test-key"}):
+            resp = self.client.get("/ohlc/AMC/3m", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertEqual(data["symbol"], "AMC")
+        self.assertEqual(data["timeframe"], "3m")
+        self.assertEqual(data["bar_count"], 2)
+        self.assertEqual(data["bars"][0]["o"], 2.58)
+        self.assertEqual(data["bars"][-1]["c"], 2.60)
+
+    def test_ohlc_serves_cached_response_without_refetch(self):
+        rows = [{"t": 1786348800000, "o": 1.0, "h": 1.0, "l": 1.0, "c": 1.0, "v": 1}]
+        massive_ohlc._cache.clear()
+        with mock.patch("massive_ohlc._fetch_raw", return_value=rows) as fetch, \
+             mock.patch.dict(os.environ, {"MASSIVE_API_KEY": "test-key"}):
+            r1 = self.client.get("/ohlc/AMC/5m", headers=self._state_headers())
+            r2 = self.client.get("/ohlc/AMC/5m", headers=self._state_headers())
+            self.assertEqual(r1.status_code, 200)
+            self.assertEqual(r2.status_code, 200)
+            self.assertEqual(r2.get_json()["cached"], True)
+            fetch.assert_called_once()
+
+    def test_ohlc_missing_key_returns_503(self):
+        massive_ohlc._cache.clear()
+        with mock.patch.dict(os.environ, {"MASSIVE_API_KEY": "", "POLYGON_API_KEY": ""}):
+            resp = self.client.get("/ohlc/AMC/15m", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 503)
+
+    def test_ohlc_resolve_timeframe_aliases(self):
+        self.assertEqual(massive_ohlc.resolve_timeframe("3m"), "3m")
+        self.assertEqual(massive_ohlc.resolve_timeframe("60"), "1H")
+        self.assertEqual(massive_ohlc.resolve_timeframe("1D"), "D")
+        self.assertEqual(massive_ohlc.resolve_timeframe("240"), "4H")
+        self.assertEqual(massive_ohlc.resolve_timeframe("5"), "5m")
+        self.assertIsNone(massive_ohlc.resolve_timeframe("99m"))
 
     def test_poll_can_build_campaign_state(self):
         self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
