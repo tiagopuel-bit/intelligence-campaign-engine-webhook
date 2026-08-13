@@ -300,7 +300,21 @@
     "CATASTROPHIC FAIL":"broken down badly","WAIT":"quiet","RESOLVING":"resolving",
     "RECOVERY WATCH":"trying to recover","START TEST":"testing","IGNITION TEST":"testing"
   };
-  function plain(p){ return PLAIN[(p||"").toUpperCase()] || (p || "no reading").toLowerCase(); }
+  // WAIT is Pine's per-bar default -- campaignPhase is recomputed fresh
+  // every bar and only overwritten if THAT bar hits a specific condition
+  // (an event, or continuationContext: close>ema50 AND ema21>ema50 AND
+  // ema21Slope>0 AND low>recentLow, all four, on that one bar). Miss any
+  // one of those on a single bar and phase falls through to WAIT even
+  // though campaignHealth -- smoothed and persistent, not per-bar -- can
+  // still be high. So "WAIT" means "nothing specific classified this bar,"
+  // not "campaign inactive." Reading it as flatly "quiet" regardless of
+  // health was the actual bug; this reflects health in the wording instead.
+  var WAIT_STEADY_HEALTH = 70;
+  function plain(p, health) {
+    var up = (p || "").toUpperCase();
+    if (up === "WAIT" && health != null && health >= WAIT_STEADY_HEALTH) return "holding steady";
+    return PLAIN[up] || (p || "no reading").toLowerCase();
+  }
   function phaseTone(p) {
     p = (p || "").toUpperCase();
     if (BROKEN.indexOf(p) !== -1) return "neg";
@@ -333,7 +347,7 @@
       var t = rank[phaseTone(r.phase)];
       if (t > bestRank) { bestRank = t; best = r; }
     });
-    return { tier: tier, rows: rows, tone: phaseTone(best.phase), text: plain(best.phase), lead: best, empty: false };
+    return { tier: tier, rows: rows, tone: phaseTone(best.phase), text: plain(best.phase, best.health), lead: best, empty: false };
   }
 
   // --- Attention triage: one honest, rule-based verdict per asset -------
@@ -999,7 +1013,7 @@
         .sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); })
         .map(function (r) {
           var ag = age(r.bar_time);
-          return '<span class="chip ' + phaseTone(r.phase) + (ag.stale ? " stale" : "") + '">' + tfLabel(r.timeframe) + " · " + plain(r.phase) + '</span>';
+          return '<span class="chip ' + phaseTone(r.phase) + (ag.stale ? " stale" : "") + '">' + tfLabel(r.timeframe) + " · " + plain(r.phase, r.health) + '</span>';
         }).join("");
       return '<div class="step ' + tone + '"><div class="step-n">' + s.n + '</div><h3>' + s.h + '</h3><div class="q">' + s.q + '</div>' +
         '<div class="answer">' + answer + '</div><div class="tf-chips">' + (chips || '<span class="chip">nothing reporting</span>') + '</div></div>';
