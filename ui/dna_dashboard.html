@@ -112,10 +112,29 @@
   .chip.neg{color:var(--critical); background:var(--critical-glow); border-color:transparent}
   .chip.stale{opacity:.45}
 
-  /* ---- your position & portfolio for this asset (backend not built yet) ---- */
+  /* ---- your position & portfolio for this asset ---- */
   .position-wrap{margin-bottom:26px}
   .position-placeholder{border:1px dashed var(--line); border-radius:11px; padding:18px 20px; color:var(--muted); font-size:13px; line-height:1.6}
   .position-placeholder strong{color:var(--text)}
+  .pos-form{display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:12px 14px; margin-bottom:12px}
+  .pos-form select,.pos-form input{background:var(--surface-2); border:1px solid var(--line); color:var(--text); border-radius:7px; padding:7px 9px; font-size:12.5px; font-family:var(--font-display)}
+  .pos-form input[name="quantity"]{width:70px}
+  .pos-form input[name="entry_price"]{width:90px}
+  .pos-form input[name="strike"]{width:80px}
+  .pos-form input[name="expiration"]{width:140px}
+  .pos-form input[name="entry_time"]{width:170px}
+  .pos-form input[name="notes"]{flex:1; min-width:140px}
+  .pos-form button{background:var(--accent); color:#04211b; border:none; border-radius:7px; padding:7px 16px; font-weight:700; font-size:12.5px}
+  .pos-form button:hover{filter:brightness(1.08)}
+  .pos-form-err{width:100%; color:var(--critical); font-size:12px; font-family:var(--font-display)}
+  .pos-card{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--positive); border-radius:10px; padding:12px 14px; margin-bottom:9px}
+  .pos-card.closed{border-left-color:var(--faint); opacity:.72}
+  .pos-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:8px}
+  .pos-status{font-family:var(--font-display); font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+  .pos-date{font-size:11.5px; color:var(--faint)}
+  .pos-close{margin-left:auto; background:var(--critical-glow); color:var(--critical); border:1px solid color-mix(in srgb,var(--critical) 40%,transparent); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600}
+  .pos-close:hover{background:color-mix(in srgb,var(--critical) 18%,transparent)}
+  .pos-legs{display:flex; flex-wrap:wrap; gap:5px}
 
   /* ---- stage 3: what to do ---- */
   .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
@@ -375,12 +394,146 @@
       }).join("") + '</div>';
   }
 
-  // Your position & portfolio for this asset. No backend exists yet --
-  // the positions DB (migrations/002_add_positions.sql) is specced and
-  // handed to DeepSeek, not built. Honest placeholder, not fake numbers.
+  // --- Your position: manual log, no broker ------------------------------
+  // POST /positions opens a leg; GET /positions?symbol= lists them; PATCH
+  // closes. The system never opens anything on its own.
+  var posCache = {};
+
+  function loadPositions(sym) {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    return fetch(base + "/positions?symbol=" + encodeURIComponent(sym), { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : { positions: [] }; })
+      .catch(function () { return { positions: [] }; })
+      .then(function (d) {
+        var summaries = d.positions || [];
+        return Promise.all(summaries.map(function (p) {
+          return fetch(base + "/positions/" + p.id, { headers: authHeaders() })
+            .then(function (r) { return r.ok ? r.json() : p; })
+            .catch(function () { return p; });
+        }));
+      })
+      .then(function (detailed) { posCache[sym] = detailed; });
+  }
+
+  function fmtMoney(n) { return n == null ? "—" : "$" + Number(n).toFixed(2); }
+
+  function renderPositionRow(p) {
+    var dir = p.direction === "LONG" ? "▲ LONG" : "▼ SHORT";
+    var dirCls = p.direction === "LONG" ? "pos" : "neg";
+    var open = p.status === "OPEN";
+    var legs = (p.instruments || []).map(function (i) {
+      var label = i.instrument_type === "SHARE"
+        ? i.instrument_type + " ×" + i.quantity + " @ " + fmtMoney(i.entry_price)
+        : i.instrument_type + " " + (i.strike != null ? i.strike : "") +
+          (i.expiration ? " " + i.expiration : "") + " ×" + i.quantity + " @ " + fmtMoney(i.entry_price);
+      var cls = i.status === "OPEN" ? "pos" : (i.status === "ROLLED" ? "warn" : "");
+      var suffix = i.status === "OPEN" ? "" : " · " + i.status.toLowerCase();
+      return '<span class="chip ' + cls + '">' + label + suffix + '</span>';
+    }).join("");
+    var closeBtn = open
+      ? '<button class="pos-close" data-id="' + p.id + '">Close position</button>'
+      : "";
+    return '<div class="pos-card' + (open ? "" : " closed") + '">' +
+      '<div class="pos-top"><span class="chip ' + dirCls + '">' + dir + '</span>' +
+      '<span class="pos-status">' + p.status + '</span>' +
+      '<span class="pos-date">opened ' + age(p.opened_at).text + '</span>' + closeBtn + '</div>' +
+      '<div class="pos-legs">' + (legs || '<span class="chip">no legs</span>') + '</div></div>';
+  }
+
+  function renderPositionForm(sym) {
+    return '<form class="pos-form" data-sym="' + sym + '">' +
+      '<select name="direction"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>' +
+      '<select name="type"><option value="SHARE">Shares</option><option value="CALL">Call</option><option value="PUT">Put</option></select>' +
+      '<input name="quantity" type="number" min="0" step="any" placeholder="qty" required>' +
+      '<input name="entry_price" type="number" min="0" step="any" placeholder="entry $" required>' +
+      '<input name="strike" type="number" min="0" step="any" placeholder="strike" class="opt-field" style="display:none">' +
+      '<input name="expiration" type="text" placeholder="expiry YYYY-MM-DD" class="opt-field" style="display:none">' +
+      '<input name="entry_time" type="datetime-local">' +
+      '<input name="notes" type="text" placeholder="notes">' +
+      '<button type="submit">Open position</button>' +
+      '<div class="pos-form-err" style="display:none"></div>' +
+      '</form>';
+  }
+
   function renderPosition(sym) {
-    return '<div class="position-wrap"><div class="stage-head"><h2>Your position</h2><span class="hint">' + sym + ' orders &amp; portfolio</span></div>' +
-      '<div class="position-placeholder"><strong>Not connected yet.</strong> Opened orders and portfolio tracking for ' + sym + ' will show here once the positions database is built (spec\'d in <code>docs/POSITIONS_DB_TASK_PACKET.md</code>, queued with DeepSeek). Nothing invented in the meantime.</div></div>';
+    var positions = posCache[sym];
+    var loaded = positions !== undefined;
+    var list = (positions || []);
+    var listHtml = !loaded
+      ? '<div class="position-placeholder">loading positions…</div>'
+      : (list.length === 0
+          ? '<div class="position-placeholder">No positions logged for ' + sym + ' yet. Open one above — the system never opens anything on its own.</div>'
+          : list.map(renderPositionRow).join(""));
+    return '<div class="position-wrap"><div class="stage-head"><h2>Your position</h2><span class="hint">' + sym + ' — manual log, no broker</span></div>' +
+      renderPositionForm(sym) + listHtml + '</div>';
+  }
+
+  function wirePosition() {
+    var form = document.querySelector(".pos-form");
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var sym = form.dataset.sym;
+      var fd = new FormData(form);
+      var type = fd.get("type");
+      var entryTimeVal = fd.get("entry_time");
+      var errEl = form.querySelector(".pos-form-err");
+      errEl.style.display = "none";
+
+      var instrument = {
+        type: type,
+        quantity: Number(fd.get("quantity")),
+        entry_price: Number(fd.get("entry_price")),
+        entry_time: entryTimeVal ? new Date(entryTimeVal).toISOString() : new Date().toISOString()
+      };
+      if (type !== "SHARE") {
+        instrument.strike = fd.get("strike") ? Number(fd.get("strike")) : null;
+        instrument.expiration = fd.get("expiration") || null;
+      }
+      var body = { symbol: sym, direction: fd.get("direction"), notes: fd.get("notes") || null, instrument: instrument };
+      var base = baseInput.value.trim().replace(/\/$/, "");
+
+      fetch(base + "/positions", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+        body: JSON.stringify(body)
+      })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (!res.ok) {
+            errEl.textContent = "Couldn't open: " + (res.d.error || res.d.detail || "HTTP " + res.d.status);
+            errEl.style.display = "block";
+            return;
+          }
+          form.reset();
+          return loadPositions(sym).then(paint);
+        })
+        .catch(function (ex) { errEl.textContent = "Error: " + ex.message; errEl.style.display = "block"; });
+    });
+
+    var typeSel = form.querySelector('select[name="type"]');
+    function syncOptFields() {
+      var isOpt = typeSel.value !== "SHARE";
+      Array.prototype.forEach.call(form.querySelectorAll(".opt-field"), function (f) {
+        f.style.display = isOpt ? "" : "none";
+        if (f.name === "strike") f.required = isOpt;
+      });
+    }
+    typeSel.addEventListener("change", syncOptFields);
+    syncOptFields();
+
+    Array.prototype.forEach.call(document.querySelectorAll(".pos-close"), function (b) {
+      b.addEventListener("click", function () {
+        var id = b.dataset.id, sym = selected;
+        if (!window.confirm("Close this " + sym + " position?")) return;
+        var base = baseInput.value.trim().replace(/\/$/, "");
+        fetch(base + "/positions/" + id, {
+          method: "PATCH",
+          headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+          body: JSON.stringify({ status: "CLOSED" })
+        }).then(function () { return loadPositions(sym).then(paint); });
+      });
+    });
   }
 
   function renderDetail(sym) {
@@ -444,14 +597,18 @@
       '<details class="raw"><summary>Every timeframe, raw</summary><div class="raw-body"><div class="scroll"><table>' +
       '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div></div></details>' +
-      '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). Nothing here accounts for a position you hold; position tracking is a separate piece, still being built.</p>';
+      '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). The "Your position" panel is a manual log you fill in yourself; nothing here opens or closes anything automatically.</p>';
   }
 
   function paint() {
     app.innerHTML = renderTriage() + (selected ? renderDetail(selected) : "");
     Array.prototype.forEach.call(document.querySelectorAll(".tri-card"), function (b) {
-      b.addEventListener("click", function () { selected = b.dataset.sym; loadSymbol(selected, true); });
+      b.addEventListener("click", function () {
+        selected = b.dataset.sym;
+        Promise.all([loadSymbol(selected, false), loadPositions(selected)]).then(function () { paint(); });
+      });
     });
+    wirePosition();
   }
 
   function loadSymbol(sym, repaint) {
@@ -491,8 +648,8 @@
             return LEVEL_ORDER[cache[x.symbol].assess.level] - LEVEL_ORDER[cache[y.symbol].assess.level];
           });
           if (!selected || !cache[selected]) selected = ranked[0].symbol;
-          paint();
-        });
+          return loadPositions(selected);
+        }).then(function () { paint(); });
       })
       .catch(function (e) {
         app.innerHTML = '<div class="msg err">' + e.message + '</div>';
