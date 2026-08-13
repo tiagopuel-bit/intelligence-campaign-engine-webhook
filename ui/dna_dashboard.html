@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Dashboard</title>
+<style>
+  :root{
+    --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
+    --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
+    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14);
+    --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
+    --positive-glow:rgba(47,158,91,.12); --warning-glow:rgba(180,121,12,.12); --critical-glow:rgba(196,67,58,.12);
+    --font-display: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
+      --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
+      --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12);
+      --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
+      --positive-glow:rgba(111,207,124,.11); --warning-glow:rgba(231,178,76,.11); --critical-glow:rgba(226,104,92,.11);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
+    --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
+    --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12);
+    --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
+    --positive-glow:rgba(111,207,124,.11); --warning-glow:rgba(231,178,76,.11); --critical-glow:rgba(226,104,92,.11);
+  }
+  :root[data-theme="light"]{
+    --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
+    --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
+    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14);
+    --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
+    --positive-glow:rgba(47,158,91,.12); --warning-glow:rgba(180,121,12,.12); --critical-glow:rgba(196,67,58,.12);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--ink); color:var(--text); font-family:var(--font-body); font-size:15px; line-height:1.5}
+  button{font-family:inherit; cursor:pointer}
+  input{font-family:var(--font-display)}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .tabular{font-variant-numeric:tabular-nums}
+  .label{font-family:var(--font-display); font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted)}
+
+  /* ---- header: minimal, no app chrome ---- */
+  header{border-bottom:1px solid var(--line); padding:18px clamp(16px,3vw,40px) 16px}
+  .header-inner{max-width:1320px; margin:0 auto; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap}
+  h1{font-family:var(--font-display); font-size:17px; font-weight:600; margin:0}
+  .subtitle{color:var(--muted); font-size:12.5px; margin-top:3px}
+  .conn{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .conn input{background:var(--surface); border:1px solid var(--line); color:var(--text); border-radius:7px; padding:7px 10px; font-size:12px}
+  .conn input[data-role="base"]{width:250px}
+  .conn input[data-role="token"]{width:150px}
+  .conn button{background:var(--surface-2); border:1px solid var(--line); color:var(--text); border-radius:7px; padding:7px 15px; font-size:12px}
+  .conn button:hover{border-color:var(--faint)}
+  .conn .status{font-family:var(--font-display); font-size:11px; color:var(--muted)}
+
+  main{max-width:1320px; margin:0 auto; padding:26px clamp(16px,3vw,40px) 70px}
+
+  /* ---- stage 1: triage rail ---- */
+  .stage-head{display:flex; align-items:baseline; gap:12px; margin:0 0 14px}
+  .stage-head h2{font-family:var(--font-display); font-size:12px; letter-spacing:.07em; text-transform:uppercase; margin:0; color:var(--text)}
+  .stage-head .hint{font-size:12px; color:var(--faint)}
+
+  .triage{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:10px; margin-bottom:38px}
+  .tri-card{text-align:left; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--faint); border-radius:10px; padding:12px 14px; transition:border-color .14s, background .14s}
+  .tri-card:hover{background:var(--surface-2)}
+  .tri-card.sel{border-color:var(--accent); border-left-color:var(--accent); background:var(--accent-glow)}
+  .tri-card.critical{border-left-color:var(--critical)}
+  .tri-card.watch{border-left-color:var(--warning)}
+  .tri-card.opportunity{border-left-color:var(--positive)}
+  .tri-top{display:flex; align-items:baseline; justify-content:space-between; gap:8px}
+  .tri-sym{font-family:var(--font-display); font-weight:700; font-size:16px}
+  .tri-state{font-size:11px; font-weight:700; font-family:var(--font-display); letter-spacing:.02em}
+  .tri-card.critical .tri-state{color:var(--critical)}
+  .tri-card.watch .tri-state{color:var(--warning)}
+  .tri-card.opportunity .tri-state{color:var(--positive)}
+  .tri-card.quiet .tri-state{color:var(--faint)}
+  .tri-why{font-size:12.5px; color:var(--muted); margin-top:5px; line-height:1.4}
+
+  /* ---- stage 2: the selected asset's flow ---- */
+  .asset-head{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px}
+  .asset-head .sym{font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:-.01em}
+  .asset-head .px{font-family:var(--font-display); font-size:15px; color:var(--muted)}
+  .verdict{font-size:19px; line-height:1.45; max-width:60ch; margin:0 0 4px; text-wrap:balance}
+  .verdict .em{font-weight:700}
+  .verdict.critical .em{color:var(--critical)}
+  .verdict.watch .em{color:var(--warning)}
+  .verdict.opportunity .em{color:var(--positive)}
+  .verdict.quiet .em{color:var(--muted)}
+  .verdict-sub{font-size:12.5px; color:var(--faint); margin-bottom:26px}
+
+  .flow{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
+  @media (max-width:900px){ .flow{grid-template-columns:1fr} }
+  .step{background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:16px 18px; position:relative}
+  .step .step-n{font-family:var(--font-display); font-size:10px; color:var(--faint); letter-spacing:.08em}
+  .step h3{font-size:13.5px; margin:5px 0 3px; font-weight:700}
+  .step .q{font-size:11.5px; color:var(--faint); margin-bottom:12px}
+  .step .answer{font-size:15px; font-weight:600; line-height:1.4; margin-bottom:10px}
+  .step.pos .answer{color:var(--positive)}
+  .step.warn .answer{color:var(--warning)}
+  .step.neg .answer{color:var(--critical)}
+  .step.none .answer{color:var(--faint); font-weight:500}
+  .tf-chips{display:flex; flex-wrap:wrap; gap:5px}
+  .chip{font-family:var(--font-display); font-size:10.5px; padding:2px 7px; border-radius:5px; background:var(--surface-2); color:var(--muted); border:1px solid var(--line); white-space:nowrap}
+  .chip.pos{color:var(--positive); background:var(--positive-glow); border-color:transparent}
+  .chip.warn{color:var(--warning); background:var(--warning-glow); border-color:transparent}
+  .chip.neg{color:var(--critical); background:var(--critical-glow); border-color:transparent}
+  .chip.stale{opacity:.45}
+
+  /* ---- stage 3: what to do ---- */
+  .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
+  .action{display:grid; grid-template-columns:26px 1fr; gap:12px; align-items:start; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .action.critical{border-color:color-mix(in srgb,var(--critical) 35%,var(--line)); background:var(--critical-glow)}
+  .action.watch{border-color:color-mix(in srgb,var(--warning) 32%,var(--line)); background:var(--warning-glow)}
+  .action.opportunity{border-color:color-mix(in srgb,var(--positive) 32%,var(--line)); background:var(--positive-glow)}
+  .action .ic{width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:13px; background:var(--surface-2)}
+  .action.critical .ic{background:color-mix(in srgb,var(--critical) 18%,transparent); color:var(--critical)}
+  .action.watch .ic{background:color-mix(in srgb,var(--warning) 18%,transparent); color:var(--warning)}
+  .action.opportunity .ic{background:color-mix(in srgb,var(--positive) 18%,transparent); color:var(--positive)}
+  .action .a-title{font-size:13.5px; font-weight:700; margin-bottom:2px}
+  .action .a-text{font-size:13.5px; color:var(--text); line-height:1.5}
+  .action .a-why{font-size:11.5px; color:var(--faint); margin-top:5px; font-family:var(--font-display)}
+  .no-actions{color:var(--faint); font-size:13px; padding:16px; border:1px dashed var(--line); border-radius:10px}
+
+  /* ---- collapsed raw data ---- */
+  details.raw{border:1px dashed var(--line); border-radius:10px; padding:0}
+  details.raw summary{list-style:none; padding:12px 16px; color:var(--muted); font-size:12px; cursor:pointer; font-family:var(--font-display)}
+  details.raw summary::-webkit-details-marker{display:none}
+  details.raw summary::before{content:"› "; display:inline-block; transition:transform .15s}
+  details.raw[open] summary::before{transform:rotate(90deg)}
+  details.raw summary:hover{color:var(--text)}
+  .raw-body{padding:0 16px 16px}
+  .scroll{overflow-x:auto; border:1px solid var(--line); border-radius:9px}
+  table{border-collapse:collapse; width:100%; min-width:620px}
+  th{font-family:var(--font-display); font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); text-align:left; padding:8px 12px; background:var(--surface-2); border-bottom:1px solid var(--line)}
+  td{padding:8px 12px; border-bottom:1px solid var(--line); background:var(--surface); font-size:12px}
+  tr:last-child td{border-bottom:none}
+  tr.st td{opacity:.5}
+  .tier-tag{font-family:var(--font-display); font-size:9.5px; color:var(--faint); text-transform:uppercase; letter-spacing:.06em}
+
+  .note{font-size:11.5px; color:var(--faint); line-height:1.6; margin-top:28px; padding-top:16px; border-top:1px solid var(--line); max-width:88ch}
+  .msg{padding:44px 0; text-align:center; color:var(--faint); font-size:13.5px}
+  .msg.err{color:var(--critical)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>DNA Dashboard</h1>
+      <div class="subtitle">What needs you, what you're holding, and what the campaign is doing — in that order.</div>
+    </div>
+    <div class="conn">
+      <input data-role="base" type="text" placeholder="API base URL">
+      <input data-role="token" type="password" placeholder="Token">
+      <button data-role="load">Load</button>
+      <span class="status" data-role="status"></span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="app"><div class="msg">Connecting…</div></div>
+</main>
+
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var baseInput = $('[data-role="base"]'), tokenInput = $('[data-role="token"]');
+  var statusEl = $('[data-role="status"]'), app = $("#app");
+
+  baseInput.value = localStorage.getItem("dna_api_base") || "https://dna-tradingview-webhook-production.up.railway.app";
+  tokenInput.value = localStorage.getItem("dna_api_token") || "";
+
+  function authHeaders() {
+    var t = tokenInput.value.trim();
+    return t ? { Authorization: "Bearer " + t } : {};
+  }
+
+  // --- Timeframe tiers, straight from Coordinator_Spec_v1.md -------------
+  // The whole point of the tier system is that a 5m reading must never carry
+  // the same visual weight as a 4H one. Grouping here is what stops the
+  // shortest timeframe from dominating the page.
+  var TIERS = [
+    { key: "backbone",  tfs: ["D", "W"],     label: "Direction" },
+    { key: "owner",     tfs: ["180", "240"], label: "Campaign" },
+    { key: "confirm",   tfs: ["60", "120"],  label: "Confirmation" },
+    { key: "timing",    tfs: ["15", "30"],   label: "Timing" },
+    { key: "micro",     tfs: ["3", "5"],     label: "Right now" }
+  ];
+  function tierOf(tf) {
+    for (var i = 0; i < TIERS.length; i++) if (TIERS[i].tfs.indexOf(String(tf)) !== -1) return TIERS[i];
+    return null;
+  }
+  var TF_SORT = { "3":0,"5":1,"15":2,"30":3,"60":4,"120":5,"180":6,"240":7,"D":8,"W":9 };
+  function tfKey(tf){ return TF_SORT.hasOwnProperty(String(tf)) ? TF_SORT[String(tf)] : 99; }
+  function tfLabel(tf) {
+    tf = String(tf);
+    if (tf === "D") return "Daily";
+    if (tf === "W") return "Weekly";
+    var n = parseInt(tf, 10);
+    if (isNaN(n)) return tf;
+    return n >= 60 ? (n / 60) + "H" : n + "m";
+  }
+
+  // --- Phase vocabulary -> plain language -------------------------------
+  var BROKEN   = ["FAILED","FAIL","MODERATE FAIL","STRONG FAIL","CATASTROPHIC FAIL"];
+  var STRESSED = ["FAIL TEST"];
+  var STRETCH  = ["PREMIUM","PEAK","MANAGE"];
+  var BUILDING = ["EXPANSION","IGNITION","STRONG START","CAMPAIGN START","FIRE ADD","ADD","RELOAD","ACCUMULATE","ACCUMULATION"];
+  var PLAIN = {
+    "EXPANSION":"expanding","IGNITION":"igniting","STRONG START":"campaign started",
+    "CAMPAIGN START":"campaign started","FIRE ADD":"adding hard","ADD":"adding",
+    "ACCUMULATION":"accumulating","ACCUMULATE":"accumulating","RELOAD":"recovered",
+    "MANAGE":"overextended","PEAK":"peaking","PREMIUM":"stretched",
+    "FAIL TEST":"under stress","FAILED":"broken down","FAIL":"broken down",
+    "MODERATE FAIL":"broken down","STRONG FAIL":"broken down badly",
+    "CATASTROPHIC FAIL":"broken down badly","WAIT":"quiet","RESOLVING":"resolving",
+    "RECOVERY WATCH":"trying to recover","START TEST":"testing","IGNITION TEST":"testing"
+  };
+  function plain(p){ return PLAIN[(p||"").toUpperCase()] || (p || "no reading").toLowerCase(); }
+  function phaseTone(p) {
+    p = (p || "").toUpperCase();
+    if (BROKEN.indexOf(p) !== -1) return "neg";
+    if (STRESSED.indexOf(p) !== -1) return "neg";
+    if (STRETCH.indexOf(p) !== -1) return "warn";
+    if (BUILDING.indexOf(p) !== -1) return "pos";
+    return "neu";
+  }
+
+  function age(raw) {
+    if (!raw) return { text: "—", stale: true, mins: Infinity };
+    var d = /^\d+$/.test(String(raw).trim())
+      ? new Date(Number(raw))
+      : new Date(String(raw).replace(" ", "T") + (String(raw).endsWith("Z") ? "" : "Z"));
+    if (isNaN(d.getTime())) return { text: String(raw), stale: false, mins: 0 };
+    var m = Math.round((Date.now() - d.getTime()) / 60000);
+    return {
+      mins: m, stale: m > 24 * 60,
+      text: m < 1 ? "just now" : m < 60 ? m + "m ago" : m < 1440 ? Math.round(m / 60) + "h ago" : Math.round(m / 1440) + "d ago"
+    };
+  }
+
+  // --- Tier reading: the worst/most significant signal in the tier wins --
+  function readTier(states, tier) {
+    var rows = states.filter(function (s) { return tier.tfs.indexOf(String(s.timeframe)) !== -1; });
+    if (!rows.length) return { tier: tier, rows: [], tone: "none", text: "no data", empty: true };
+    var rank = { neg: 3, warn: 2, pos: 1, neu: 0 };
+    var best = rows[0], bestRank = -1;
+    rows.forEach(function (r) {
+      var t = rank[phaseTone(r.phase)];
+      if (t > bestRank) { bestRank = t; best = r; }
+    });
+    return { tier: tier, rows: rows, tone: phaseTone(best.phase), text: plain(best.phase), lead: best, empty: false };
+  }
+
+  // --- Attention triage: one honest, rule-based verdict per asset -------
+  function assess(states) {
+    var t = {};
+    TIERS.forEach(function (tier) { t[tier.key] = readTier(states, tier); });
+
+    var newest = Infinity;
+    states.forEach(function (s) { var a = age(s.bar_time); if (a.mins < newest) newest = a.mins; });
+    var allStale = newest > 24 * 60;
+
+    var upper = [t.backbone, t.owner, t.confirm];
+    var brokenUpper = upper.filter(function (x) { return x.tone === "neg"; });
+    var stretched = TIERS.map(function (x) { return t[x.key]; }).filter(function (x) { return x.tone === "warn"; });
+    var buildingLower = [t.confirm, t.timing].filter(function (x) { return x.tone === "pos"; });
+
+    var level, headline, why;
+    if (brokenUpper.length) {
+      level = "critical";
+      headline = "needs a decision";
+      why = brokenUpper[0].tier.label.toLowerCase() + " has " + brokenUpper[0].text;
+    } else if (stretched.length) {
+      level = "watch";
+      headline = "worth watching";
+      why = stretched[0].tier.label.toLowerCase() + " is " + stretched[0].text;
+    } else if (buildingLower.length && t.owner.tone !== "neg") {
+      level = "opportunity";
+      headline = "setting up";
+      why = buildingLower[0].tier.label.toLowerCase() + " is " + buildingLower[0].text;
+    } else {
+      level = "quiet";
+      headline = "nothing to do";
+      why = t.owner.empty ? "no campaign-level data yet" : "campaign is " + t.owner.text;
+    }
+    if (allStale) why = "nothing new in " + (newest > 2880 ? Math.round(newest / 1440) + " days" : Math.round(newest / 60) + " hours");
+
+    return { tiers: t, level: level, headline: headline, why: why, allStale: allStale, newest: newest };
+  }
+
+  var LEVEL_ORDER = { critical: 0, watch: 1, opportunity: 2, quiet: 3 };
+
+  // --- Actions: only what's actionable now, never a running commentary --
+  function actionsFor(sym, a) {
+    var out = [], t = a.tiers;
+
+    if (t.backbone.tone === "neg" || t.owner.tone === "neg") {
+      out.push({ level: "critical", ic: "✕", title: "Protect, don't add",
+        text: "The campaign structure itself is " + (t.owner.tone === "neg" ? t.owner.text : t.backbone.text) + " on " + sym + ". Adding into this is fighting the higher timeframe.",
+        why: (t.owner.tone === "neg" ? t.owner.lead : t.backbone.lead).timeframe ? "from " + tfLabel((t.owner.tone === "neg" ? t.owner.lead : t.backbone.lead).timeframe) : "" });
+    } else if (t.confirm.tone === "neg") {
+      out.push({ level: "critical", ic: "!", title: "Confirmation broke",
+        text: "The confirmation timeframes turned " + t.confirm.text + " while the campaign above is still intact. This is where a position gets challenged — worth a look before it propagates up.",
+        why: "from " + tfLabel(t.confirm.lead.timeframe) });
+    }
+
+    TIERS.forEach(function (tier) {
+      var r = t[tier.key];
+      if (r.tone === "warn" && !r.empty) {
+        out.push({ level: "watch", ic: "⚠", title: "Stretched on " + tfLabel(r.lead.timeframe),
+          text: sym + " is reading " + r.text + " here — an early pause warning, not an exit signal. If you're holding, this is a manage-and-watch moment.",
+          why: "phase " + r.lead.phase });
+      }
+    });
+
+    if (t.owner.tone === "pos" && t.confirm.tone === "pos") {
+      out.push({ level: "opportunity", ic: "▲", title: "Campaign and confirmation agree",
+        text: "Both the campaign timeframes and the confirmation timeframes are constructive on " + sym + " — the cleanest version of a setup this engine produces.",
+        why: tfLabel(t.owner.lead.timeframe) + " + " + tfLabel(t.confirm.lead.timeframe) });
+    } else if (t.timing.tone === "pos" && t.owner.tone !== "neg" && t.confirm.tone !== "pos") {
+      out.push({ level: "watch", ic: "◷", title: "Timing is early",
+        text: "The timing timeframes are moving on " + sym + " but confirmation hasn't caught up. Real, but unproven at the level that decides whether it holds.",
+        why: "unconfirmed by " + TIERS[2].tfs.map(tfLabel).join("/") });
+    }
+
+    var messy = [];
+    Object.keys(t).forEach(function (k) {
+      (t[k].rows || []).forEach(function (r) { if (r.reload_quality === "MESSY") messy.push(r); });
+    });
+    if (messy.length) {
+      out.push({ level: "watch", ic: "↺", title: "Last recovery didn't hold",
+        text: "A failure followed the last recovery on " + tfLabel(messy[0].timeframe) + " within the tracking window. Treat the recovery as unsettled rather than done.",
+        why: "reload quality: messy" });
+    }
+
+    if (a.allStale) {
+      out.push({ level: "watch", ic: "◴", title: "This data is stale",
+        text: "Nothing has come in for " + sym + " in over a day. That could be a genuinely quiet campaign or a webhook that stopped — silence alone can't tell you which.",
+        why: "newest reading " + Math.round(a.newest / 60) + "h old" });
+    }
+    return out;
+  }
+
+  // --- Render -----------------------------------------------------------
+  var assets = [], cache = {}, selected = null;
+
+  function renderTriage() {
+    var ranked = assets.slice().sort(function (x, y) {
+      var ax = cache[x.symbol], ay = cache[y.symbol];
+      var lx = ax ? LEVEL_ORDER[ax.assess.level] : 9, ly = ay ? LEVEL_ORDER[ay.assess.level] : 9;
+      return lx - ly || x.symbol.localeCompare(y.symbol);
+    });
+    return '<div class="stage-head"><h2>Needs attention</h2><span class="hint">ranked by urgency, worst first</span></div>' +
+      '<div class="triage">' + ranked.map(function (as) {
+        var c = cache[as.symbol];
+        if (!c) return '<button class="tri-card quiet" data-sym="' + as.symbol + '"><div class="tri-top"><span class="tri-sym">' + as.symbol + '</span></div><div class="tri-why">loading…</div></button>';
+        var a = c.assess;
+        return '<button class="tri-card ' + a.level + (as.symbol === selected ? " sel" : "") + '" data-sym="' + as.symbol + '">' +
+          '<div class="tri-top"><span class="tri-sym">' + as.symbol + '</span><span class="tri-state">' + a.headline + '</span></div>' +
+          '<div class="tri-why">' + a.why + '</div></button>';
+      }).join("") + '</div>';
+  }
+
+  function renderDetail(sym) {
+    var c = cache[sym];
+    if (!c) return '<div class="msg">loading ' + sym + '…</div>';
+    var a = c.assess, t = a.tiers, states = c.states;
+    var px = states.length ? states.slice().sort(function (p, q) { return tfKey(p.timeframe) - tfKey(q.timeframe); })[0].close : null;
+
+    // Three-step flow: campaign -> opportunity -> right now.
+    var steps = [
+      { n: "Step 1", h: "Is there a campaign?", q: "Direction + campaign timeframes", parts: [t.backbone, t.owner] },
+      { n: "Step 2", h: "Is it actionable?", q: "Confirmation + timing", parts: [t.confirm, t.timing] },
+      { n: "Step 3", h: "What's happening now?", q: "Short-term pressure only", parts: [t.micro] }
+    ];
+
+    var flowHtml = steps.map(function (s) {
+      var lead = s.parts.filter(function (p) { return !p.empty; });
+      var rank = { neg: 3, warn: 2, pos: 1, neu: 0, none: -1 };
+      var top = lead.length ? lead.reduce(function (m, p) { return rank[p.tone] > rank[m.tone] ? p : m; }) : null;
+      var tone = top ? ({ neg: "neg", warn: "warn", pos: "pos", neu: "none" })[top.tone] : "none";
+      var answer = top ? (top.tier.label + " is " + top.text) : "No data at this level";
+      var chips = s.parts.reduce(function (acc, p) { return acc.concat(p.rows); }, [])
+        .sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); })
+        .map(function (r) {
+          var ag = age(r.bar_time);
+          return '<span class="chip ' + phaseTone(r.phase) + (ag.stale ? " stale" : "") + '">' + tfLabel(r.timeframe) + " · " + plain(r.phase) + '</span>';
+        }).join("");
+      return '<div class="step ' + tone + '"><div class="step-n">' + s.n + '</div><h3>' + s.h + '</h3><div class="q">' + s.q + '</div>' +
+        '<div class="answer">' + answer + '</div><div class="tf-chips">' + (chips || '<span class="chip">nothing reporting</span>') + '</div></div>';
+    }).join("");
+
+    var acts = actionsFor(sym, a);
+    var actHtml = acts.length
+      ? acts.map(function (x) {
+          return '<div class="action ' + x.level + '"><div class="ic">' + x.ic + '</div><div>' +
+            '<div class="a-title">' + x.title + '</div><div class="a-text">' + x.text + '</div>' +
+            (x.why ? '<div class="a-why">' + x.why + '</div>' : "") + '</div></div>';
+        }).join("")
+      : '<div class="no-actions">Nothing actionable on ' + sym + ' right now. The engine has readings, but none of them cross a threshold worth interrupting you for.</div>';
+
+    var rows = states.slice().sort(function (x, y) { return tfKey(y.timeframe) - tfKey(x.timeframe); }).map(function (r) {
+      var ag = age(r.bar_time), tr = tierOf(r.timeframe);
+      return '<tr class="' + (ag.stale ? "st" : "") + '"><td class="tabular" style="font-family:var(--font-display);font-weight:600">' + tfLabel(r.timeframe) + '</td>' +
+        '<td><span class="tier-tag">' + (tr ? tr.label : "—") + '</span></td>' +
+        '<td>' + (r.phase || "—") + '</td>' +
+        '<td class="tabular">' + (r.health != null ? r.health + "%" : "—") + '</td>' +
+        '<td class="tabular">' + (r.confidence != null ? r.confidence + "%" : "—") + '</td>' +
+        '<td>' + (r.recent_event || "—") + '</td>' +
+        '<td class="tabular">' + ag.text + '</td></tr>';
+    }).join("");
+
+    return '<div class="asset-head"><span class="sym">' + sym + '</span>' +
+        (px != null ? '<span class="px tabular">$' + px + '</span>' : "") + '</div>' +
+      '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
+      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>' +
+      '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
+      '<div class="flow">' + flowHtml + '</div>' +
+      '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
+      '<div class="actions">' + actHtml + '</div>' +
+      '<details class="raw"><summary>Every timeframe, raw</summary><div class="raw-body"><div class="scroll"><table>' +
+      '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div></div></details>' +
+      '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). Nothing here accounts for a position you hold; position tracking is a separate piece, still being built.</p>';
+  }
+
+  function paint() {
+    app.innerHTML = renderTriage() + (selected ? renderDetail(selected) : "");
+    Array.prototype.forEach.call(document.querySelectorAll(".tri-card"), function (b) {
+      b.addEventListener("click", function () { selected = b.dataset.sym; loadSymbol(selected, true); });
+    });
+  }
+
+  function loadSymbol(sym, repaint) {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    if (cache[sym]) { if (repaint) paint(); return Promise.resolve(); }
+    return fetch(base + "/state_all/" + encodeURIComponent(sym), { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : { states: [] }; })
+      .catch(function () { return { states: [] }; })
+      .then(function (d) {
+        var states = d.states || [];
+        cache[sym] = { states: states, assess: assess(states) };
+        if (repaint) paint();
+      });
+  }
+
+  function load() {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    if (!base) { statusEl.textContent = "enter a URL"; return; }
+    localStorage.setItem("dna_api_base", base);
+    localStorage.setItem("dna_api_token", tokenInput.value.trim());
+    statusEl.textContent = "loading…";
+    cache = {};
+    app.innerHTML = '<div class="msg">Loading…</div>';
+
+    fetch(base + "/assets", { headers: authHeaders() })
+      .then(function (r) {
+        if (r.status === 401) throw new Error("Unauthorized — check the token.");
+        if (!r.ok) throw new Error("GET /assets returned HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        assets = d.assets || [];
+        if (!assets.length) { app.innerHTML = '<div class="msg">No assets recorded yet.</div>'; statusEl.textContent = "0 assets"; return; }
+        statusEl.textContent = assets.length + " assets";
+        return Promise.all(assets.map(function (a) { return loadSymbol(a.symbol, false); })).then(function () {
+          var ranked = assets.slice().sort(function (x, y) {
+            return LEVEL_ORDER[cache[x.symbol].assess.level] - LEVEL_ORDER[cache[y.symbol].assess.level];
+          });
+          if (!selected || !cache[selected]) selected = ranked[0].symbol;
+          paint();
+        });
+      })
+      .catch(function (e) {
+        app.innerHTML = '<div class="msg err">' + e.message + '</div>';
+        statusEl.textContent = "error";
+      });
+  }
+
+  $('[data-role="load"]').addEventListener("click", load);
+  baseInput.addEventListener("keydown", function (e) { if (e.key === "Enter") load(); });
+  tokenInput.addEventListener("keydown", function (e) { if (e.key === "Enter") load(); });
+  load();
+})();
+</script>
+</body>
+</html>
