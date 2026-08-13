@@ -22,7 +22,7 @@ import requests
 from lib import pine_replay_v12_6_19 as replay
 from massive_ohlc import BASE_URL, api_key, limiter
 
-SYMBOLS = ("AMC", "GME")
+SYMBOLS = ("AMC", "GME", "VALE")
 
 # (db timeframe label, tf_minutes, multiplier, span)
 LADDER = [
@@ -164,16 +164,25 @@ def _replay_one(symbol: str, label: str, tf_minutes: int, mult: int, span: str,
     return inserts, len(df)
 
 
-def run_backfill(db_path: str, start: str = "2024-08-12", end: str | None = None) -> dict:
+def run_backfill(db_path: str, start: str = "2024-08-12", end: str | None = None,
+                 symbols: tuple[str, ...] | None = None) -> dict:
     if end is None:
         end = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if symbols is None:
+        symbols = SYMBOLS
     conn = sqlite3.connect(db_path, timeout=60)
     conn.execute("PRAGMA busy_timeout=5000")
     report: dict = {"symbols": {}}
     total_inserted = 0
-    for symbol in SYMBOLS:
+    for symbol in symbols:
         report["symbols"][symbol] = {}
         for label, tf_minutes, mult, span in LADDER:
+            # Idempotent: clear any prior backfill for this symbol/timeframe so a
+            # re-run never duplicates rows. Live rows are untouched.
+            conn.execute(
+                "DELETE FROM alerts WHERE symbol=? AND timeframe=? AND source='backfill_replay'",
+                (symbol, label),
+            )
             cutoff = _live_cutoff(conn, symbol, label)
             print(f"[backfill] {symbol} {label}: live_cutoff={cutoff}", flush=True)
             inserts, bar_count = _replay_one(symbol, label, tf_minutes, mult, span, start, end)

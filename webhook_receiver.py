@@ -624,12 +624,12 @@ def get_history(symbol, timeframe):
 _backfill_state = {"status": "idle", "report": None}
 
 
-def _run_backfill_job():
+def _run_backfill_job(symbols=None):
     global _backfill_state
     _backfill_state = {"status": "running", "report": None}
     try:
         import backfill
-        report = backfill.run_backfill(str(DB_PATH))
+        report = backfill.run_backfill(str(DB_PATH), symbols=symbols)
         _backfill_state = {"status": "done", "report": report}
     except Exception as exc:  # noqa: BLE001
         _backfill_state = {"status": "error", "report": str(exc)}
@@ -641,7 +641,13 @@ def trigger_backfill():
         return jsonify({"error": "unauthorized"}), 401
     if _backfill_state.get("status") == "running":
         return jsonify({"status": "already_running"}), 409
-    threading.Thread(target=_run_backfill_job, daemon=True).start()
+    payload = request.get_json(silent=True) or {}
+    symbols = None
+    if payload.get("symbols"):
+        symbols = tuple(str(s).strip().upper() for s in payload["symbols"] if str(s).strip())
+        if not symbols:
+            return jsonify({"error": "empty symbols"}), 400
+    threading.Thread(target=_run_backfill_job, args=(symbols,), daemon=True).start()
     return jsonify({"status": "started"})
 
 
