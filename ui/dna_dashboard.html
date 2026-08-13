@@ -173,6 +173,15 @@
   .pf-del{background:transparent; color:var(--faint); border:1px solid var(--line); border-radius:7px; padding:3px 9px; font-size:12px}
   .pf-del:hover{color:var(--critical); border-color:var(--critical)}
   .pf-detail{border-top:1px dashed var(--line); padding:12px 14px}
+  .pf-actions{display:flex; gap:8px; margin-top:12px}
+  .pf-close{background:var(--critical-glow); color:var(--critical); border:1px solid color-mix(in srgb,var(--critical) 40%,transparent); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600}
+  .pf-close:hover{background:color-mix(in srgb,var(--critical) 18%,transparent)}
+
+  /* ---- open-a-position (collapsible) ---- */
+  .open-wrap{margin:0 0 20px}
+  .open-pos-btn{background:var(--accent); color:#04211b; border:none; border-radius:8px; padding:9px 16px; font-weight:700; font-size:13px}
+  .open-pos-btn:hover{filter:brightness(1.08)}
+  .open-pos-form{margin-top:10px}
 
   /* ---- stage 3: what to do ---- */
   .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
@@ -500,6 +509,9 @@
       var detail = (p.valuation && p.valuation.summary)
         ? renderValuationBody(s.symbol, p.valuation)
         : '<div class="position-placeholder">No valuation available.</div>';
+      if (s.status === "OPEN") {
+        detail += '<div class="pf-actions"><button class="pf-close" data-id="' + s.id + '">Close position…</button></div>';
+      }
       return '<div class="pf-item">' +
         '<div class="pf-row">' +
           '<span class="pf-label">' + label + '</span>' +
@@ -534,7 +546,7 @@
     Array.prototype.forEach.call(document.querySelectorAll(".pf-jump"), function (b) {
       b.addEventListener("click", function () {
         selected = b.dataset.sym;
-        Promise.all([loadSymbol(selected, false), loadPositions(selected)]).then(paint);
+        loadSymbol(selected, false).then(paint);
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll(".pf-del"), function (b) {
@@ -544,9 +556,31 @@
         var base = baseInput.value.trim().replace(/\/$/, "");
         fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
           .then(function () {
-            posCache = {};
-            return Promise.all([loadPortfolio(), loadClosedPositions(), selected ? loadPositions(selected) : Promise.resolve()]);
+            return Promise.all([loadPortfolio(), loadClosedPositions()]);
           }).then(paint);
+      });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".pf-close"), function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var id = b.dataset.id;
+        var entry = portfolio.filter(function (x) { return String(x.summary.id) === String(id); })[0];
+        var sym = entry ? entry.summary.symbol : "";
+        var def = "";
+        if (entry && entry.valuation && entry.valuation.underlying) def = entry.valuation.underlying.current;
+        var price = window.prompt("Exit price for " + sym + "? (blank = no price)", def || "");
+        if (price === null) return;
+        var body = { status: "CLOSED" };
+        if (String(price).trim() !== "") body.exit_price = Number(price);
+        var base = baseInput.value.trim().replace(/\/$/, "");
+        fetch(base + "/positions/" + id, {
+          method: "PATCH",
+          headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+          body: JSON.stringify(body)
+        }).then(function () {
+          return Promise.all([loadPortfolio(), loadClosedPositions()]).then(paint);
+        });
       });
     });
   }
@@ -725,6 +759,15 @@
   }
 
   function wirePosition() {
+    var openBtn = document.querySelector(".open-pos-btn");
+    var openForm = document.querySelector(".open-pos-form");
+    if (openBtn && openForm) {
+      openBtn.addEventListener("click", function () {
+        var show = openForm.style.display === "none";
+        openForm.style.display = show ? "" : "none";
+        openBtn.textContent = show ? "− Close" : "+ Open a position in " + (openForm.dataset.sym || "");
+      });
+    }
     var form = document.querySelector(".pos-form");
     if (!form) return;
     var sym = form.dataset.sym;
@@ -803,45 +846,29 @@
           }
           form.reset();
           syncOptFields();
-          return loadPositions(sym).then(paint);
+          return Promise.all([loadPortfolio(), loadClosedPositions()]).then(paint);
         })
         .catch(function (ex) { errEl.textContent = "Error: " + ex.message; errEl.style.display = "block"; });
     });
 
-    Array.prototype.forEach.call(document.querySelectorAll(".pos-close"), function (b) {
-      b.addEventListener("click", function () {
-        var id = b.dataset.id;
-        var def = "";
-        var pos = (posCache[sym] || []).filter(function (x) { return String(x.id) === String(id); })[0];
-        if (pos && pos.valuation && pos.valuation.underlying) def = pos.valuation.underlying.current;
-        var price = window.prompt("Exit price for " + sym + "? (blank = no price)", def || "");
-        if (price === null) return;
-        var body = { status: "CLOSED" };
-        if (String(price).trim() !== "") body.exit_price = Number(price);
-        var base = baseInput.value.trim().replace(/\/$/, "");
-        fetch(base + "/positions/" + id, {
-          method: "PATCH",
-          headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
-          body: JSON.stringify(body)
-        }).then(function () {
-          posCache = {};
-          return Promise.all([loadPortfolio(), loadClosedPositions(), loadPositions(sym)]).then(paint);
-        });
-      });
-    });
+  }
 
-    Array.prototype.forEach.call(document.querySelectorAll(".pos-del"), function (b) {
-      b.addEventListener("click", function () {
-        var id = b.dataset.id;
-        if (!window.confirm("Delete this " + sym + " position and all its legs?")) return;
-        var base = baseInput.value.trim().replace(/\/$/, "");
-        fetch(base + "/positions/" + id, { method: "DELETE", headers: authHeaders() })
-          .then(function () {
-            posCache = {};
-            return Promise.all([loadPortfolio(), loadClosedPositions(), loadPositions(sym)]).then(paint);
-          });
-      });
-    });
+  function renderAssetHeader(sym) {
+    var c = cache[sym];
+    if (!c) return '';
+    var a = c.assess, states = c.states;
+    var px = states.length ? states.slice().sort(function (p, q) { return tfKey(p.timeframe) - tfKey(q.timeframe); })[0].close : null;
+    return '<div class="asset-head"><span class="sym">' + sym + '</span>' +
+      (px != null ? '<span class="px tabular">$' + px + '</span>' : "") + '</div>' +
+      '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
+      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
+  }
+
+  function renderOpenPosition(sym) {
+    return '<div class="open-wrap">' +
+      '<button class="open-pos-btn">+ Open a position in ' + sym + '</button>' +
+      '<div class="open-pos-form" style="display:none">' + renderPositionForm(sym) + '</div>' +
+      '</div>';
   }
 
   function renderDetail(sym) {
@@ -893,28 +920,25 @@
         '<td class="tabular">' + ag.text + '</td></tr>';
     }).join("");
 
-    return '<div class="asset-head"><span class="sym">' + sym + '</span>' +
-        (px != null ? '<span class="px tabular">$' + px + '</span>' : "") + '</div>' +
-      '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
-      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>' +
-      renderPosition(sym) +
-      '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
+    return '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
       '<div class="flow">' + flowHtml + '</div>' +
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
       '<div class="actions">' + actHtml + '</div>' +
       '<details class="raw"><summary>Every timeframe, raw</summary><div class="raw-body"><div class="scroll"><table>' +
       '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div></div></details>' +
-      '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). The "Your position" panel is a manual log you fill in yourself; nothing here opens or closes anything automatically.</p>';
+      '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). Positions are a manual log; nothing here opens or closes anything automatically.</p>';
   }
 
   function paint() {
-    app.innerHTML = renderPortfolio() + renderTriage() + (selected ? renderDetail(selected) : "");
+    app.innerHTML = (selected ? renderAssetHeader(selected) : "") +
+      (selected ? renderOpenPosition(selected) : "") +
+      renderPortfolio() + renderTriage() + (selected ? renderDetail(selected) : "");
     wirePortfolio();
     Array.prototype.forEach.call(document.querySelectorAll(".tri-card"), function (b) {
       b.addEventListener("click", function () {
         selected = b.dataset.sym;
-        Promise.all([loadSymbol(selected, false), loadPositions(selected)]).then(function () { paint(); });
+        loadSymbol(selected, false).then(function () { paint(); });
       });
     });
     wirePosition();
@@ -957,7 +981,7 @@
             return LEVEL_ORDER[cache[x.symbol].assess.level] - LEVEL_ORDER[cache[y.symbol].assess.level];
           });
           if (!selected || !cache[selected]) selected = ranked[0].symbol;
-          return Promise.all([loadPortfolio(), loadClosedPositions(), loadPositions(selected)]);
+          return Promise.all([loadPortfolio(), loadClosedPositions()]);
         }).then(function () { paint(); });
       })
       .catch(function (e) {
