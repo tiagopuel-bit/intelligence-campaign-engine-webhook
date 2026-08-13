@@ -77,7 +77,9 @@ class _Limiter:
             self._last = time.monotonic()
 
 
-_limiter = _Limiter(FREE_PLAN_REQUESTS_PER_MINUTE)
+# Public limiter so other Massive consumers (options) share the same
+# per-API-key budget instead of double-spending the free plan.
+limiter = _Limiter(FREE_PLAN_REQUESTS_PER_MINUTE)
 _cache: dict[tuple[str, str], tuple[float, dict]] = {}
 _cache_lock = threading.Lock()
 
@@ -107,7 +109,7 @@ def _fetch_raw(symbol: str, canonical: str) -> list[dict]:
     params = {"adjusted": "true", "sort": "asc", "limit": "50000", "apiKey": api_key()}
     rows: list[dict] = []
     for attempt in range(4):
-        _limiter.wait()
+        limiter.wait()
         response = requests.get(url, params=params, timeout=30)
         if response.status_code == 429:
             retry_after = response.headers.get("Retry-After")

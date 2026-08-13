@@ -36,6 +36,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import massive_ohlc
+import massive_options
 import positions
 
 
@@ -555,6 +556,22 @@ def get_ohlc(symbol, timeframe):
     return jsonify({**meta, "bars": bars})
 
 
+@app.route("/options/chain/<symbol>", methods=["GET"])
+def get_options_chain(symbol):
+    """Massive free-plan options chain for an underlying (contract picker)."""
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    clean = positions.clean_symbol(symbol)
+    if clean is None:
+        return jsonify({"error": "invalid symbol"}), 400
+    try:
+        chain = massive_options.get_chain(clean)
+    except massive_options.UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+    return jsonify(chain)
+
+
 @app.after_request
 def _add_cors_headers(response):
     """Permissive CORS for the static dashboard/landing pages.
@@ -689,6 +706,117 @@ def _position_detail(conn, position_id):
     detail["instruments"] = shaped
     detail["dna_context"] = _dna_context(conn, row["symbol"], row["opened_at"])
     return detail
+
+
+def _compute_valuation(symbol, instruments):
+    """Enrich open legs with live Massive prices (underlying + option bars).
+
+    `instruments` is a list of shaped (open) instrument dicts. Option legs are
+    grouped by (type, strike, expiration); stock legs are pooled. Free-plan
+    reality: option "current" is the latest daily close, not a real-time quote,
+    and there are no Greeks.
+    """
+    bars, _meta = massive_ohlc.get_ohlc(symbol, "D")
+    underlying_current = bars[-1]["c"] if bars else None
+    underlying_prev = bars[-2]["c"] if len(bars) >= 2 else underlying_current
+
+    option_groups: dict[tuple, list] = {}
+    stock_legs: list = []
+    for inst in instruments:
+        itype = inst["instrument_type"]
+        if itype == "SHARE":
+            stock_legs.append(inst)
+        elif itype in ("CALL", "PUT") and inst["strike"] is not None and inst["expiration"]:
+            option_groups.setdefault((itype, inst["strike"], inst["expiration"]), []).append(inst)
+
+    options = []
+    for (ctype, strike, exp), legs in option_groups.items():
+        contracts = sum(l["quantity"] for l in legs)
+        cost_basis = sum(l["entry_price"] * l["quantity"] for l in legs)
+        avg_cost = cost_basis / contracts if contracts else None
+        quote = massive_options.get_option_quote(symbol, ctype, strike, exp)
+        current = quote["current"] if quote else None
+        prev = quote["prev"] if quote else None
+        mult = 100
+        itm = None
+        if underlying_current is not None and strike is not None:
+            itm = underlying_current > strike if ctype == "CALL" else underlying_current < strike
+        options.append({
+            "contract": {"type": ctype, "strike": strike, "expiration": exp},
+            "contracts": contracts,
+            "avg_cost": round(avg_cost, 4) if avg_cost is not None else None,
+            "current_price": current,
+            "prev_price": prev,
+            "market_value": round(current * contracts * mult, 2) if current is not None else None,
+            "cost_basis": round(cost_basis, 2),
+            "first_entry": min(l["entry_time"] for l in legs) if legs else None,
+            "breakeven": round((strike + avg_cost) if ctype == "CALL" else (strike - avg_cost), 4)
+            if (strike is not None and avg_cost is not None) else None,
+            "itm": itm,
+            "today_pnl": round((current - prev) * contracts * mult, 2)
+            if (current is not None and prev is not None) else None,
+            "today_return_pct": round((current - prev) / prev * 100, 2)
+            if (current is not None and prev) else None,
+            "total_pnl": round((current - avg_cost) * contracts * mult, 2)
+            if (current is not None and avg_cost is not None) else None,
+            "total_return_pct": round((current - avg_cost) / avg_cost * 100, 2)
+            if (current is not None and avg_cost) else None,
+            "leg_ids": [l["id"] for l in legs],
+        })
+
+    stock = None
+    if stock_legs:
+        shares = sum(l["quantity"] for l in stock_legs)
+        cost_basis = sum(l["entry_price"] * l["quantity"] for l in stock_legs)
+        avg_cost = cost_basis / shares if shares else None
+        cur = underlying_current
+        stock = {
+            "shares": shares,
+            "avg_cost": round(avg_cost, 4) if avg_cost is not None else None,
+            "current_price": cur,
+            "prev_price": underlying_prev,
+            "market_value": round(cur * shares, 2) if cur is not None else None,
+            "cost_basis": round(cost_basis, 2),
+            "first_entry": min(l["entry_time"] for l in stock_legs) if stock_legs else None,
+            "today_pnl": round((cur - underlying_prev) * shares, 2)
+            if (cur is not None and underlying_prev is not None) else None,
+            "today_return_pct": round((cur - underlying_prev) / underlying_prev * 100, 2)
+            if (cur is not None and underlying_prev) else None,
+            "total_pnl": round((cur - avg_cost) * shares, 2)
+            if (cur is not None and avg_cost is not None) else None,
+            "total_return_pct": round((cur - avg_cost) / avg_cost * 100, 2)
+            if (cur is not None and avg_cost) else None,
+        }
+
+    def _sum(items, key):
+        return sum((x.get(key) or 0) for x in items)
+
+    options_value = _sum(options, "market_value")
+    options_today = _sum(options, "today_pnl")
+    options_total = _sum(options, "total_pnl")
+    stock_value = stock["market_value"] if stock and stock["market_value"] is not None else 0
+    stock_today = stock["today_pnl"] if stock and stock["today_pnl"] is not None else 0
+    stock_total = stock["total_pnl"] if stock and stock["total_pnl"] is not None else 0
+
+    return {
+        "underlying": {"symbol": symbol, "current": underlying_current, "prev": underlying_prev},
+        "options": options,
+        "stock": stock,
+        "summary": {
+            "options_contracts": _sum(options, "contracts"),
+            "options_value": round(options_value, 2),
+            "options_today_pnl": round(options_today, 2),
+            "options_total_pnl": round(options_total, 2),
+            "stock_shares": stock["shares"] if stock else 0,
+            "stock_value": round(stock_value, 2),
+            "stock_today_pnl": round(stock_today, 2),
+            "stock_total_pnl": round(stock_total, 2),
+            "total_value": round(options_value + stock_value, 2),
+            "total_today_pnl": round(options_today + stock_today, 2),
+            "total_pnl": round(options_total + stock_total, 2),
+        },
+        "as_of": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 @app.route("/positions", methods=["POST"])
@@ -875,6 +1003,38 @@ def update_instrument(position_id, iid):
     updated = conn.execute("SELECT * FROM position_instruments WHERE id=?", (iid,)).fetchone()
     conn.close()
     return jsonify(positions.shape_instrument(updated))
+
+
+@app.route("/positions/<int:position_id>/valuation", methods=["GET"])
+def get_position_valuation(position_id):
+    """Live valuation of a position's open legs (near-live Massive prices).
+
+    Groups option legs by contract (type/strike/expiration) and pools stock
+    legs, then enriches with current/prev price, market value, breakeven, ITM,
+    today's and total return -- plus a summary roll-up.
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    conn = get_db()
+    row = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": "position not found"}), 404
+    instruments = conn.execute(
+        "SELECT * FROM position_instruments WHERE position_id=? AND status='OPEN' ORDER BY id",
+        (position_id,),
+    ).fetchall()
+    conn.close()
+    shaped = [positions.shape_instrument(r) for r in instruments]
+    try:
+        valuation = _compute_valuation(row["symbol"], shaped)
+    except massive_options.UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+    except massive_ohlc._UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+    return jsonify({"position_id": position_id, "symbol": row["symbol"], **valuation})
 
 
 init_db()

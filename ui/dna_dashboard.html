@@ -136,6 +136,21 @@
   .pos-close{margin-left:auto; background:var(--critical-glow); color:var(--critical); border:1px solid color-mix(in srgb,var(--critical) 40%,transparent); border-radius:7px; padding:5px 12px; font-size:11.5px; font-weight:600}
   .pos-close:hover{background:color-mix(in srgb,var(--critical) 18%,transparent)}
   .pos-legs{display:flex; flex-wrap:wrap; gap:5px}
+  .pos-stats{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:11px}
+  .pos-stat{flex:1; min-width:150px; background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:9px 12px}
+  .stat-label{font-family:var(--font-display); font-size:10px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+  .stat-value{font-family:var(--font-display); font-size:20px; font-weight:700; margin:1px 0}
+  .stat-sub{font-size:11px; color:var(--faint)}
+  .pos-opt-list{display:flex; flex-direction:column; gap:8px}
+  .pos-opt{background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:9px 12px}
+  .pos-opt-top{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .pos-opt-contracts{font-size:11.5px; color:var(--muted); font-family:var(--font-display)}
+  .pos-opt-pnl{margin-left:auto; font-family:var(--font-display); font-weight:700; font-size:13px}
+  .pos-opt-pnl.pos{color:var(--positive)}
+  .pos-opt-pnl.neg{color:var(--critical)}
+  .pos-opt-detail{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:5px 14px; margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); font-size:11.5px; color:var(--muted)}
+  .pos-opt-detail b{font-family:var(--font-display); color:var(--faint); font-weight:600; font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; display:block}
+  .pos-und{font-size:11px; color:var(--faint); margin-top:8px; font-family:var(--font-display)}
 
   /* ---- stage 3: what to do ---- */
   .actions{display:flex; flex-direction:column; gap:9px; margin-bottom:26px}
@@ -396,9 +411,16 @@
   }
 
   // --- Your position: manual log, no broker ------------------------------
-  // POST /positions opens a leg; GET /positions?symbol= lists them; PATCH
-  // closes. The system never opens anything on its own.
-  var posCache = {};
+  var posCache = {}, chainCache = {};
+
+  function loadChain(sym) {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    if (chainCache[sym]) return Promise.resolve(chainCache[sym]);
+    return fetch(base + "/options/chain/" + encodeURIComponent(sym), { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : { contracts: [], expirations: [] }; })
+      .catch(function () { return { contracts: [], expirations: [] }; })
+      .then(function (d) { chainCache[sym] = d; return d; });
+  }
 
   function loadPositions(sym) {
     var base = baseInput.value.trim().replace(/\/$/, "");
@@ -408,51 +430,112 @@
       .then(function (d) {
         var summaries = d.positions || [];
         return Promise.all(summaries.map(function (p) {
-          return fetch(base + "/positions/" + p.id, { headers: authHeaders() })
+          var detailP = fetch(base + "/positions/" + p.id, { headers: authHeaders() })
             .then(function (r) { return r.ok ? r.json() : p; })
             .catch(function () { return p; });
+          var valP = fetch(base + "/positions/" + p.id + "/valuation", { headers: authHeaders() })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; });
+          return Promise.all([detailP, valP]).then(function (res) {
+            var detail = res[0]; detail.valuation = res[1]; return detail;
+          });
         }));
       })
       .then(function (detailed) { posCache[sym] = detailed; });
   }
 
   function fmtMoney(n) { return n == null ? "—" : "$" + Number(n).toFixed(2); }
+  function fmtSigned(n) { return n == null ? "—" : (n >= 0 ? "+" : "") + fmtMoney(n); }
+  function fmtPct(n) { return n == null ? "—" : (n >= 0 ? "+" : "") + Number(n).toFixed(1) + "%"; }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    var d = new Date(String(iso).replace(" ", "T") + (String(iso).endsWith("Z") ? "" : "Z"));
+    if (isNaN(d.getTime())) return String(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }
+
+  function statCard(label, sub, value, today, total) {
+    return '<div class="pos-stat"><div class="stat-label">' + label + '</div>' +
+      '<div class="stat-value tabular">' + fmtMoney(value) + '</div>' +
+      '<div class="stat-sub tabular">' + sub + ' · today ' + fmtSigned(today) + ' · total ' + fmtSigned(total) + '</div></div>';
+  }
+
+  function renderOptionRow(sym, o) {
+    var c = o.contract;
+    var moneyness = o.itm === true ? "ITM" : (o.itm === false ? "OTM" : "");
+    var moneyCls = moneyness === "ITM" ? "pos" : (moneyness === "OTM" ? "neg" : "");
+    var title = sym + " $" + c.strike + " " + c.type + (moneyness ? " (" + moneyness + ")" : "");
+    var pnl = o.total_pnl, pnlCls = pnl == null ? "" : (pnl >= 0 ? "pos" : "neg");
+    var detail =
+      '<span><b>avg cost</b> ' + fmtMoney(o.avg_cost) + '</span>' +
+      '<span><b>current</b> ' + fmtMoney(o.current_price) + '</span>' +
+      '<span><b>market value</b> ' + fmtMoney(o.market_value) + '</span>' +
+      '<span><b>bought</b> ' + fmtDate(o.first_entry) + '</span>' +
+      '<span><b>breakeven</b> ' + fmtMoney(o.breakeven) + '</span>' +
+      '<span><b>today</b> ' + fmtSigned(o.today_pnl) + ' (' + fmtPct(o.today_return_pct) + ')</span>' +
+      '<span><b>total</b> ' + fmtSigned(o.total_pnl) + ' (' + fmtPct(o.total_return_pct) + ')</span>';
+    return '<div class="pos-opt"><div class="pos-opt-top">' +
+      '<span class="chip ' + moneyCls + '">' + title + '</span>' +
+      '<span class="pos-opt-contracts tabular">' + o.contracts + ' contracts</span>' +
+      '<span class="pos-opt-pnl tabular ' + pnlCls + '">' + fmtSigned(pnl) + '</span>' +
+      '</div><div class="pos-opt-detail">' + detail + '</div></div>';
+  }
+
+  function renderValuationBody(sym, v) {
+    var s = v.summary, html = "";
+    var stats = [];
+    if (s.options_contracts > 0 || s.options_value > 0) {
+      stats.push(statCard("Options", s.options_contracts + " contracts", s.options_value, s.options_today_pnl, s.options_total_pnl));
+    }
+    if (s.stock_shares > 0 || s.stock_value > 0) {
+      stats.push(statCard("Stock", s.stock_shares + " shares", s.stock_value, s.stock_today_pnl, s.stock_total_pnl));
+    }
+    if (stats.length) html += '<div class="pos-stats">' + stats.join("") + '</div>';
+    var opts = v.options || [];
+    if (opts.length) html += '<div class="pos-opt-list">' + opts.map(function (o) { return renderOptionRow(sym, o); }).join("") + '</div>';
+    var u = v.underlying;
+    if (u && u.current != null) html += '<div class="pos-und tabular">' + sym + ' last ' + fmtMoney(u.current) + (u.prev != null ? ' (prev ' + fmtMoney(u.prev) + ')' : '') + '</div>';
+    return html;
+  }
 
   function renderPositionRow(p) {
     var dir = p.direction === "LONG" ? "▲ LONG" : "▼ SHORT";
     var dirCls = p.direction === "LONG" ? "pos" : "neg";
     var open = p.status === "OPEN";
-    var legs = (p.instruments || []).map(function (i) {
-      var label = i.instrument_type === "SHARE"
-        ? i.instrument_type + " ×" + i.quantity + " @ " + fmtMoney(i.entry_price)
-        : i.instrument_type + " " + (i.strike != null ? i.strike : "") +
-          (i.expiration ? " " + i.expiration : "") + " ×" + i.quantity + " @ " + fmtMoney(i.entry_price);
-      var cls = i.status === "OPEN" ? "pos" : (i.status === "ROLLED" ? "warn" : "");
-      var suffix = i.status === "OPEN" ? "" : " · " + i.status.toLowerCase();
-      return '<span class="chip ' + cls + '">' + label + suffix + '</span>';
-    }).join("");
-    var closeBtn = open
-      ? '<button class="pos-close" data-id="' + p.id + '">Close position</button>'
-      : "";
+    var closeBtn = open ? '<button class="pos-close" data-id="' + p.id + '">Close position</button>' : "";
+    var body;
+    if (p.valuation && p.valuation.summary) {
+      body = renderValuationBody(p.symbol, p.valuation);
+    } else {
+      var legs = (p.instruments || []).map(function (i) {
+        var label = i.instrument_type === "SHARE"
+          ? i.instrument_type + " ×" + i.quantity + " @ " + fmtMoney(i.entry_price)
+          : i.instrument_type + " " + (i.strike != null ? i.strike : "") + (i.expiration ? " " + i.expiration : "") + " ×" + i.quantity + " @ " + fmtMoney(i.entry_price);
+        var cls = i.status === "OPEN" ? "pos" : (i.status === "ROLLED" ? "warn" : "");
+        var suffix = i.status === "OPEN" ? "" : " · " + i.status.toLowerCase();
+        return '<span class="chip ' + cls + '">' + label + suffix + '</span>';
+      }).join("");
+      body = '<div class="pos-legs">' + (legs || '<span class="chip">no legs</span>') + '</div>';
+    }
     return '<div class="pos-card' + (open ? "" : " closed") + '">' +
       '<div class="pos-top"><span class="chip ' + dirCls + '">' + dir + '</span>' +
       '<span class="pos-status">' + p.status + '</span>' +
-      '<span class="pos-date">opened ' + age(p.opened_at).text + '</span>' + closeBtn + '</div>' +
-      '<div class="pos-legs">' + (legs || '<span class="chip">no legs</span>') + '</div></div>';
+      '<span class="pos-date">opened ' + age(p.opened_at).text + '</span>' + closeBtn + '</div>' + body + '</div>';
   }
 
   function renderPositionForm(sym) {
     return '<form class="pos-form" data-sym="' + sym + '">' +
-      '<select name="direction" title="Trade direction"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>' +
-      '<select name="type" title="Instrument — pick Call/Put to reveal strike + expiry"><option value="SHARE">Shares</option><option value="CALL">Call</option><option value="PUT">Put</option></select>' +
-      '<input name="quantity" type="number" min="0" step="any" placeholder="qty" title="Number of shares or contracts" required>' +
-      '<input name="entry_price" type="number" min="0" step="any" placeholder="entry $" title="Entry price per share/contract" required>' +
-      '<input name="strike" type="number" min="0" step="any" placeholder="strike $" title="Option strike price" class="opt-field" style="display:none">' +
-      '<input name="expiration" type="text" placeholder="option expiry (YYYY-MM-DD)" title="Option expiration date" class="opt-field" style="display:none">' +
-      '<input name="entry_time" type="datetime-local" title="When you entered the position — leave blank to use now">' +
-      '<input name="notes" type="text" placeholder="notes" title="Optional note">' +
+      '<select name="direction"><option value="LONG">LONG</option><option value="SHORT">SHORT</option></select>' +
+      '<select name="type"><option value="SHARE">Shares</option><option value="CALL">Call</option><option value="PUT">Put</option></select>' +
+      '<select name="contract" class="opt-field" style="display:none"><option value="">pick contract…</option></select>' +
+      '<input name="strike" type="number" min="0" step="any" placeholder="strike $" class="opt-manual" style="display:none">' +
+      '<input name="expiration" type="text" placeholder="expiry YYYY-MM-DD" class="opt-manual" style="display:none">' +
+      '<input name="quantity" type="number" min="0" step="any" placeholder="qty" required>' +
+      '<input name="entry_price" type="number" min="0" step="any" placeholder="entry $" required>' +
+      '<input name="entry_time" type="datetime-local">' +
+      '<input name="notes" type="text" placeholder="notes">' +
       '<button type="submit">Open position</button>' +
-      '<div class="pos-hint">"entry time" is when you entered the trade (blank = now). Strike + expiry only appear for Call/Put.</div>' +
+      '<div class="pos-hint">"entry time" is when you entered (blank = now). For Call/Put, pick the contract from the chain instead of typing strike/expiry.</div>' +
       '<div class="pos-form-err" style="display:none"></div>' +
       '</form>';
   }
@@ -473,9 +556,43 @@
   function wirePosition() {
     var form = document.querySelector(".pos-form");
     if (!form) return;
+    var sym = form.dataset.sym;
+    var typeSel = form.querySelector('select[name="type"]');
+    var contractSel = form.querySelector('select[name="contract"]');
+
+    function populateContracts(type) {
+      var chain = chainCache[sym];
+      var contracts = chain ? (chain.contracts || []).filter(function (c) { return c.contract_type === type; }) : [];
+      contractSel.innerHTML = '<option value="">pick contract…</option>' + contracts.map(function (c) {
+        return '<option value="' + c.ticker + '" data-strike="' + c.strike + '" data-exp="' + c.expiration + '" data-type="' + c.contract_type + '">' +
+          c.contract_type + ' $' + c.strike + ' · ' + (c.expiration || "").slice(5) + '</option>';
+      }).join("");
+    }
+
+    function syncOptFields() {
+      var type = typeSel.value;
+      var isOpt = type !== "SHARE";
+      var chain = chainCache[sym];
+      var haveChain = isOpt && chain && (chain.contracts || []).some(function (c) { return c.contract_type === type; });
+      contractSel.style.display = (isOpt && haveChain) ? "" : "none";
+      Array.prototype.forEach.call(form.querySelectorAll(".opt-manual"), function (f) {
+        f.style.display = (isOpt && !haveChain) ? "" : "none";
+        if (f.name === "strike") f.required = (isOpt && !haveChain);
+      });
+      if (isOpt && haveChain) populateContracts(type);
+    }
+
+    typeSel.addEventListener("change", function () {
+      if (typeSel.value !== "SHARE" && !chainCache[sym]) {
+        loadChain(sym).then(syncOptFields);
+      } else {
+        syncOptFields();
+      }
+    });
+    syncOptFields();
+
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var sym = form.dataset.sym;
       var fd = new FormData(form);
       var type = fd.get("type");
       var entryTimeVal = fd.get("entry_time");
@@ -489,8 +606,14 @@
         entry_time: entryTimeVal ? new Date(entryTimeVal).toISOString() : new Date().toISOString()
       };
       if (type !== "SHARE") {
-        instrument.strike = fd.get("strike") ? Number(fd.get("strike")) : null;
-        instrument.expiration = fd.get("expiration") || null;
+        var opt = contractSel.selectedOptions[0];
+        if (opt && opt.dataset.strike) {
+          instrument.strike = Number(opt.dataset.strike);
+          instrument.expiration = opt.dataset.exp || null;
+        } else {
+          instrument.strike = fd.get("strike") ? Number(fd.get("strike")) : null;
+          instrument.expiration = fd.get("expiration") || null;
+        }
       }
       var body = { symbol: sym, direction: fd.get("direction"), notes: fd.get("notes") || null, instrument: instrument };
       var base = baseInput.value.trim().replace(/\/$/, "");
@@ -508,25 +631,15 @@
             return;
           }
           form.reset();
+          syncOptFields();
           return loadPositions(sym).then(paint);
         })
         .catch(function (ex) { errEl.textContent = "Error: " + ex.message; errEl.style.display = "block"; });
     });
 
-    var typeSel = form.querySelector('select[name="type"]');
-    function syncOptFields() {
-      var isOpt = typeSel.value !== "SHARE";
-      Array.prototype.forEach.call(form.querySelectorAll(".opt-field"), function (f) {
-        f.style.display = isOpt ? "" : "none";
-        if (f.name === "strike") f.required = isOpt;
-      });
-    }
-    typeSel.addEventListener("change", syncOptFields);
-    syncOptFields();
-
     Array.prototype.forEach.call(document.querySelectorAll(".pos-close"), function (b) {
       b.addEventListener("click", function () {
-        var id = b.dataset.id, sym = selected;
+        var id = b.dataset.id;
         if (!window.confirm("Close this " + sym + " position?")) return;
         var base = baseInput.value.trim().replace(/\/$/, "");
         fetch(base + "/positions/" + id, {

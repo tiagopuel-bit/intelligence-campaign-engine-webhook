@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import webhook_receiver
 import massive_ohlc
+import massive_options
 from webhook_receiver import app, init_db, compute_extension_label
 from unittest import mock
 
@@ -494,6 +495,44 @@ class WebhookReceiverTests(unittest.TestCase):
                                                  "entry_price": 2.53, "entry_time": "2026-08-13T14:30:00Z"}),
                                 content_type="application/json", headers=self._state_headers())
         self.assertEqual(resp.status_code, 404)
+
+    # =========================================================================
+    # Options chain + valuation (near-live Massive enrichment)
+    # =========================================================================
+
+    def test_option_ticker_construction(self):
+        self.assertEqual(massive_options.option_ticker("AMC", "CALL", 0.5, "2026-08-14"),
+                         "O:AMC260814C00000500")
+        self.assertEqual(massive_options.option_ticker("AMC", "CALL", 1.5, "2026-09-18"),
+                         "O:AMC260918C00001500")
+        self.assertEqual(massive_options.option_ticker("AMC", "PUT", 3.0, "2026-09-18"),
+                         "O:AMC260918P00003000")
+
+    def test_options_chain_requires_auth(self):
+        self.assertEqual(self.client.get("/options/chain/AMC").status_code, 401)
+
+    def test_valuation_requires_auth(self):
+        self.assertEqual(self.client.get("/positions/1/valuation").status_code, 401)
+
+    def test_valuation_endpoint(self):
+        bars = [{"t": 1, "o": 2.4, "h": 2.5, "l": 2.3, "c": 2.4, "v": 100},
+                {"t": 2, "o": 2.4, "h": 2.6, "l": 2.4, "c": 2.53, "v": 100}]
+        quote = {"ticker": "O:AMC260918C00002500", "current": 0.30, "prev": 0.24, "last_t": 2}
+        with mock.patch("massive_ohlc.get_ohlc", return_value=(bars, {})), \
+             mock.patch("massive_options.get_option_quote", return_value=quote):
+            pid = self._create_position(symbol="VALTEST").get_json()["id"]
+            self.client.post(f"/positions/{pid}/instruments",
+                             data=json.dumps({"type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+                                              "quantity": 2, "entry_price": 0.30, "entry_time": "2026-08-12T14:30:00Z"}),
+                             content_type="application/json", headers=self._state_headers())
+            r = self.client.get(f"/positions/{pid}/valuation", headers=self._state_headers())
+        self.assertEqual(r.status_code, 200)
+        d = r.get_json()
+        self.assertEqual(d["summary"]["options_contracts"], 2)
+        self.assertEqual(d["summary"]["stock_shares"], 100)
+        self.assertEqual(d["summary"]["total_value"], 313.0)
+        self.assertEqual(d["options"][0]["breakeven"], 2.8)
+        self.assertTrue(d["options"][0]["itm"])
 
     def test_poll_can_build_campaign_state(self):
         self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
