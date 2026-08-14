@@ -89,7 +89,9 @@
   .asset-row.expanded .asset-row-head:hover{background:transparent}
   .ar-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px; width:100%}
   .asset-row.expanded .ar-top{width:auto; gap:14px}
-  .ar-sym{font-family:var(--font-display); font-weight:700; font-size:19px}
+  .ar-sym{font-family:var(--font-display); font-weight:700; font-size:19px; transition:font-size .12s}
+  .asset-row.expanded .ar-sym{font-size:26px; letter-spacing:-.01em}
+  .asset-row.expanded .ar-price{font-size:15px}
   .ar-price{font-family:var(--font-display); font-size:13px; color:var(--muted)}
   .ar-state{font-family:var(--font-display); font-size:12px; font-weight:700; letter-spacing:.02em}
   .asset-row.critical .ar-state{color:var(--critical)}
