@@ -130,6 +130,11 @@
   .chip.warn{color:var(--warning); background:var(--warning-glow); border-color:transparent}
   .chip.neg{color:var(--critical); background:var(--critical-glow); border-color:transparent}
   .chip.stale{opacity:.45}
+  .chip.bf{border-style:dashed; border-color:var(--warning)}
+  .bf-tag{display:inline-block; font-size:8.5px; font-weight:700; vertical-align:super; margin-left:2px; opacity:.8}
+  .src-badge{font-family:var(--font-display); font-size:10px; padding:1px 7px; border-radius:5px}
+  .src-badge.live{color:var(--faint)}
+  .src-badge.bf{color:var(--warning); border:1px dashed var(--warning); cursor:help}
 
   /* ---- your position & portfolio for this asset ---- */
   .position-wrap{margin-bottom:26px}
@@ -1060,7 +1065,10 @@
         .sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); })
         .map(function (r) {
           var ag = age(r.bar_time);
-          return '<span class="chip ' + phaseTone(r.phase) + (ag.stale ? " stale" : "") + '">' + tfLabel(r.timeframe) + " · " + plain(r.phase, r.health) + '</span>';
+          var bf = r.source === "backfill_replay";
+          return '<span class="chip ' + phaseTone(r.phase) + (ag.stale ? " stale" : "") + (bf ? " bf" : "") + '"' +
+            (bf ? ' title="Reconstructed from historical replay, not a live TradingView alert — advisory, not fidelity-tested."' : "") + '>' +
+            tfLabel(r.timeframe) + " · " + plain(r.phase, r.health) + (bf ? ' <span class="bf-tag">R</span>' : "") + '</span>';
         }).join("");
       return '<div class="step ' + tone + '"><div class="step-n">' + s.n + '</div><h3>' + s.h + '</h3><div class="q">' + s.q + '</div>' +
         '<div class="answer">' + answer + '</div><div class="tf-chips">' + (chips || '<span class="chip">nothing reporting</span>') + '</div></div>';
@@ -1077,13 +1085,15 @@
 
     var rows = states.slice().sort(function (x, y) { return tfKey(y.timeframe) - tfKey(x.timeframe); }).map(function (r) {
       var ag = age(r.bar_time), tr = tierOf(r.timeframe);
+      var bf = r.source === "backfill_replay";
       return '<tr class="' + (ag.stale ? "st" : "") + '"><td class="tabular" style="font-family:var(--font-display);font-weight:600">' + tfLabel(r.timeframe) + '</td>' +
         '<td><span class="tier-tag">' + (tr ? tr.label : "—") + '</span></td>' +
         '<td>' + (r.phase || "—") + '</td>' +
         '<td class="tabular">' + (r.health != null ? r.health + "%" : "—") + '</td>' +
         '<td class="tabular">' + (r.confidence != null ? r.confidence + "%" : "—") + '</td>' +
         '<td>' + (r.recent_event || "—") + '</td>' +
-        '<td class="tabular">' + ag.text + '</td></tr>';
+        '<td class="tabular">' + ag.text + '</td>' +
+        '<td>' + (bf ? '<span class="src-badge bf" title="Reconstructed from historical replay, not fidelity-tested">reconstructed</span>' : '<span class="src-badge live">live</span>') + '</td></tr>';
     }).join("");
 
     return verdictHtml + chartHtml + openPosHtml + holdingsHtml +
@@ -1092,7 +1102,7 @@
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
       '<div class="actions">' + actHtml + '</div>' +
       '<details class="raw"><summary>Every timeframe, raw</summary><div class="raw-body"><div class="scroll"><table>' +
-      '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th></tr></thead>' +
+      '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th><th>Source</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div></div></details>' +
       '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). Positions are a manual log; nothing here opens or closes anything automatically.</p>';
   }
