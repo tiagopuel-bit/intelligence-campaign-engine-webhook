@@ -124,6 +124,7 @@
   .insight-title{font-family:var(--font-display); font-weight:700; font-size:13px; margin-bottom:8px}
   .insight-line{margin:0 0 7px; font-size:13.5px; line-height:1.55; color:var(--text)}
   .insight-line:last-child{margin-bottom:0}
+  .insight-prompt{border:1px dashed var(--line); border-radius:10px; padding:14px 16px; font-size:13.5px; color:var(--faint); line-height:1.55}
 
   .flow{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
   @media (max-width:900px){ .flow{grid-template-columns:1fr} }
@@ -202,6 +203,8 @@
   .pf-item{border:1px solid var(--line); border-radius:9px; background:var(--surface)}
   .pf-row{display:flex; align-items:center; gap:12px; padding:9px 13px; cursor:pointer}
   .pf-row:hover{border-color:var(--accent)}
+  .pf-row.selected{background:var(--accent-glow); border-radius:8px}
+  .pf-row.selected .pf-label{color:var(--accent)}
   .pf-label{font-family:var(--font-display); font-size:13px}
   .pf-val{margin-left:auto; font-family:var(--font-display); font-size:13px}
   .pf-pnl{font-family:var(--font-display); font-size:13px; min-width:72px; text-align:right}
@@ -506,6 +509,11 @@
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
   var portfolio = [], realized = 0, portfolioById = {};
+  // Which single holding (share line or option contract) the chart + insight
+  // panel currently track. null = nothing picked yet. Keyed by leg_ids so it
+  // survives a repaint even though holding objects themselves get rebuilt.
+  var selectedHolding = null;
+  function holdingKey(legIds) { return (legIds || []).join(","); }
 
   function realizedPnl(p) {
     var sum = 0;
@@ -615,8 +623,9 @@
           '<button class="pf-close" data-pid="' + s.position_id + '" data-legs="' + JSON.stringify(s.leg_ids) + '" data-label="' + s.symbol + ' shares">Close shares…</button>' +
           '<button class="pf-del" data-pid="' + s.position_id + '" data-legs="' + JSON.stringify(s.leg_ids) + '" data-label="' + s.symbol + ' shares">✕</button>' +
         '</div>';
+      var key = holdingKey(s.leg_ids);
       return '<div class="pf-item">' +
-        '<div class="pf-row"><span class="pf-label">' + s.symbol + ' ' + s.direction + ' — ' + s.shares + ' shares</span>' +
+        '<div class="pf-row' + (key === selectedHolding ? " selected" : "") + '" data-holding="' + key + '"><span class="pf-label">' + s.symbol + ' ' + s.direction + ' — ' + s.shares + ' shares</span>' +
         '<span class="pf-val tabular">' + fmtMoney(s.market_value) + '</span>' +
         '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
         '</div><div class="pf-detail" style="display:none">' + detail + '</div></div>';
@@ -649,8 +658,9 @@
           '<button class="pf-close" data-pid="' + o.position_id + '" data-legs="' + JSON.stringify(o.leg_ids) + '" data-label="' + label + '">Close contract…</button>' +
           '<button class="pf-del" data-pid="' + o.position_id + '" data-legs="' + JSON.stringify(o.leg_ids) + '" data-label="' + label + '">✕</button>' +
         '</div>';
+      var key = holdingKey(o.leg_ids);
       return '<div class="pf-item">' +
-        '<div class="pf-row"><span class="pf-label ' + moneyCls + '">' + label + '</span>' +
+        '<div class="pf-row' + (key === selectedHolding ? " selected" : "") + '" data-holding="' + key + '"><span class="pf-label ' + moneyCls + '">' + label + '</span>' +
         '<span class="pf-contracts tabular">' + o.contracts + ' contracts</span>' +
         '<span class="pf-val tabular">' + fmtMoney(o.market_value) + '</span>' +
         '<span class="pf-pnl tabular ' + (pnl == null ? "" : (pnl >= 0 ? "pos" : "neg")) + '">' + fmtSigned(pnl) + '</span>' +
@@ -789,28 +799,37 @@
     return better[0];
   }
 
+  // Tracks exactly one holding at a time -- the one clicked in Shares/Options
+  // below -- instead of printing every holding's insight block at once.
+  // Auto-picks when there's only one holding total (no reason to make that
+  // click mandatory); otherwise prompts you to pick which one.
   function renderPositionInsights(sym) {
     var h = deriveHoldings();
     var shares = h.shares.filter(function (s) { return s.symbol === sym; });
     var strategies = h.strategies.filter(function (o) { return o.symbol === sym; });
-    if (!shares.length && !strategies.length) return "";
+    var all = shares.map(function (s) { return { kind: "share", data: s, key: holdingKey(s.leg_ids) }; })
+      .concat(strategies.map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
+    if (!all.length) return "";
+
+    var pick = all.length === 1 ? all[0] : all.filter(function (x) { return x.key === selectedHolding; })[0];
+    if (!pick) {
+      return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">pick a holding below</span></div>' +
+        '<div class="insight-prompt">You\'re holding ' + all.length + ' different things on ' + sym + ' — click one in Shares/Options below to see its chart markers and insight here.</div></div>';
+    }
+
     var primary = primaryReadFor(sym);
-    var blocks = [];
-    shares.forEach(function (s) {
-      blocks.push({ title: s.symbol + " shares", lines: shareInsight(sym, s, primary) });
-    });
-    strategies.forEach(function (o) {
-      var c = o.contract;
-      blocks.push({
-        title: "$" + c.strike + " " + c.type + " · " + fmtExpiry(c.expiration), lines: optionInsight(sym, o, primary),
-        chainSlot: '<div class="chain-suggest" data-sym="' + sym + '" data-strike="' + c.strike + '" data-exp="' + c.expiration + '" data-type="' + c.type + '" data-tone="' + (primary ? primary.tone : "") + '"></div>'
-      });
-    });
-    return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">entry, current read, and what it suggests</span></div>' +
-      blocks.map(function (b) {
-        return '<div class="insight-block"><div class="insight-title">' + b.title + '</div>' +
-          b.lines.map(function (l) { return '<p class="insight-line">' + l + '</p>'; }).join("") + (b.chainSlot || "") + '</div>';
-      }).join("") + '</div>';
+    var title, lines, chainSlot = "";
+    if (pick.kind === "share") {
+      title = pick.data.symbol + " shares"; lines = shareInsight(sym, pick.data, primary);
+    } else {
+      var c = pick.data.contract;
+      title = "$" + c.strike + " " + c.type + " · " + fmtExpiry(c.expiration);
+      lines = optionInsight(sym, pick.data, primary);
+      chainSlot = '<div class="chain-suggest" data-sym="' + sym + '" data-strike="' + c.strike + '" data-exp="' + c.expiration + '" data-type="' + c.type + '" data-tone="' + (primary ? primary.tone : "") + '"></div>';
+    }
+    return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">' + title + '</span></div>' +
+      '<div class="insight-block"><div class="insight-title">' + title + '</div>' +
+        lines.map(function (l) { return '<p class="insight-line">' + l + '</p>'; }).join("") + chainSlot + '</div></div>';
   }
 
   function closeHolding(pid, legIds, label) {
@@ -842,10 +861,18 @@
 
   function wirePortfolio() {
     Array.prototype.forEach.call(document.querySelectorAll(".pf-row"), function (row) {
+      // Selecting a holding is what drives the chart + Position Insight panel
+      // now -- one holding tracked at a time instead of printing every
+      // holding's insight at once. Re-paints, which also re-opens this row's
+      // detail (below) so the Close/Delete actions stay reachable.
+      if (row.dataset.holding === selectedHolding) {
+        var d = row.parentElement.querySelector(".pf-detail");
+        if (d) d.style.display = "";
+      }
       row.addEventListener("click", function (e) {
         if (e.target.closest(".pf-del") || e.target.closest(".pf-jump") || e.target.closest(".pf-close")) return;
-        var detail = row.parentElement.querySelector(".pf-detail");
-        if (detail) detail.style.display = detail.style.display === "none" ? "" : "none";
+        selectedHolding = (selectedHolding === row.dataset.holding) ? null : row.dataset.holding;
+        paint();
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll(".pf-jump"), function (b) {
@@ -1360,15 +1387,25 @@
         bars.forEach(function (b, i) { var diff = Math.abs(b.t - t); if (diff < bestDiff) { bestDiff = diff; best = i; } });
         return best;
       }
+      // Marks only the one holding selected below (same selection logic as
+      // renderPositionInsights: auto-pick when there's just one, otherwise
+      // require a click) instead of stacking every holding's entry on top
+      // of each other.
+      var symShares = holdings.shares.filter(function (s) { return s.symbol === sym; });
+      var symStrategies = holdings.strategies.filter(function (o) { return o.symbol === sym; });
+      var symAll = symShares.map(function (s) { return { kind: "share", data: s, key: holdingKey(s.leg_ids) }; })
+        .concat(symStrategies.map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
+      var chartPick = symAll.length === 1 ? symAll[0] : symAll.filter(function (x) { return x.key === selectedHolding; })[0];
       var entryMarkers = [];
-      holdings.shares.filter(function (s) { return s.symbol === sym; }).forEach(function (s) {
-        var idx = nearestBarIndex(s.first_entry);
-        if (idx != null) entryMarkers.push({ idx: idx, label: "In (shares)" });
-      });
-      holdings.strategies.filter(function (o) { return o.symbol === sym; }).forEach(function (o) {
-        var idx = nearestBarIndex(o.first_entry);
-        if (idx != null) entryMarkers.push({ idx: idx, label: "In ($" + o.contract.strike + " " + o.contract.type + ")" });
-      });
+      if (chartPick) {
+        var idx = nearestBarIndex(chartPick.data.first_entry);
+        if (idx != null) {
+          entryMarkers.push({
+            idx: idx,
+            label: chartPick.kind === "share" ? "In (shares)" : "In ($" + chartPick.data.contract.strike + " " + chartPick.data.contract.type + ")"
+          });
+        }
+      }
       var accentColor = "rgb(" + colorVar("var(--accent)") + ")";
       entryMarkers.forEach(function (m) {
         var mx = x(m.idx), my = y(bars[m.idx].c);
