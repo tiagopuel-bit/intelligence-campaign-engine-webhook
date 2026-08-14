@@ -769,6 +769,26 @@
     return lines;
   }
 
+  // Roll-candidate suggestion from the real options chain -- strike/expiry
+  // only (Massive free plan has no greeks), so the heuristic is simple and
+  // says so: same type, further out-of-the-money in the campaign's
+  // direction, same expiration if available else the next one out.
+  function suggestRollCandidate(chain, currentStrike, currentExp, type, tone) {
+    if (!chain || !chain.contracts || !chain.contracts.length) return null;
+    if (tone !== "pos") return null; // only worth suggesting a roll when DNA agrees
+    var sameType = chain.contracts.filter(function (c) { return c.contract_type === type; });
+    var better = sameType.filter(function (c) {
+      return type === "CALL" ? c.strike > currentStrike : c.strike < currentStrike;
+    });
+    if (!better.length) return null;
+    better.sort(function (a, b) {
+      var expDiff = Math.abs(new Date(a.expiration) - new Date(currentExp)) - Math.abs(new Date(b.expiration) - new Date(currentExp));
+      if (expDiff !== 0) return expDiff;
+      return Math.abs(a.strike - currentStrike) - Math.abs(b.strike - currentStrike);
+    });
+    return better[0];
+  }
+
   function renderPositionInsights(sym) {
     var h = deriveHoldings();
     var shares = h.shares.filter(function (s) { return s.symbol === sym; });
@@ -781,12 +801,15 @@
     });
     strategies.forEach(function (o) {
       var c = o.contract;
-      blocks.push({ title: "$" + c.strike + " " + c.type + " · " + fmtExpiry(c.expiration), lines: optionInsight(sym, o, primary) });
+      blocks.push({
+        title: "$" + c.strike + " " + c.type + " · " + fmtExpiry(c.expiration), lines: optionInsight(sym, o, primary),
+        chainSlot: '<div class="chain-suggest" data-sym="' + sym + '" data-strike="' + c.strike + '" data-exp="' + c.expiration + '" data-type="' + c.type + '" data-tone="' + (primary ? primary.tone : "") + '"></div>'
+      });
     });
     return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">entry, current read, and what it suggests</span></div>' +
       blocks.map(function (b) {
         return '<div class="insight-block"><div class="insight-title">' + b.title + '</div>' +
-          b.lines.map(function (l) { return '<p class="insight-line">' + l + '</p>'; }).join("") + '</div>';
+          b.lines.map(function (l) { return '<p class="insight-line">' + l + '</p>'; }).join("") + (b.chainSlot || "") + '</div>';
       }).join("") + '</div>';
   }
 
@@ -1394,6 +1417,28 @@
     tryNext(0);
   }
 
+  // Fill in each option holding's "worth a look" roll candidate from the
+  // real chain, once per symbol (not once per contract). Only ever shows a
+  // real chain contract or nothing -- never a made-up strike.
+  function populateChainSuggestions() {
+    var slots = document.querySelectorAll(".chain-suggest");
+    var bySymbol = {};
+    Array.prototype.forEach.call(slots, function (el) {
+      var sym = el.dataset.sym;
+      (bySymbol[sym] = bySymbol[sym] || []).push(el);
+    });
+    Object.keys(bySymbol).forEach(function (sym) {
+      loadChain(sym).then(function (chain) {
+        bySymbol[sym].forEach(function (el) {
+          var cand = suggestRollCandidate(chain, Number(el.dataset.strike), el.dataset.exp, el.dataset.type, el.dataset.tone);
+          if (!cand) return;
+          el.innerHTML = '<p class="insight-line chain-line">Worth a look: <strong>$' + cand.strike + ' ' + cand.contract_type +
+            ' · ' + fmtExpiry(cand.expiration) + '</strong> — from the real chain, DNA-agreeing direction. Strike/expiry only, no live pricing on the free plan to size it precisely.</p>';
+        });
+      });
+    });
+  }
+
   function paint() {
     app.innerHTML = renderPortfolioStrip() + renderAssetList();
     wirePortfolio();
@@ -1409,6 +1454,7 @@
     });
     wirePosition();
     if (selected) drawChart(selected);
+    populateChainSuggestions();
   }
 
   function loadSymbol(sym, repaint) {
