@@ -890,6 +890,10 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertIn("dna-decision", html)
         self.assertIn("Position manager", html)
         self.assertIn("Portfolio campaign radar", html)
+        self.assertIn("holdingGuidance", html)
+        self.assertIn("daysLeft", html)
+        self.assertIn("News stream", html)
+        self.assertIn("chartDrawSeq", html)
         self.assertIn("/positions/", html)
         self.assertIn("/state_all/", html)
 
