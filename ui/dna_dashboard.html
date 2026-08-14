@@ -281,6 +281,7 @@
       <input data-role="base" type="text" placeholder="API base URL">
       <input data-role="token" type="password" placeholder="Token">
       <button data-role="load">Load</button>
+      <button data-role="theme-toggle" title="Switch light/dark">◐</button>
       <span class="status" data-role="status"></span>
     </div>
   </div>
@@ -298,6 +299,24 @@
 
   baseInput.value = localStorage.getItem("dna_api_base") || "https://dna-tradingview-webhook-production.up.railway.app";
   tokenInput.value = localStorage.getItem("dna_api_token") || "";
+
+  // Theme toggle -- CSS already has explicit [data-theme] overrides, this
+  // just flips between them instead of always trailing the OS setting.
+  var themeBtn = $('[data-role="theme-toggle"]');
+  function applyTheme(t) {
+    if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    else document.documentElement.removeAttribute("data-theme");
+    themeBtn.textContent = t === "light" ? "☀" : t === "dark" ? "☾" : "◐";
+  }
+  applyTheme(localStorage.getItem("dna_theme") || "");
+  themeBtn.addEventListener("click", function () {
+    var cur = localStorage.getItem("dna_theme") || "";
+    var sysDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var order = sysDark ? ["", "light", "dark"] : ["", "dark", "light"];
+    var next = order[(order.indexOf(cur) + 1) % order.length];
+    localStorage.setItem("dna_theme", next);
+    applyTheme(next);
+  });
 
   function authHeaders() {
     var t = tokenInput.value.trim();
