@@ -882,6 +882,26 @@ class WebhookReceiverTests(unittest.TestCase):
         finally:
             webhook_receiver.STATE_API_TOKEN = saved
 
+    def test_dashboard_serves_approved_live_asset_layout(self):
+        resp = self.client.get("/dashboard")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.mimetype, "text/html")
+        html = resp.get_data(as_text=True)
+        self.assertIn("dna-decision", html)
+        self.assertIn("Position manager", html)
+        self.assertIn("Portfolio campaign radar", html)
+        self.assertIn("/positions/", html)
+        self.assertIn("/state_all/", html)
+
+    def test_dashboard_serves_vendored_lightweight_charts(self):
+        resp = self.client.get(
+            "/dashboard/vendor/lightweight-charts/"
+            "lightweight-charts.standalone.production.js"
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertGreater(len(resp.data), 1000)
+        resp.close()
+
     # --- Test 11: State/history reject absent/invalid bearer tokens ---
 
     def test_auth_state_rejects_no_token_when_configured(self):

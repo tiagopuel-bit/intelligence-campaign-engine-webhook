@@ -121,6 +121,11 @@
   .chart-toggles .tf-btn.on{background:var(--surface-2); color:var(--text); border-color:var(--line)}
   .chart-canvas{width:100%; height:230px; display:block}
   .chart-status{font-family:var(--font-display); font-size:11px; color:var(--faint); margin-top:6px}
+  .chart-toprow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:7px}
+  .chart-mode{display:inline-flex;padding:3px;gap:2px;border:1px solid var(--line);border-radius:7px;background:var(--surface-2)}
+  .cm-btn{border:0;background:transparent;color:var(--muted);border-radius:5px;padding:4px 8px;font-size:10px}.cm-btn.on{background:var(--surface);color:#2563eb;font-weight:700}.cm-btn:disabled{opacity:.4;cursor:not-allowed}
+  .chart-feats{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.cf{font-size:9px;color:var(--muted);white-space:nowrap}.cf input{accent-color:#2563eb;vertical-align:-1px}
+  .chart-container{width:100%;height:300px}.chart-legend{font-family:var(--font-display);font-size:10px;color:var(--muted);min-height:15px;margin-top:5px}
 
   .flow{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
   @media (max-width:900px){ .flow{grid-template-columns:1fr} }
@@ -265,6 +270,51 @@
   .note{font-size:11.5px; color:var(--faint); line-height:1.6; margin-top:28px; padding-top:16px; border-top:1px solid var(--line); max-width:88ch}
   .msg{padding:44px 0; text-align:center; color:var(--faint); font-size:13.5px}
   .msg.err{color:var(--critical)}
+
+  /* ---- approved Asset Page baseline (2026-08-14) ---- */
+  .dna-page{display:grid;gap:14px}
+  .dna-decision{height:80px;display:grid;grid-template-columns:1.35fr .72fr 1fr 1fr;gap:8px}
+  .dna-decision-cell{min-width:0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);display:flex;flex-direction:column;justify-content:center}
+  .dna-decision-cell.risk{background:var(--critical-glow);border-color:color-mix(in srgb,var(--critical) 26%,var(--line))}
+  .dna-decision-cell .eyebrow{font-family:var(--font-display);font-size:9px;letter-spacing:.075em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .dna-decision-cell h2{margin:3px 0 0;font-size:16px;line-height:1.18;letter-spacing:-.02em}
+  .dna-decision-cell .big{font-size:22px;line-height:1;font-weight:750;color:#2563eb;margin:4px 0 2px}
+  .dna-decision-cell .copy{font-size:10px;line-height:1.35;color:var(--muted);margin-top:2px}
+  .dna-decision-cell .positive{color:var(--positive)}
+  .dna-decision-cell .critical{color:var(--critical)}
+  .dna-portfolio{display:grid;grid-template-columns:1.1fr 1fr 1fr;background:#ccf0cc;color:#1f2923;border:1px solid #97d8b0;border-radius:10px;overflow:hidden}
+  :root[data-theme="dark"] .dna-portfolio{background:#173326;color:#e7f1ec;border-color:#315b43}
+  .dna-portfolio-slice{min-width:0;padding:12px 15px}
+  .dna-portfolio-slice+.dna-portfolio-slice{border-left:1px solid #97d8b0}
+  :root[data-theme="dark"] .dna-portfolio-slice+.dna-portfolio-slice{border-color:#315b43}
+  .dna-slice-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .dna-slice-head strong{font-size:18px}.dna-portfolio-slice:first-child .dna-slice-head strong{font-size:28px;line-height:1;letter-spacing:-.035em}
+  .dna-pill{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:700;background:rgba(37,99,235,.10);color:#1d4ed8;white-space:nowrap}
+  .dna-pill.green{background:rgba(28,154,87,.10);color:#0d7f4b}.dna-pill.red{background:var(--critical-glow);color:var(--critical)}
+  .dna-slice-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .dna-k{font-size:9px;color:color-mix(in srgb,currentColor 62%,transparent)}
+  .dna-v{font-family:var(--font-display);font-size:14px;font-weight:700;margin-top:2px}.dna-v.price{font-size:19px}.dna-v.return{font-size:12px;font-weight:500}.dna-v.pos{color:#0d7f4b}.dna-v.neg{color:var(--critical)}
+  .dna-workspace{display:grid;grid-template-columns:310px minmax(0,1fr);gap:16px;align-items:stretch}
+  .dna-manager,.dna-chart-card,.dna-panel{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+  .dna-manager{padding:16px;display:flex;flex-direction:column;min-width:0}
+  .dna-manager-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:5px 0 12px}.dna-manager-title strong{font-size:16px}
+  .dna-manager-highlight{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:11px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .dna-manager-highlight .dna-v{font-size:16px}.dna-manager-highlight .dna-v.return{font-size:12px}
+  .dna-timeline{padding:12px 0 3px}.dna-timeline-head,.dna-timeline-labels{display:flex;justify-content:space-between;align-items:center;gap:6px}.dna-timeline-head{font-size:9px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}.dna-timeline-head span,.dna-timeline-labels{font-size:8px;color:var(--faint)}
+  .dna-timeline-track{position:relative;height:8px;border-radius:99px;background:var(--surface-2)}.dna-timeline-fill{position:absolute;inset:0 auto 0 0;border-radius:inherit;background:linear-gradient(90deg,#0ea5e9,#2563eb)}.dna-timeline-dot{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid #2563eb;transform:translate(-50%,-50%)}.dna-timeline-labels{margin-top:7px}
+  .dna-manager-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;padding:12px 0}.dna-manager-grid .dna-v{font-size:12px}
+  .dna-risk{padding:10px;border-radius:8px;background:var(--positive-glow);color:var(--positive);font-size:10px;line-height:1.4}
+  .dna-held{margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}.dna-held-title{font-family:var(--font-display);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:7px}.dna-held-list{display:grid;gap:6px}
+  .dna-held-item{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 8px;text-align:left;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)}.dna-held-item strong{font-size:10px}.dna-held-item span{font-size:9px;color:var(--muted)}.dna-held-item b{grid-row:1/3;grid-column:2;align-self:center;font-size:12px;font-weight:500;color:var(--positive)}.dna-held-item.selected{border-color:#2563eb;background:rgba(37,99,235,.08);box-shadow:inset 3px 0 0 #2563eb}
+  .dna-manager-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:auto;padding-top:12px}.dna-manager-actions .open-pos-btn{grid-column:1/-1}.dna-manager-actions button{min-height:34px}.dna-manager-actions .pf-close{font-size:12px}
+  .dna-chart-column{min-width:0;display:grid;gap:12px}.dna-chart-card{overflow:hidden}.dna-chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid var(--line)}.dna-chart-title{font-size:13px;font-weight:700}.dna-chart-sub{font-size:10px;color:var(--muted)}
+  .dna-chart-card .chart-wrap{border:0;border-radius:0;margin:0;padding:10px 14px}.dna-chart-card .chart-container{height:300px}.dna-chart-card .chart-status{padding-bottom:4px}
+  .dna-signals{padding:14px}.dna-signals table{min-width:580px}.dna-signals-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.dna-signals-head h3{font-size:12px;margin:0}.dna-signals-head span{font-size:10px;color:var(--faint)}
+  .dna-middle{display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}.dna-panel{padding:15px}.dna-panel .stage-head{margin-bottom:10px}.dna-insight-row{display:grid;grid-template-columns:minmax(130px,.8fr) 1.4fr auto;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);margin-top:6px}.dna-insight-row strong{font-size:10.5px}.dna-insight-row span{font-size:10px;color:var(--muted)}
+  .dna-progression{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.dna-stage{position:relative}.dna-stage-head{display:flex;align-items:center;gap:8px}.dna-stage-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-size:10px;font-weight:700}.dna-stage.pos .dna-stage-dot{background:var(--positive-glow);color:var(--positive)}.dna-stage.warn .dna-stage-dot{background:var(--warning-glow);color:var(--warning)}.dna-stage.neg .dna-stage-dot{background:var(--critical-glow);color:var(--critical)}.dna-stage strong{font-size:10px}.dna-stage small{display:block;color:var(--faint);font-size:9px}.dna-stage-state{padding-left:36px;margin-top:6px;font-size:10px;font-weight:700}
+  .dna-radar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dna-radar-item{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);cursor:pointer}.dna-radar-item:hover{border-color:#2563eb}.dna-radar-top{display:flex;justify-content:space-between;gap:6px;margin-bottom:7px}.dna-radar-top strong{font-family:var(--font-display);font-size:11px}.dna-radar-tfs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.dna-radar-tf{text-align:center;padding:4px 2px;border-radius:4px;font-size:8px;font-weight:700;background:var(--positive-glow);color:var(--positive)}.dna-radar-tf.warn{background:var(--warning-glow);color:var(--warning)}.dna-radar-tf.neg{background:var(--critical-glow);color:var(--critical)}
+  @media(max-width:980px){.dna-workspace,.dna-middle{grid-template-columns:1fr}.dna-portfolio{grid-template-columns:1fr}.dna-portfolio-slice+.dna-portfolio-slice{border-left:0;border-top:1px solid #97d8b0}.dna-decision{height:auto;grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.dna-decision{grid-template-columns:1fr}.dna-slice-metrics{grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:1fr}.dna-progression{grid-template-columns:1fr 1fr}.dna-insight-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -292,6 +342,7 @@
   <div id="app"><div class="msg">Connecting…</div></div>
 </main>
 
+<script src="vendor/lightweight-charts/lightweight-charts.standalone.production.js"></script>
 <script>
 (function () {
   var $ = function (s) { return document.querySelector(s); };
@@ -1231,6 +1282,137 @@
 
   }
 
+  function sumBy(list, key) {
+    return list.reduce(function (n, x) { return n + (Number(x[key]) || 0); }, 0);
+  }
+
+  function aggregateReturn(list) {
+    var pnl = sumBy(list, "total_pnl"), cost = sumBy(list, "market_value") - pnl;
+    return { pnl: pnl, pct: cost ? pnl / cost * 100 : null };
+  }
+
+  function performanceText(pnl, pct) {
+    return fmtSigned(pnl) + " (" + fmtPct(pct) + ")";
+  }
+
+  function selectedAssetHoldings(sym) {
+    var h = deriveHoldings();
+    var shares = h.shares.filter(function (x) { return x.symbol === sym; });
+    var options = h.strategies.filter(function (x) { return x.symbol === sym; });
+    var all = shares.map(function (x) { return { kind: "share", data: x, key: holdingKey(x.leg_ids) }; })
+      .concat(options.map(function (x) { return { kind: "option", data: x, key: holdingKey(x.leg_ids) }; }));
+    if (all.length && !all.some(function (x) { return x.key === selectedHolding; })) selectedHolding = all[0].key;
+    return { shares: shares, options: options, all: all, pick: all.filter(function (x) { return x.key === selectedHolding; })[0] || null };
+  }
+
+  function holdingLabel(x) {
+    if (x.kind === "share") return x.data.symbol + " shares";
+    return x.data.symbol + " $" + x.data.contract.strike + " " + x.data.contract.type;
+  }
+
+  function timelineFor(pick) {
+    if (!pick) return null;
+    var entryMs = parseIsoMs(pick.data.first_entry);
+    var now = Date.now(), endMs = null, expiry = "Open position";
+    if (pick.kind === "option" && pick.data.contract.expiration) {
+      endMs = new Date(pick.data.contract.expiration + "T23:59:59Z").getTime();
+      expiry = "Expiry · " + fmtDate(pick.data.contract.expiration);
+    }
+    var pct = endMs && entryMs ? Math.max(0, Math.min(100, (now - entryMs) / (endMs - entryMs) * 100)) : 100;
+    return { width: pct.toFixed(1) + "%", progress: endMs ? Math.round(pct) + "% elapsed" : "Open-ended holding", entry: "Entry · " + fmtDate(pick.data.first_entry), expiry: expiry };
+  }
+
+  function toneClass(tone) { return tone === "neg" ? "neg" : tone === "warn" ? "warn" : tone === "pos" ? "pos" : ""; }
+
+  function renderApprovedAsset(sym) {
+    var c = cache[sym];
+    if (!c) return '<div class="msg">loading ' + sym + '…</div>';
+    var a = c.assess, t = a.tiers, states = c.states.slice().sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); });
+    var held = selectedAssetHoldings(sym), pick = held.pick;
+    var sharePerf = aggregateReturn(held.shares), optionPerf = aggregateReturn(held.options);
+    var stockValue = sumBy(held.shares, "market_value"), optionValue = sumBy(held.options, "market_value");
+    var stockToday = sumBy(held.shares, "today_pnl"), optionToday = sumBy(held.options, "today_pnl");
+    var optionContracts = sumBy(held.options, "contracts"), stockShares = sumBy(held.shares, "shares");
+    var underlying = null;
+    portfolio.some(function (p) { if (p.summary.symbol === sym && p.valuation && p.valuation.underlying) { underlying = p.valuation.underlying; return true; } return false; });
+    var latest = states.filter(function (s) { return s.close != null; })[0];
+    var price = underlying && underlying.current != null ? underlying.current : (latest ? latest.close : null);
+    var dayPct = underlying && underlying.current != null && underlying.prev ? (underlying.current - underlying.prev) / underlying.prev * 100 : null;
+    var dayMove = underlying && underlying.current != null && underlying.prev != null ? underlying.current - underlying.prev : null;
+    var totalValue = stockValue + optionValue, totalPnl = sharePerf.pnl + optionPerf.pnl;
+    var totalCost = totalValue - totalPnl;
+    var totalPct = totalCost ? totalPnl / totalCost * 100 : null;
+    var owner = t.owner && !t.owner.empty ? t.owner : t.backbone;
+    var confirm = t.confirm && !t.confirm.empty ? t.confirm : t.timing;
+    var action = a.level === "critical" ? "PROTECT" : a.level === "watch" ? "WATCH" : "HOLD";
+    var nextText = confirm && !confirm.empty ? tfLabel(confirm.lead.timeframe) + " · " + confirm.text : "Await confirmation";
+    var riskTier = [t.confirm,t.owner,t.backbone].filter(function (x) { return x && !x.empty && x.tone === "neg"; })[0];
+    var riskText = riskTier ? tfLabel(riskTier.lead.timeframe) + " structure is " + riskTier.text : "Pressure propagating into the campaign";
+
+    var decision = '<section class="dna-decision" aria-label="Current campaign decision">' +
+      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span></h2><div class="copy">' + a.why + '</div></div>' +
+      '<div class="dna-decision-cell"><div class="eyebrow">Recommended action</div><div class="big">' + action + '</div><div class="copy">Rule-based DNA guidance</div></div>' +
+      '<div class="dna-decision-cell"><div class="eyebrow">Next confirmation</div><div class="copy" style="color:#2563eb;font-weight:700">' + nextText + '</div><div class="copy">Timing before action</div></div>' +
+      '<div class="dna-decision-cell risk"><div class="eyebrow">Main risk</div><div class="copy critical" style="font-weight:700">' + riskText + '</div><div class="copy">Slower structure remains the authority</div></div></section>';
+
+    var portfolioBand = '<section class="dna-portfolio" aria-label="' + sym + ' portfolio">' +
+      '<div class="dna-portfolio-slice"><div class="dna-slice-head"><strong>' + sym + '</strong><span class="dna-pill green">' + states.length + ' TF live</span></div><div class="dna-slice-metrics">' +
+        '<div><div class="dna-k">Price</div><div class="dna-v price">' + fmtMoney(price) + '</div></div>' +
+        '<div><div class="dna-k">Today</div><div class="dna-v return ' + (dayMove == null || dayMove >= 0 ? "pos" : "neg") + '">' + performanceText(dayMove, dayPct) + '</div></div>' +
+        '<div><div class="dna-k">Portfolio value</div><div class="dna-v">' + fmtMoney(totalValue) + '</div></div></div></div>' +
+      '<div class="dna-portfolio-slice"><div class="dna-slice-head"><strong>Stock position</strong><span class="dna-pill green">' + stockShares + ' shares</span></div><div class="dna-slice-metrics">' +
+        '<div><div class="dna-k">Market value</div><div class="dna-v">' + fmtMoney(stockValue) + '</div></div>' +
+        '<div><div class="dna-k">Today</div><div class="dna-v return ' + (stockToday >= 0 ? "pos" : "neg") + '">' + fmtSigned(stockToday) + '</div></div>' +
+        '<div><div class="dna-k">Total P&amp;L</div><div class="dna-v return ' + (sharePerf.pnl >= 0 ? "pos" : "neg") + '">' + performanceText(sharePerf.pnl, sharePerf.pct) + '</div></div></div></div>' +
+      '<div class="dna-portfolio-slice"><div class="dna-slice-head"><strong>Options overview</strong><span class="dna-pill">' + held.options.length + ' open · ' + optionContracts + ' contracts</span></div><div class="dna-slice-metrics">' +
+        '<div><div class="dna-k">Market value</div><div class="dna-v">' + fmtMoney(optionValue) + '</div></div>' +
+        '<div><div class="dna-k">Total P&amp;L</div><div class="dna-v return ' + (optionPerf.pnl >= 0 ? "pos" : "neg") + '">' + performanceText(optionPerf.pnl, optionPerf.pct) + '</div></div>' +
+        '<div><div class="dna-k">Asset total</div><div class="dna-v return ' + (totalPnl >= 0 ? "pos" : "neg") + '">' + performanceText(totalPnl, totalPct) + '</div></div></div></div></section>';
+
+    var timeline = timelineFor(pick);
+    var managerTitle = pick ? holdingLabel(pick) : "No open holding";
+    var current = pick ? (pick.data.current_price != null ? pick.data.current_price : null) : null;
+    var managerPnl = pick ? pick.data.total_pnl : null, managerPct = pick ? pick.data.total_return_pct : null;
+    var qtyText = !pick ? "—" : pick.kind === "share" ? pick.data.shares + " shares" : pick.data.contracts + " × " + fmtExpiry(pick.data.contract.expiration);
+    var entryText = pick ? fmtMoney(pick.data.avg_cost) : "—";
+    var breakEven = pick && pick.kind === "option" ? fmtMoney(pick.data.breakeven) : "—";
+    var heldDays = pick ? daysBetween(pick.data.first_entry) : null;
+    var dte = pick && pick.kind === "option" ? daysBetween(new Date().toISOString(), new Date(pick.data.contract.expiration).getTime()) : null;
+    var primary = primaryReadFor(sym), riskTone = primary ? primary.tone : "neu";
+    var riskCopy = primary ? primary.tier.label + " is " + primary.text + " on " + tfLabel(primary.lead.timeframe) + "." : "No current position-specific DNA reading.";
+    var heldRows = held.all.map(function (x) {
+      var ret = x.data.total_return_pct, meta = x.kind === "share" ? x.data.shares + " shares · avg " + fmtMoney(x.data.avg_cost) : fmtExpiry(x.data.contract.expiration) + " · " + x.data.contracts + " contract" + (x.data.contracts === 1 ? "" : "s");
+      return '<button type="button" class="dna-held-item pf-row' + (x.key === selectedHolding ? ' selected' : '') + '" data-holding="' + x.key + '"><strong>' + holdingLabel(x) + '</strong><span>' + meta + '</span><b>' + fmtPct(ret) + '</b></button>';
+    }).join("") || '<div class="copy">No open positions on this asset.</div>';
+    var closeButton = pick ? '<button class="pf-close" data-pid="' + pick.data.position_id + '" data-legs="' + JSON.stringify(pick.data.leg_ids) + '" data-label="' + holdingLabel(pick) + '">Close</button>' : '<button class="pf-close" disabled>Close</button>';
+    var timelineHtml = timeline ? '<div class="dna-timeline"><div class="dna-timeline-head"><strong>Entry → expiration</strong><span>' + timeline.progress + '</span></div><div class="dna-timeline-track"><span class="dna-timeline-fill" style="width:' + timeline.width + '"></span><i class="dna-timeline-dot" style="left:' + timeline.width + '"></i></div><div class="dna-timeline-labels"><span>' + timeline.entry + '</span><span>Today</span><span>' + timeline.expiry + '</span></div></div>' : '';
+    var manager = '<aside class="dna-manager"><div class="label">Position manager</div><div class="dna-manager-title"><strong>' + managerTitle + '</strong><span class="dna-pill green">' + (pick ? 'OPEN' : 'EMPTY') + '</span></div>' +
+      '<div class="dna-manager-highlight"><div><div class="dna-k">Current price</div><div class="dna-v">' + fmtMoney(current) + '</div></div><div><div class="dna-k">Market value</div><div class="dna-v">' + fmtMoney(pick ? pick.data.market_value : null) + '</div></div><div><div class="dna-k">Total P&amp;L</div><div class="dna-v return ' + (managerPnl == null || managerPnl >= 0 ? 'pos' : 'neg') + '">' + performanceText(managerPnl, managerPct) + '</div></div><div><div class="dna-k">Return</div><div class="dna-v return ' + (managerPct == null || managerPct >= 0 ? 'pos' : 'neg') + '">' + fmtPct(managerPct) + '</div></div></div>' + timelineHtml +
+      '<div class="dna-manager-grid"><div><div class="dna-k">Holding</div><div class="dna-v">' + qtyText + '</div></div><div><div class="dna-k">Entry</div><div class="dna-v">' + entryText + '</div></div><div><div class="dna-k">Breakeven</div><div class="dna-v">' + breakEven + '</div></div><div><div class="dna-k">Held</div><div class="dna-v">' + (heldDays == null ? '—' : heldDays + ' days') + '</div></div><div><div class="dna-k">DTE</div><div class="dna-v">' + (dte == null ? '—' : dte + ' days') + '</div></div></div>' +
+      '<div class="dna-risk"><strong>' + (riskTone === 'neg' ? 'Risk elevated' : riskTone === 'warn' ? 'Risk needs attention' : 'Risk controlled') + '</strong><br>' + riskCopy + '</div>' +
+      '<div class="dna-held"><div class="dna-held-title">Positions held</div><div class="dna-held-list">' + heldRows + '</div></div>' +
+      '<div class="dna-manager-actions"><button class="open-pos-btn" data-sym="' + sym + '">+ Add position</button>' + closeButton + '<button class="pf-del" disabled>Manage</button></div>' +
+      '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div></aside>';
+
+    var chart = '<div class="dna-chart-column"><section class="dna-chart-card"><div class="dna-chart-head"><div><div class="dna-chart-title">' + managerTitle + '</div><div class="dna-chart-sub">Live position chart · entry and DNA reference levels</div></div><span class="dna-pill">Lightweight Charts</span></div><div class="chart-wrap"><div class="chart-toprow"><span class="chart-mode" data-sym="' + sym + '"></span><span class="chart-feats" data-sym="' + sym + '"></span></div><div class="chart-toggles" data-sym="' + sym + '"></div><div class="chart-container" data-sym="' + sym + '"></div><div class="chart-legend" data-sym="' + sym + '">hover a bar for OHLCV</div><div class="chart-status" data-sym="' + sym + '">loading chart…</div></div></section>';
+    var signalRows = states.map(function (r) { var tr = tierOf(r.timeframe), ag = age(r.bar_time); return '<tr class="' + (ag.stale ? 'st' : '') + '"><td>' + tfLabel(r.timeframe) + '</td><td>' + (tr ? tr.label : '—') + '</td><td><span class="phase-pill ' + phaseTone(r.phase) + '">' + (r.phase || '—') + '</span></td><td>' + (r.health != null ? r.health + '%' : '—') + '</td><td>' + (r.recent_event || '—') + '</td><td>' + ag.text + '</td></tr>'; }).join("");
+    chart += '<section class="dna-panel dna-signals"><div class="dna-signals-head"><div><h3>Timeframe signals</h3><span>Compact evidence under the active chart</span></div></div><details class="raw" open><summary>Show timeframe ladder</summary><div class="raw-body"><div class="scroll"><table><thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Last event</th><th>Updated</th></tr></thead><tbody>' + signalRows + '</tbody></table></div></div></details></section></div>';
+
+    var acts = actionsFor(sym, a);
+    var actionHtml = acts.length ? acts.slice(0,3).map(function (x) { return '<div class="action ' + x.level + '"><div class="ic">' + x.ic + '</div><div><div class="a-title">' + x.title + '</div><div class="a-text">' + x.text + '</div></div></div>'; }).join("") : '<div class="no-actions">Nothing crosses an action threshold right now.</div>';
+    var insightTiers = [t.owner,t.confirm,t.timing].filter(function (x) { return x && !x.empty; });
+    var insightHtml = insightTiers.map(function (x) { return '<div class="dna-insight-row"><strong>' + x.tier.label + ' · ' + tfLabel(x.lead.timeframe) + '</strong><span>' + x.text + ' · health ' + (x.lead.health != null ? x.lead.health + '%' : '—') + '</span><span class="dna-pill ' + (x.tone === 'neg' ? 'red' : x.tone === 'pos' ? 'green' : '') + '">' + (x.lead.phase || 'WAIT') + '</span></div>'; }).join("");
+    var middle = '<div class="dna-middle"><section class="dna-panel"><div class="stage-head"><h2>Action plan</h2><span class="hint">only threshold-crossing guidance</span></div><div class="actions">' + actionHtml + '</div></section><section class="dna-panel"><div class="stage-head"><h2>Why this matters</h2><span class="hint">current campaign evidence</span></div>' + (insightHtml || '<div class="no-actions">No tier evidence available.</div>') + '</section></div>';
+
+    var progressionTiers = [t.backbone,t.owner,t.confirm,t.timing];
+    var progression = '<section class="dna-panel"><div class="stage-head"><h2>Trade progression</h2><span class="hint">backbone → campaign → confirmation → timing</span></div><div class="dna-progression">' + progressionTiers.map(function (x, i) { var empty = !x || x.empty; var cls = empty ? '' : toneClass(x.tone); return '<div class="dna-stage ' + cls + '"><div class="dna-stage-head"><span class="dna-stage-dot">' + (i+1) + '</span><div><strong>' + ["Backbone","Campaign","Confirmation","Timing"][i] + '</strong><small>' + (empty ? 'no data' : tfLabel(x.lead.timeframe)) + '</small></div></div><div class="dna-stage-state">' + (empty ? 'Waiting' : x.text) + '</div></div>'; }).join("") + '</div></section>';
+
+    var radar = assets.filter(function (x) { return x.symbol !== sym; }).map(function (x) { var rc = cache[x.symbol], ra = rc && rc.assess; var rs = rc ? rc.states : []; var quick = ["15","60","240","D"].map(function (tf) { var row = rs.filter(function (r) { return String(r.timeframe) === tf; })[0]; return '<span class="dna-radar-tf ' + (row ? toneClass(phaseTone(row.phase)) : 'warn') + '">' + tfLabel(tf) + '</span>'; }).join(""); return '<button type="button" class="dna-radar-item" data-sym="' + x.symbol + '"><span class="dna-radar-top"><strong>' + x.symbol + '</strong><span class="dna-pill ' + (ra && ra.level === 'critical' ? 'red' : ra && ra.level === 'opportunity' ? 'green' : '') + '">' + (ra ? ra.headline : 'Loading') + '</span></span><span class="dna-radar-tfs">' + quick + '</span></button>'; }).join("");
+    var radarHtml = '<section class="dna-panel"><div class="stage-head"><h2>Portfolio campaign radar</h2><span class="hint">quick multi-timeframe view across tracked assets</span></div><div class="dna-radar">' + radar + '</div></section>';
+
+    return '<div class="dna-page">' + radarHtml + decision + portfolioBand + '<div class="dna-workspace">' + manager + chart + '</div>' + middle + progression + '<p class="note"><strong>Evidence boundary:</strong> this page translates live database state and manual position records into advisory navigation. It does not place orders, and reconstructed backfill remains visually distinct in the timeframe table.</p></div>';
+  }
+
   // Everything for one expanded asset row: verdict, open-position control,
   // this asset's own holdings (if any), the three-step flow, actions, and
   // the raw table. Replaces what used to be three separate top-level
@@ -1245,8 +1427,13 @@
       '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
 
     var chartHtml = '<div class="chart-wrap">' +
+      '<div class="chart-toprow">' +
+        '<span class="chart-mode" data-sym="' + sym + '"></span>' +
+        '<span class="chart-feats" data-sym="' + sym + '"></span>' +
+      '</div>' +
       '<div class="chart-toggles" data-sym="' + sym + '"></div>' +
-      '<canvas class="chart-canvas" data-sym="' + sym + '" width="900" height="230"></canvas>' +
+      '<div class="chart-container" data-sym="' + sym + '"></div>' +
+      '<div class="chart-legend" data-sym="' + sym + '">hover a bar for OHLCV</div>' +
       '<div class="chart-status" data-sym="' + sym + '">loading chart…</div></div>';
 
     var insightHtml = renderPositionInsights(sym);
@@ -1327,41 +1514,150 @@
   // timeframe this asset actually has data for.
   var ohlcCache = {};
   var OHLC_TF_MAP = { "3": "3m", "5": "5m", "15": "15m", "30": "30m", "60": "1H", "120": "2H", "180": "3H", "240": "4H", "D": "D" };
+  var OPTION_TFS = ["5m", "15m", "30m", "1H", "4H", "D"];
+  var chartModeOverride = {};
+  var chartFeatOverride = {};
 
-  function loadOhlc(sym, tf) {
-    var key = sym + ":" + tf;
+  var chartCtl = {
+    chart: null, candleSeries: null, volSeries: null, markersPlugin: null, resizeObserver: null,
+    sym: null, mode: null, tf: null, ticker: null
+  };
+
+  function optionTickerJs(sym, type, strike, exp) {
+    var d = String(exp).replace(/-/g, "");
+    var ct = type === "CALL" ? "C" : "P";
+    var s = String(Math.round(Number(strike) * 1000));
+    while (s.length < 8) s = "0" + s;
+    return "O:" + sym + d.slice(2, 4) + d.slice(4, 6) + d.slice(6, 8) + ct + s;
+  }
+
+  function chartColors() {
+    var st = getComputedStyle(document.documentElement);
+    var get = function (k, d) { var v = st.getPropertyValue(k).trim(); return v || d; };
+    return {
+      bg: get("--surface", "#101613"), fg: get("--text", "#e7ede9"),
+      grid: get("--line", "#1e2925"), up: get("--positive", "#6fcf7c"), down: get("--critical", "#e2685c"),
+      accent: get("--accent", "#4fe3c4"), warn: get("--warning", "#e7b24c"),
+    };
+  }
+
+  function destroyChart() {
+    if (chartCtl.resizeObserver) { chartCtl.resizeObserver.disconnect(); chartCtl.resizeObserver = null; }
+    if (chartCtl.markersPlugin && chartCtl.markersPlugin.detach) { try { chartCtl.markersPlugin.detach(); } catch (e) {} }
+    chartCtl.markersPlugin = null;
+    if (chartCtl.chart) { chartCtl.chart.remove(); chartCtl.chart = null; }
+    chartCtl.candleSeries = null; chartCtl.volSeries = null;
+  }
+
+  function makeChart(container, legendEl) {
+    destroyChart();
+    var c = chartColors();
+    var chart = LightweightCharts.createChart(container, {
+      layout: { background: { color: c.bg }, textColor: c.fg },
+      grid: { vertLines: { color: c.grid }, horzLines: { color: c.grid } },
+      rightPriceScale: { borderColor: c.grid },
+      timeScale: { borderColor: c.grid, timeVisible: true, secondsVisible: false },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    });
+    var cs = chart.addSeries(LightweightCharts.CandlestickSeries, {
+      upColor: c.up, downColor: c.down, borderVisible: false, wickUpColor: c.up, wickDownColor: c.down,
+    });
+    var vs = chart.addSeries(LightweightCharts.HistogramSeries, { priceFormat: { type: "volume" }, priceScaleId: "" });
+    vs.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+    chartCtl.chart = chart; chartCtl.candleSeries = cs; chartCtl.volSeries = vs;
+    chart.subscribeCrosshairMove(function (param) {
+      if (!param || !param.time || !param.seriesData.has(cs)) { legendEl.textContent = "hover a bar for OHLCV"; return; }
+      var b = param.seriesData.get(cs);
+      var v = param.seriesData.has(vs) ? param.seriesData.get(vs).value : null;
+      legendEl.textContent = "O " + b.open.toFixed(2) + " · H " + b.high.toFixed(2) + " · L " + b.low.toFixed(2) +
+        " · C " + b.close.toFixed(2) + (v != null ? " · V " + v : "");
+    });
+    chartCtl.resizeObserver = new ResizeObserver(function () {
+      chart.applyOptions({ width: container.clientWidth || 600, height: 300 });
+    });
+    chartCtl.resizeObserver.observe(container);
+  }
+
+  function chartTarget(sym) {
+    var h = deriveHoldings();
+    var shares = h.shares.filter(function (s) { return s.symbol === sym; });
+    var strategies = h.strategies.filter(function (o) { return o.symbol === sym; });
+    var all = shares.map(function (s) { return { kind: "share", data: s, key: holdingKey(s.leg_ids) }; })
+      .concat(strategies.map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
+    var pick = all.length === 1 ? all[0] : all.filter(function (x) { return x.key === selectedHolding; })[0];
+    return { all: all, pick: pick, shares: shares, strategies: strategies };
+  }
+
+  function loadChartBars(sym, mode, ticker, tf) {
+    var key = (mode === "option" ? ticker : sym) + ":" + tf;
     if (ohlcCache[key]) return Promise.resolve(ohlcCache[key]);
     var base = baseInput.value.trim().replace(/\/$/, "");
-    return fetch(base + "/ohlc/" + encodeURIComponent(sym) + "/" + encodeURIComponent(tf), { headers: authHeaders() })
+    var url = mode === "option"
+      ? base + "/options/ohlc/" + encodeURIComponent(ticker) + "/" + encodeURIComponent(tf)
+      : base + "/ohlc/" + encodeURIComponent(sym) + "/" + encodeURIComponent(tf);
+    return fetch(url, { headers: authHeaders() })
       .then(function (r) { return r.ok ? r.json() : null; })
       .catch(function () { return null; })
       .then(function (d) { if (d && d.bars) ohlcCache[key] = d; return d; });
   }
 
   function drawChart(sym) {
-    var canvas = document.querySelector('.chart-canvas[data-sym="' + sym + '"]');
+    var container = document.querySelector('.chart-container[data-sym="' + sym + '"]');
     var statusEl2 = document.querySelector('.chart-status[data-sym="' + sym + '"]');
+    var legendEl = document.querySelector('.chart-legend[data-sym="' + sym + '"]');
     var togglesEl = document.querySelector('.chart-toggles[data-sym="' + sym + '"]');
-    if (!canvas) return;
-    var c = cache[sym];
-    var states = (c && c.states) || [];
-    var sorted = states.slice().sort(function (a, b) { return tfKey(a.timeframe) - tfKey(b.timeframe); });
-    var candidates = sorted.map(function (r) { return OHLC_TF_MAP[String(r.timeframe)]; }).filter(Boolean);
-    candidates = candidates.filter(function (v, i) { return candidates.indexOf(v) === i; }); // de-dupe (two coordinator TFs can share an OHLC label)
-    if (!candidates.length) candidates = ["15m"];
+    var modeEl = document.querySelector('.chart-mode[data-sym="' + sym + '"]');
+    var featsEl = document.querySelector('.chart-feats[data-sym="' + sym + '"]');
+    if (!container) return;
 
-    // Which holding (if any) the chart should keep in view -- same selection
-    // as renderPositionInsights. Computed up front so the default timeframe
-    // can widen until the entry actually fits in the window, instead of
-    // always opening on the shortest timeframe where an entry from days ago
-    // falls off the left edge (the "chart is fixed on 3m" problem).
-    var holdings = deriveHoldings();
-    var symAll = holdings.shares.filter(function (s) { return s.symbol === sym; })
-      .map(function (s) { return { kind: "share", data: s, key: holdingKey(s.leg_ids) }; })
-      .concat(holdings.strategies.filter(function (o) { return o.symbol === sym; })
-        .map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
-    var chartPick = symAll.length === 1 ? symAll[0] : symAll.filter(function (x) { return x.key === selectedHolding; })[0];
-    var entryMs = chartPick ? parseIsoMs(chartPick.data.first_entry) : null;
+    var tgt = chartTarget(sym);
+    var target = tgt.pick;
+    var isOptionTarget = target && target.kind === "option";
+    var mode = chartModeOverride[sym] || (isOptionTarget ? "option" : "underlying");
+    var optionTarget = (mode === "option") && (isOptionTarget ? target : (tgt.strategies[0] ? { kind: "option", data: tgt.strategies[0], key: holdingKey(tgt.strategies[0].leg_ids) } : null));
+    var ticker = (mode === "option" && optionTarget) ? optionTickerJs(sym, optionTarget.data.contract.type, optionTarget.data.contract.strike, optionTarget.data.contract.expiration) : null;
+    if (mode === "option" && !ticker) { mode = "underlying"; chartModeOverride[sym] = "underlying"; }
+
+    if (modeEl) {
+      modeEl.innerHTML =
+        '<button class="cm-btn' + (mode === "underlying" ? " on" : "") + '" data-mode="underlying">Underlying</button>' +
+        '<button class="cm-btn' + (mode === "option" ? " on" : "") + '" data-mode="option"' + (tgt.strategies.length ? "" : ' disabled title="no option holding to view"') + '>Option</button>';
+      Array.prototype.forEach.call(modeEl.querySelectorAll(".cm-btn"), function (b) {
+        if (b.disabled) return;
+        b.addEventListener("click", function () {
+          chartModeOverride[sym] = b.dataset.mode;
+          drawChart(sym);
+        });
+      });
+    }
+
+    var feats = chartFeatOverride[sym] || { volume: true, position: true, dna: true, tradebox: true };
+    if (featsEl) {
+      featsEl.innerHTML =
+        '<label class="cf"><input type="checkbox" data-feat="volume"' + (feats.volume ? " checked" : "") + '> Volume</label>' +
+        '<label class="cf"><input type="checkbox" data-feat="position"' + (feats.position ? " checked" : "") + '> Position</label>' +
+        '<label class="cf"><input type="checkbox" data-feat="dna"' + (feats.dna ? " checked" : "") + '> DNA</label>' +
+        '<label class="cf"><input type="checkbox" data-feat="tradebox"' + (feats.tradebox ? " checked" : "") + '> Trade Box</label>';
+      Array.prototype.forEach.call(featsEl.querySelectorAll("input[data-feat]"), function (cb) {
+        cb.addEventListener("change", function () {
+          chartFeatOverride[sym] = chartFeatOverride[sym] || { volume: true, position: true, dna: true, tradebox: true };
+          chartFeatOverride[sym][cb.dataset.feat] = cb.checked;
+          drawChart(sym);
+        });
+      });
+    }
+
+    var candidates;
+    if (mode === "option") {
+      candidates = OPTION_TFS;
+    } else {
+      var c = cache[sym];
+      var states = (c && c.states) || [];
+      var sorted = states.slice().sort(function (a, b) { return tfKey(a.timeframe) - tfKey(b.timeframe); });
+      candidates = sorted.map(function (r) { return OHLC_TF_MAP[String(r.timeframe)]; }).filter(Boolean);
+      candidates = candidates.filter(function (v, i) { return candidates.indexOf(v) === i; });
+      if (!candidates.length) candidates = ["15m"];
+    }
 
     if (togglesEl) {
       togglesEl.innerHTML = candidates.map(function (tf) {
@@ -1376,167 +1672,91 @@
       });
     }
 
+    var entryMs = target ? parseIsoMs(target.data.first_entry) : null;
+
     function autoTry(i) {
       if (i >= candidates.length) { if (statusEl2) statusEl2.textContent = "No chart data available for " + sym + "."; return; }
-      loadOhlc(sym, candidates[i]).then(function (d) {
+      loadChartBars(sym, mode, ticker, candidates[i]).then(function (d) {
         if (!d || !d.bars || !d.bars.length) return autoTry(i + 1);
-        // Entry isn't inside this window yet -- widen to the next longer
-        // timeframe rather than render a chart with no marker on it.
         if (entryMs != null && d.bars[0].t > entryMs && i < candidates.length - 1) return autoTry(i + 1);
-        render(d, candidates[i]);
+        renderChart(d, candidates[i]);
       });
     }
 
     var manualTf = chartTfOverride[sym];
     if (manualTf && candidates.indexOf(manualTf) !== -1) {
-      loadOhlc(sym, manualTf).then(function (d) {
-        if (d && d.bars && d.bars.length) return render(d, manualTf);
+      loadChartBars(sym, mode, ticker, manualTf).then(function (d) {
+        if (d && d.bars && d.bars.length) return renderChart(d, manualTf);
         autoTry(0);
       });
     } else {
       autoTry(0);
     }
 
-    function render(d, tfLbl) {
+    function renderChart(d, tfLbl) {
+      var container2 = document.querySelector('.chart-container[data-sym="' + sym + '"]');
+      if (!container2) return;
+      makeChart(container2, legendEl);
+      var c = chartColors();
       var bars = d.bars;
-      var ctx = canvas.getContext("2d");
-      var rect = canvas.getBoundingClientRect();
-      var w = Math.max(rect.width, 300), h = 230;
-      canvas.width = w * devicePixelRatio; canvas.height = h * devicePixelRatio;
-      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
-      ctx.clearRect(0, 0, w, h);
+      var feats2 = chartFeatOverride[sym] || { volume: true, position: true, dna: true, tradebox: true };
 
-      var pad = { l: 52, r: 14, t: 12, b: 10 };
-      var plotW = w - pad.l - pad.r, plotH = h - pad.t - pad.b;
-
-      // Reference lines: this asset's actual position entry, and DNA's own
-      // Trade Box entry/stop/target if a box is currently open on any
-      // reporting timeframe. Real values only -- never invented.
-      var refs = [];
-      holdings.shares.filter(function (s) { return s.symbol === sym; }).forEach(function (s) {
-        refs.push({ price: s.avg_cost, label: "Your entry (shares)", color: "var(--accent)" });
-      });
-      var activeRow = sorted.filter(function (r) { return r.active_trade; })[0];
-      if (activeRow) {
-        if (activeRow.active_entry != null) refs.push({ price: activeRow.active_entry, label: "DNA entry", color: "var(--accent)" });
-        if (activeRow.active_stop != null) refs.push({ price: activeRow.active_stop, label: "DNA stop", color: "var(--critical)" });
-        if (activeRow.active_target != null) refs.push({ price: activeRow.active_target, label: "DNA target", color: "var(--positive)" });
+      chartCtl.candleSeries.setData(bars.map(function (b) { return { time: b.t / 1000, open: b.o, high: b.h, low: b.l, close: b.c }; }));
+      if (feats2.volume) {
+        chartCtl.volSeries.setData(bars.map(function (b) { return { time: b.t / 1000, value: b.v, color: b.c >= b.o ? c.up + "88" : c.down + "88" }; }));
       }
 
-      var closes = bars.map(function (b) { return b.c; });
-      var allPrices = closes.concat(refs.map(function (r) { return r.price; }));
-      var min = Math.min.apply(null, allPrices), max = Math.max.apply(null, allPrices);
-      if (min === max) { min -= 1; max += 1; }
-      var pad2 = (max - min) * 0.08;
-      min -= pad2; max += pad2;
+      var refs = [], markers = [], firstT = bars[0].t / 1000, lastT = bars[bars.length - 1].t / 1000;
 
-      function y(price) { return pad.t + plotH * (1 - (price - min) / (max - min)); }
-      function x(i) { return pad.l + plotW * (i / Math.max(1, bars.length - 1)); }
-
-      var style = getComputedStyle(document.documentElement);
-      var lineColor = style.getPropertyValue("--accent").trim() || "#0E9E85";
-      var gridColor = style.getPropertyValue("--line").trim() || "#ddd";
-      var textColor = style.getPropertyValue("--faint").trim() || "#888";
-
-      // Gridlines + price labels (4 bands)
-      ctx.font = "10px " + (style.getPropertyValue("--font-display") || "monospace");
-      ctx.fillStyle = textColor;
-      ctx.strokeStyle = gridColor;
-      ctx.lineWidth = 1;
-      for (var g = 0; g <= 3; g++) {
-        var gy = pad.t + (plotH * g / 3);
-        ctx.beginPath(); ctx.moveTo(pad.l, gy); ctx.lineTo(w - pad.r, gy); ctx.stroke();
-        var price = max - (max - min) * (g / 3);
-        ctx.fillText("$" + price.toFixed(2), 2, gy + 3);
+      if (mode === "option" && optionTarget) {
+        var o = optionTarget.data;
+        if (feats2.position && o.avg_cost != null) {
+          refs.push({ price: o.avg_cost, color: c.accent, style: LightweightCharts.LineStyle.Solid, title: "entry " + Number(o.avg_cost).toFixed(3) });
+          var t = parseIsoMs(o.first_entry);
+          if (t != null && t / 1000 >= firstT && t / 1000 <= lastT) {
+            markers.push({ time: t / 1000, position: "belowBar", color: c.accent, shape: "arrowUp", text: "Entry " + Number(o.avg_cost).toFixed(3) });
+          }
+        }
+        var lastB = bars[bars.length - 1];
+        refs.push({ price: lastB.c, color: c.accent, style: LightweightCharts.LineStyle.Dashed, title: "premium " + lastB.c.toFixed(2) });
+      } else {
+        if (feats2.position && target && target.kind === "share") {
+          var s = target.data;
+          if (s.avg_cost != null) {
+            refs.push({ price: s.avg_cost, color: c.accent, style: LightweightCharts.LineStyle.Solid, title: "avg " + Number(s.avg_cost).toFixed(2) });
+            var t = parseIsoMs(s.first_entry);
+            if (t != null && t / 1000 >= firstT && t / 1000 <= lastT) {
+              markers.push({ time: t / 1000, position: "belowBar", color: c.accent, shape: "arrowUp", text: "In " + Number(s.avg_cost).toFixed(2) });
+            }
+          }
+        }
+        if (feats2.dna || feats2.tradebox) {
+          var c2 = cache[sym];
+          var states2 = (c2 && c2.states) || [];
+          var activeRow = states2.filter(function (r) { return r.active_trade; })[0];
+          if (activeRow) {
+            if (feats2.dna) {
+              if (activeRow.active_entry != null) refs.push({ price: activeRow.active_entry, color: c.accent, style: LightweightCharts.LineStyle.Solid, title: "DNA entry" });
+              if (activeRow.active_stop != null) refs.push({ price: activeRow.active_stop, color: c.down, style: LightweightCharts.LineStyle.Solid, title: "DNA stop" });
+              if (activeRow.active_target != null) refs.push({ price: activeRow.active_target, color: c.up, style: LightweightCharts.LineStyle.Solid, title: "DNA target" });
+            }
+          }
+        }
+        var lastB = bars[bars.length - 1];
+        refs.push({ price: lastB.c, color: c.accent, style: LightweightCharts.LineStyle.Dashed, title: "close " + lastB.c.toFixed(2) });
       }
 
-      // Close-price line, filled area beneath for legibility
-      ctx.beginPath();
-      bars.forEach(function (b, i) { var px2 = x(i), py = y(b.c); i === 0 ? ctx.moveTo(px2, py) : ctx.lineTo(px2, py); });
-      ctx.strokeStyle = lineColor; ctx.lineWidth = 1.6; ctx.stroke();
-      ctx.lineTo(x(bars.length - 1), pad.t + plotH); ctx.lineTo(x(0), pad.t + plotH); ctx.closePath();
-      ctx.fillStyle = lineColor + "22"; ctx.fill();
-
-      // Reference lines on top, dashed, labeled at the right edge
+      if (markers.length) {
+        chartCtl.markersPlugin = LightweightCharts.createSeriesMarkers(chartCtl.candleSeries, markers);
+      }
       refs.forEach(function (r) {
-        var ry = y(r.price);
-        ctx.save();
-        ctx.setLineDash([4, 3]);
-        ctx.strokeStyle = "rgb(" + colorVar(r.color) + ")"; ctx.globalAlpha = 0.85;
-        ctx.beginPath(); ctx.moveTo(pad.l, ry); ctx.lineTo(w - pad.r, ry); ctx.stroke();
-        ctx.restore();
-        ctx.fillStyle = "rgb(" + colorVar(r.color) + ")";
-        ctx.fillText(r.label + " $" + Number(r.price).toFixed(2), pad.l + 4, ry - 3);
+        chartCtl.candleSeries.createPriceLine({ price: r.price, color: r.color, lineWidth: 1, lineStyle: r.style, axisLabelVisible: true, title: r.title });
       });
 
-      // "Where you got in": one vertical marker per real holding on this
-      // symbol, placed at the bar closest to its actual entry time (never
-      // at an invented spot). Shows the underlying price at that moment --
-      // for options this is the stock price when entered, not the premium,
-      // since the premium doesn't belong on a stock-price y-axis.
-      function nearestBarIndex(iso) {
-        var t = new Date(String(iso).replace(" ", "T") + (String(iso).endsWith("Z") ? "" : "Z")).getTime();
-        if (isNaN(t)) return null;
-        var best = 0, bestDiff = Infinity;
-        bars.forEach(function (b, i) { var diff = Math.abs(b.t - t); if (diff < bestDiff) { bestDiff = diff; best = i; } });
-        return best;
-      }
-      // Marks only the one holding selected below (chartPick, computed in
-      // the outer scope -- same selection logic as renderPositionInsights)
-      // instead of stacking every holding's entry on top of each other.
-      var entryMarkers = [];
-      if (chartPick) {
-        var idx = nearestBarIndex(chartPick.data.first_entry);
-        if (idx != null) {
-          entryMarkers.push({
-            idx: idx,
-            label: chartPick.kind === "share" ? "In (shares)" : "In ($" + chartPick.data.contract.strike + " " + chartPick.data.contract.type + ")"
-          });
-        }
-      }
-      var accentColor = "rgb(" + colorVar("var(--accent)") + ")";
-      entryMarkers.forEach(function (m) {
-        var mx = x(m.idx), my = y(bars[m.idx].c);
-        ctx.save();
-        ctx.setLineDash([2, 3]);
-        ctx.strokeStyle = accentColor; ctx.globalAlpha = 0.5;
-        ctx.beginPath(); ctx.moveTo(mx, pad.t); ctx.lineTo(mx, pad.t + plotH); ctx.stroke();
-        ctx.restore();
-        ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2);
-        ctx.fillStyle = accentColor; ctx.fill();
-        ctx.strokeStyle = textColor; ctx.lineWidth = 1; ctx.stroke();
-        ctx.save();
-        ctx.translate(mx, pad.t + 10);
-        ctx.fillStyle = accentColor; ctx.font = "9px " + (style.getPropertyValue("--font-display") || "monospace");
-        ctx.fillText(m.label, 4, 0);
-        ctx.restore();
-      });
+      chartCtl.chart.timeScale().fitContent();
 
-      // "Where we are now": explicit dot + label on the last bar, since the
-      // line simply ending there is easy to miss at a glance.
-      if (bars.length) {
-        var lastI = bars.length - 1, nx = x(lastI), ny = y(bars[lastI].c);
-        ctx.beginPath(); ctx.arc(nx, ny, 4, 0, Math.PI * 2);
-        ctx.fillStyle = lineColor; ctx.fill();
-        ctx.fillStyle = lineColor; ctx.font = "10px " + (style.getPropertyValue("--font-display") || "monospace");
-        var nowLabel = "Now $" + bars[lastI].c.toFixed(2);
-        var tw = ctx.measureText(nowLabel).width;
-        ctx.fillText(nowLabel, Math.min(nx + 6, w - pad.r - tw), ny - 8);
-      }
-
-      function colorVar(token) {
-        var m = token.match(/var\((--[\w-]+)\)/);
-        var raw = m ? style.getPropertyValue(m[1]).trim() : token;
-        if (raw.indexOf("#") === 0) {
-          var hex = raw.replace("#", "");
-          if (hex.length === 3) hex = hex.split("").map(function (ch) { return ch + ch; }).join("");
-          var n = parseInt(hex, 16);
-          return [(n >> 16) & 255, (n >> 8) & 255, n & 255].join(",");
-        }
-        return raw.replace(/[^\d,]/g, "");
-      }
-
-      if (statusEl2) statusEl2.textContent = sym + " · " + tfLbl + " · " + bars.length + " bars · source: massive" + (d.cached ? " (cached)" : "");
+      var label = mode === "option" ? ticker : sym;
+      if (statusEl2) statusEl2.textContent = label + " · " + tfLbl + " · " + bars.length + " bars · source: massive" + (d.cached ? " (cached)" : "");
     }
   }
 
@@ -1563,15 +1783,13 @@
   }
 
   function paint() {
-    app.innerHTML = renderPortfolioStrip() + renderAssetList();
+    app.innerHTML = selected ? renderApprovedAsset(selected) : renderAssetList();
     wirePortfolio();
-    // Row header click: expanding a different row switches to it; clicking
-    // the already-expanded row's header collapses it back to the list.
-    Array.prototype.forEach.call(document.querySelectorAll(".asset-row-head"), function (b) {
+    Array.prototype.forEach.call(document.querySelectorAll(".dna-radar-item"), function (b) {
       b.addEventListener("click", function () {
         var sym = b.dataset.sym;
-        selected = (selected === sym) ? null : sym;
-        if (!selected) { paint(); return; }
+        selected = sym;
+        selectedHolding = null;
         loadSymbol(selected, false).then(function () { paint(); });
       });
     });
@@ -1619,7 +1837,9 @@
           var ranked = assets.slice().sort(function (x, y) {
             return LEVEL_ORDER[cache[x.symbol].assess.level] - LEVEL_ORDER[cache[y.symbol].assess.level];
           });
-          if (!selected || !cache[selected]) selected = ranked[0].symbol;
+          if (!selected || !cache[selected]) {
+            selected = cache.AMC ? "AMC" : ranked[0].symbol;
+          }
           return Promise.all([loadPortfolio(), loadClosedPositions()]);
         }).then(function () { paint(); });
       })

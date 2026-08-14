@@ -26,7 +26,7 @@ AUTHENTICATION:
 UPDATED v12.6.19: TradingView IP allowlist replaces secret-based auth.
 The Pine script's alert() call sends its existing JSON unchanged."""
 from __future__ import annotations
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import sqlite3
 import hmac
 import os
@@ -445,6 +445,14 @@ def serve_dashboard():
     if not path.exists():
         return jsonify({"error": "dashboard not found"}), 404
     return app.response_class(path.read_text(encoding="utf-8"), mimetype="text/html")
+
+
+@app.route("/dashboard/vendor/<path:filename>", methods=["GET"])
+def serve_vendor(filename):
+    """Serve vendored static assets (e.g. lightweight-charts) referenced by the
+    dashboard via a relative path, so the same HTML loads under file:// and the
+    Railway /dashboard route."""
+    return send_from_directory(str(Path(__file__).parent / "ui" / "vendor"), filename)
 
 
 def _shape_state(symbol, timeframe, latest, watch):
