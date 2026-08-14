@@ -894,6 +894,12 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertIn("daysLeft", html)
         self.assertIn("News stream", html)
         self.assertIn("chartDrawSeq", html)
+        self.assertIn('pick.kind !== "option"', html)
+        self.assertIn("dna-held-price", html)
+        self.assertIn("Catalyst watch", html)
+        self.assertIn("premiumCompression", html)
+        self.assertIn("Attention mode only", html)
+        self.assertIn("safeNewsUrl", html)
         self.assertIn("/positions/", html)
         self.assertIn("/state_all/", html)
 
@@ -905,6 +911,50 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertGreater(len(resp.data), 1000)
         resp.close()
+
+    def test_news_requires_state_auth(self):
+        resp = self.client.get("/news/AMC")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_news_rejects_invalid_symbol(self):
+        resp = self.client.get("/news/AMC%20bad", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 400)
+
+    def test_news_merges_deduplicates_and_sorts_sources(self):
+        webhook_receiver._NEWS_CACHE.clear()
+        yahoo = [{
+            "title": "AMC filing",
+            "publisher": "Yahoo Finance",
+            "url": "https://example.test/filing",
+            "published": 1000,
+            "kind": "STORY",
+            "source": "yahoo",
+        }]
+        google = [
+            {
+                "title": "AMC catalyst",
+                "publisher": "Example News",
+                "url": "https://example.test/catalyst",
+                "published": 2000,
+                "kind": "STORY",
+                "source": "google",
+            },
+            dict(yahoo[0]),
+        ]
+        with mock.patch.object(webhook_receiver, "_fetch_yahoo_news", return_value=yahoo) as yahoo_fetch, \
+                mock.patch.object(webhook_receiver, "_fetch_google_news", return_value=google) as google_fetch:
+            resp = self.client.get("/news/amc", headers=self._state_headers())
+            cached_resp = self.client.get("/news/AMC", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        body = resp.get_json()
+        self.assertEqual(body["symbol"], "AMC")
+        self.assertEqual(body["count"], 2)
+        self.assertEqual([item["title"] for item in body["news"]], [
+            "AMC catalyst", "AMC filing",
+        ])
+        self.assertTrue(cached_resp.get_json()["cached"])
+        yahoo_fetch.assert_called_once_with("AMC", 12)
+        google_fetch.assert_called_once_with("AMC", 12)
 
     # --- Test 11: State/history reject absent/invalid bearer tokens ---
 

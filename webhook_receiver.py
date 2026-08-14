@@ -33,8 +33,12 @@ import os
 import ipaddress
 import uuid
 import threading
+import email.utils
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
+
+import requests
 
 import massive_ohlc
 import massive_options
@@ -520,6 +524,113 @@ def get_state_all(symbol):
             states.append(_shape_state(symbol, tf, latest, watch))
     conn.close()
     return jsonify({"symbol": symbol, "timeframe_count": len(states), "states": states})
+
+
+# -- News stream (media sources) ---------------------------------------------
+
+_YAHOO_SEARCH_URL = "https://query2.finance.yahoo.com/v1/finance/search"
+_GOOGLE_RSS_URL = "https://news.google.com/rss/search"
+_NEWS_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+_NEWS_CACHE_TTL_SECONDS = 300
+_NEWS_CACHE = {}
+_NEWS_CACHE_LOCK = threading.Lock()
+
+
+def _fetch_yahoo_news(symbol, limit):
+    resp = requests.get(
+        _YAHOO_SEARCH_URL,
+        params={"q": symbol, "quotesCount": 0, "newsCount": limit, "enableFuzzyQuery": "false"},
+        headers={"User-Agent": _NEWS_UA},
+        timeout=8,
+    )
+    resp.raise_for_status()
+    items = []
+    for n in resp.json().get("news") or []:
+        items.append({
+            "title": n.get("title"),
+            "publisher": n.get("publisher") or "Yahoo Finance",
+            "url": n.get("link"),
+            "published": int(n["providerPublishTime"]) * 1000 if n.get("providerPublishTime") else None,
+            "kind": n.get("type"),
+            "source": "yahoo",
+        })
+    return items
+
+
+def _fetch_google_news(symbol, limit):
+    resp = requests.get(
+        _GOOGLE_RSS_URL,
+        params={"q": f"{symbol} stock", "hl": "en-US", "gl": "US", "ceid": "US:en"},
+        headers={"User-Agent": _NEWS_UA},
+        timeout=8,
+    )
+    resp.raise_for_status()
+    root = ET.fromstring(resp.content)
+    items = []
+    for node in root.iter("item"):
+        title = node.findtext("title")
+        if not title:
+            continue
+        published = None
+        pubdate = node.findtext("pubDate")
+        if pubdate:
+            try:
+                published = int(email.utils.parsedate_to_datetime(pubdate).timestamp() * 1000)
+            except Exception:  # noqa: BLE001
+                published = None
+        items.append({
+            "title": title,
+            "publisher": node.findtext("source") or "Google News",
+            "url": node.findtext("link"),
+            "published": published,
+            "kind": "STORY",
+            "source": "google",
+        })
+        if len(items) >= limit:
+            break
+    return items
+
+
+@app.route("/news/<symbol>", methods=["GET"])
+def get_news(symbol):
+    """Aggregated headline feed for one symbol from public media sources.
+
+    Server-side proxy: the browser can't call Yahoo/Google News directly
+    (no CORS headers), so this endpoint fetches them and returns a normalized
+    JSON list. Gated by state_is_authorized() like every other read endpoint.
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    symbol = massive_ohlc.valid_symbol(symbol)
+    if not symbol:
+        return jsonify({"error": "invalid symbol"}), 400
+    now = datetime.now(timezone.utc).timestamp()
+    with _NEWS_CACHE_LOCK:
+        cached = _NEWS_CACHE.get(symbol)
+        if cached and now - cached[0] < _NEWS_CACHE_TTL_SECONDS:
+            body = dict(cached[1])
+            body["cached"] = True
+            return jsonify(body)
+    items = []
+    errors = []
+    for fetch in (_fetch_yahoo_news, _fetch_google_news):
+        try:
+            items.extend(fetch(symbol, 12))
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{fetch.__name__}: {exc}")
+    seen = set()
+    unique = []
+    for it in items:
+        key = it.get("url") or (it.get("title") or "").lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        unique.append(it)
+    unique.sort(key=lambda x: x.get("published") or 0, reverse=True)
+    body = {"symbol": symbol, "count": len(unique), "news": unique, "errors": errors, "cached": False}
+    with _NEWS_CACHE_LOCK:
+        _NEWS_CACHE[symbol] = (now, body)
+    return jsonify(body)
 
 
 # Symbols excluded from the asset list: internal pipeline smoke-test rows,

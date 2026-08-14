@@ -293,7 +293,7 @@
   .dna-pill.green{background:rgba(28,154,87,.10);color:#0d7f4b}.dna-pill.red{background:var(--critical-glow);color:var(--critical)}
   .dna-slice-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .dna-k{font-size:9px;color:color-mix(in srgb,currentColor 62%,transparent)}
-  .dna-v{font-family:var(--font-display);font-size:14px;font-weight:700;margin-top:2px}.dna-v.price{font-size:19px}.dna-v.return{font-size:12px;font-weight:500}.dna-v.pos{color:#0d7f4b}.dna-v.neg{color:var(--critical)}
+  .dna-v{font-family:var(--font-display);font-size:14px;font-weight:700;margin-top:2px}.dna-v.price,.dna-v.portfolio-total{font-size:22px}.dna-v.return{font-size:12px;font-weight:500}.dna-v.pos{color:#0d7f4b}.dna-v.neg{color:var(--critical)}.dna-sub-return{font-family:var(--font-display);font-size:10px;font-weight:600;margin-top:2px}.dna-sub-return.pos{color:#0d7f4b}.dna-sub-return.neg{color:var(--critical)}
   .dna-workspace{display:grid;grid-template-columns:310px minmax(0,1fr);gap:16px;align-items:stretch}
   .dna-manager,.dna-chart-card,.dna-panel{background:var(--surface);border:1px solid var(--line);border-radius:12px}
   .dna-manager{padding:16px;display:flex;flex-direction:column;min-width:0}
@@ -305,16 +305,24 @@
   .dna-manager-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;padding:12px 0}.dna-manager-grid .dna-v{font-size:12px}
   .dna-risk{padding:10px;border-radius:8px;background:var(--positive-glow);color:var(--positive);font-size:10px;line-height:1.4}.dna-risk.warn{background:var(--warning-glow);color:var(--warning)}.dna-risk.neg{background:var(--critical-glow);color:var(--critical)}.dna-position-actions{display:grid;gap:5px;margin:8px 0 0;padding:0;list-style:none}.dna-position-actions li{position:relative;padding-left:13px;color:var(--text);font-size:9.5px;line-height:1.35}.dna-position-actions li:before{content:"";position:absolute;left:0;top:.45em;width:5px;height:5px;border-radius:50%;background:#2563eb}
   .dna-held{margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}.dna-held-title{font-family:var(--font-display);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:7px}.dna-held-list{display:grid;gap:6px}
-  .dna-held-item{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 8px;text-align:left;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)}.dna-held-item strong{font-size:10px}.dna-held-item span{font-size:9px;color:var(--muted)}.dna-held-item b{grid-row:1/3;grid-column:2;align-self:center;font-size:12px;font-weight:500;color:var(--positive)}.dna-held-item.selected{border-color:#2563eb;background:rgba(37,99,235,.08);box-shadow:inset 3px 0 0 #2563eb}
+  .dna-held-item{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 8px;text-align:left;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)}.dna-held-item strong{font-size:10px}.dna-held-item span{font-size:9px;color:var(--muted)}.dna-held-item .dna-held-price{grid-row:1;grid-column:2;align-self:end;font-size:9px;font-style:normal;font-weight:600;color:var(--text)}.dna-held-item b{grid-row:2;grid-column:2;align-self:start;font-size:12px;font-weight:500;color:var(--positive)}.dna-held-item.selected{border-color:#2563eb;background:rgba(37,99,235,.08);box-shadow:inset 3px 0 0 #2563eb}
   .dna-manager-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:auto;padding-top:12px}.dna-manager-actions .open-pos-btn{grid-column:1/-1}.dna-manager-actions button{min-height:34px}.dna-manager-actions .pf-close{font-size:12px}
   .dna-chart-column{min-width:0;display:grid;gap:12px}.dna-chart-card{overflow:hidden}.dna-chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid var(--line)}.dna-chart-title{font-size:13px;font-weight:700}.dna-chart-sub{font-size:10px;color:var(--muted)}
   .dna-chart-card .chart-wrap{border:0;border-radius:0;margin:0;padding:10px 14px}.dna-chart-card .chart-container{height:300px}.dna-chart-card .chart-status{padding-bottom:4px}
   .dna-signals{padding:14px}.dna-signals table{min-width:580px}.dna-signals-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.dna-signals-head h3{font-size:12px;margin:0}.dna-signals-head span{font-size:10px;color:var(--faint)}
   .dna-middle{display:grid;grid-template-columns:.8fr 1.2fr;gap:16px}.dna-panel{padding:15px}.dna-panel .stage-head{margin-bottom:10px}.dna-insight-row{display:grid;grid-template-columns:minmax(130px,.8fr) 1.4fr auto;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);margin-top:6px}.dna-insight-row strong{font-size:10.5px}.dna-insight-row span{font-size:10px;color:var(--muted)}
   .dna-lower-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.dna-progression{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.dna-stage{position:relative}.dna-stage-head{display:flex;align-items:center;gap:8px}.dna-stage-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-size:10px;font-weight:700}.dna-stage.pos .dna-stage-dot{background:var(--positive-glow);color:var(--positive)}.dna-stage.warn .dna-stage-dot{background:var(--warning-glow);color:var(--warning)}.dna-stage.neg .dna-stage-dot{background:var(--critical-glow);color:var(--critical)}.dna-stage strong{font-size:10px}.dna-stage small{display:block;color:var(--faint);font-size:9px}.dna-stage-state{padding-left:36px;margin-top:6px;font-size:10px;font-weight:700}.dna-news-empty{min-height:105px;display:grid;place-items:center;border:1px dashed var(--line);border-radius:8px;color:var(--faint);font-size:10px;text-align:center;padding:16px}
+  .dna-news-list{display:flex;flex-direction:column;gap:7px;max-height:380px;overflow-y:auto;padding-right:2px}
+  .dna-news-item{display:block;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);text-decoration:none;color:var(--text);transition:border-color .12s,background .12s}
+  .dna-news-item:hover{border-color:var(--accent);background:var(--accent-glow)}
+  .dna-news-title{display:block;font-size:11.5px;line-height:1.42;font-weight:600;color:var(--text)}
+  .dna-news-meta{display:block;font-size:9.5px;color:var(--faint);margin-top:3px;font-family:var(--font-display)}
+  .dna-news-src{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:0 5px;border-radius:4px;background:var(--accent-glow);color:var(--accent2);margin-left:6px;vertical-align:1px}
+  .dna-news-foot{font-size:9px;color:var(--faint);margin-top:8px;font-family:var(--font-display)}
+  .dna-catalyst-watch{margin-bottom:10px;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}.dna-watch-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.dna-watch-head strong{font-family:var(--font-display);font-size:10px;text-transform:uppercase;letter-spacing:.05em}.dna-watch-status{padding:3px 7px;border-radius:999px;font-size:8px;font-weight:750;background:var(--surface);color:var(--faint)}.dna-watch-status.active{background:var(--warning-glow);color:var(--warning)}.dna-watch-status.high{background:var(--critical-glow);color:var(--critical)}.dna-watch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.dna-watch-item{padding:7px 8px;border-left:3px solid var(--line);background:var(--surface);border-radius:5px}.dna-watch-item.hit{border-color:var(--warning)}.dna-watch-item.high{border-color:var(--critical)}.dna-watch-item strong{display:block;font-size:9px}.dna-watch-item span{display:block;margin-top:2px;font-size:8.5px;line-height:1.35;color:var(--muted)}.dna-watch-note{margin-top:7px;font-size:8px;color:var(--faint)}
   .dna-radar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dna-radar-item{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);cursor:pointer}.dna-radar-item:hover{border-color:#2563eb}.dna-radar-top{display:flex;justify-content:space-between;gap:6px;margin-bottom:7px}.dna-radar-top strong{font-family:var(--font-display);font-size:11px}.dna-radar-tfs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.dna-radar-tf{text-align:center;padding:4px 2px;border-radius:4px;font-size:8px;font-weight:700;background:var(--positive-glow);color:var(--positive)}.dna-radar-tf.warn{background:var(--warning-glow);color:var(--warning)}.dna-radar-tf.neg{background:var(--critical-glow);color:var(--critical)}
   @media(max-width:980px){.dna-workspace,.dna-middle,.dna-lower-grid{grid-template-columns:1fr}.dna-portfolio{grid-template-columns:1fr}.dna-portfolio-slice+.dna-portfolio-slice{border-left:0;border-top:1px solid #97d8b0}.dna-decision{height:auto;grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:600px){.dna-decision{grid-template-columns:1fr}.dna-slice-metrics{grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:1fr}.dna-progression{grid-template-columns:1fr 1fr}.dna-insight-row{grid-template-columns:1fr}}
+  @media(max-width:600px){.dna-decision{grid-template-columns:1fr}.dna-slice-metrics{grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:1fr}.dna-progression,.dna-watch-grid{grid-template-columns:1fr}.dna-insight-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -589,6 +597,7 @@
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
   var portfolio = [], realized = 0, portfolioById = {};
+  var newsBySymbol = {}, marketWatchBySymbol = {};
   // Which single holding (share line or option contract) the chart + insight
   // panel currently track. null = nothing picked yet. Keyed by leg_ids so it
   // survives a repaint even though holding objects themselves get rebuilt.
@@ -1316,7 +1325,7 @@
   }
 
   function timelineFor(pick) {
-    if (!pick) return null;
+    if (!pick || pick.kind !== "option") return null;
     var entryMs = parseIsoMs(pick.data.first_entry);
     var now = Date.now(), endMs = null, expiry = "Open position";
     if (pick.kind === "option" && pick.data.contract.expiration) {
@@ -1346,6 +1355,42 @@
     }
     var dna = primary ? primary.tier.label + " is " + primary.text + " on " + tfLabel(primary.lead.timeframe) + "." : "No current position-specific DNA reading.";
     return { title: title, summary: context + " · " + dna, bullets: lines.slice(0, 3) };
+  }
+
+  function catalystWatchHtml(sym) {
+    var c = cache[sym], states = c ? c.states : [], market = marketWatchBySymbol[sym] || {};
+    var news = newsBySymbol[sym] || [];
+    var catalystPattern = /\b(424b5|s-3|fwp|offering|at-the-market|\batm\b|dilution|share count|8-k|10-q|10-k|earnings|guidance|sec filing)\b/i;
+    var highPriorityPattern = /\b(424b5|s-3|fwp|offering|at-the-market|\batm\b|dilution|share count)\b/i;
+    var catalyst = news.filter(function (n) { return catalystPattern.test(n.title || ""); })[0] || null;
+    var highPriority = catalyst && highPriorityPattern.test(catalyst.title || "");
+    var lower = states.filter(function (s) { return tfKey(s.timeframe) <= tfKey("60"); });
+    var constructive = lower.filter(function (s) { return phaseTone(s.phase) === "pos"; }).length;
+    var failures = lower.filter(function (s) { return /FAIL/i.test(s.recent_event || "") || phaseTone(s.phase) === "neg"; }).length;
+    var volumeHit = market.volumeRatio != null && market.volumeRatio >= 1.5;
+    var premiumHit = market.premiumCompression != null && market.premiumCompression >= 20;
+    var technicalHit = constructive >= 2 || failures >= 2;
+    var confluence = [volumeHit, premiumHit, technicalHit].filter(Boolean).length;
+    var active = Boolean(highPriority || (catalyst && confluence >= 1) || confluence >= 2);
+    var statusClass = highPriority ? " high" : active ? " active" : "";
+    var status = highPriority ? "CATALYST RISK" : active ? "WATCH ACTIVE" : "MONITORING";
+    var volumeText = market.volumeRatio == null ? "Waiting for chart volume." : market.volumeRatio.toFixed(2) + "× the prior 20-bar average on " + market.tf + ".";
+    var premiumText = market.premiumCompression == null ? "Select an option chart to measure compression." : market.premiumCompression.toFixed(1) + "% below its 20-bar premium high on " + market.tf + ".";
+    var technicalText = constructive + " constructive and " + failures + " pressured lower-timeframe readings.";
+    var catalystText = catalyst ? catalyst.title : "No catalyst-keyword headline in the current media feed.";
+    return '<div class="dna-watch-head"><strong>Catalyst watch</strong><span class="dna-watch-status' + statusClass + '">' + status + '</span></div>' +
+      '<div class="dna-watch-grid">' +
+        '<div class="dna-watch-item' + (highPriority ? ' high' : catalyst ? ' hit' : '') + '"><strong>Catalyst</strong><span>' + esc(catalystText) + '</span></div>' +
+        '<div class="dna-watch-item' + (volumeHit ? ' hit' : '') + '"><strong>Volume</strong><span>' + volumeText + '</span></div>' +
+        '<div class="dna-watch-item' + (premiumHit ? ' hit' : '') + '"><strong>Premium compression</strong><span>' + premiumText + '</span></div>' +
+        '<div class="dna-watch-item' + (technicalHit ? ' hit' : '') + '"><strong>DNA technical response</strong><span>' + technicalText + '</span></div>' +
+      '</div><div class="dna-watch-note">Attention mode only—not an entry signal. Premium compression is measured from observed prices and is not attributed to IV or theta without those data.</div>';
+  }
+
+  function renderCatalystWatch(sym) {
+    Array.prototype.forEach.call(document.querySelectorAll('.dna-catalyst-watch[data-sym="' + sym + '"]'), function (el) {
+      el.innerHTML = catalystWatchHtml(sym);
+    });
   }
 
   function renderApprovedAsset(sym) {
@@ -1382,8 +1427,8 @@
     var portfolioBand = '<section class="dna-portfolio" aria-label="' + sym + ' portfolio">' +
       '<div class="dna-portfolio-slice"><div class="dna-slice-head"><strong>' + sym + '</strong><span class="dna-pill green">' + states.length + ' TF live</span></div><div class="dna-slice-metrics">' +
         '<div><div class="dna-k">Price</div><div class="dna-v price">' + fmtMoney(price) + '</div></div>' +
-        '<div><div class="dna-k">Today</div><div class="dna-v return ' + (dayMove == null || dayMove >= 0 ? "pos" : "neg") + '">' + performanceText(dayMove, dayPct) + '</div></div>' +
-        '<div><div class="dna-k">Portfolio value</div><div class="dna-v">' + fmtMoney(totalValue) + '</div></div></div></div>' +
+        '<div><div class="dna-k">Portfolio value</div><div class="dna-v portfolio-total">' + fmtMoney(totalValue) + '</div><div class="dna-sub-return ' + (totalPnl >= 0 ? "pos" : "neg") + '">P&amp;L ' + performanceText(totalPnl, totalPct) + '</div></div>' +
+        '<div><div class="dna-k">Today</div><div class="dna-v return ' + (dayMove == null || dayMove >= 0 ? "pos" : "neg") + '">' + performanceText(dayMove, dayPct) + '</div></div></div></div>' +
       '<div class="dna-portfolio-slice"><div class="dna-slice-head"><strong>Stock position</strong><span class="dna-pill green">' + stockShares + ' shares</span></div><div class="dna-slice-metrics">' +
         '<div><div class="dna-k">Market value</div><div class="dna-v">' + fmtMoney(stockValue) + '</div></div>' +
         '<div><div class="dna-k">Today</div><div class="dna-v return ' + (stockToday >= 0 ? "pos" : "neg") + '">' + fmtSigned(stockToday) + '</div></div>' +
@@ -1405,7 +1450,8 @@
     var primary = primaryReadFor(sym), holdingRead = holdingGuidance(pick, primary);
     var heldRows = held.all.map(function (x) {
       var ret = x.data.total_return_pct, meta = x.kind === "share" ? x.data.shares + " shares · avg " + fmtMoney(x.data.avg_cost) : fmtExpiry(x.data.contract.expiration) + " · " + x.data.contracts + " contract" + (x.data.contracts === 1 ? "" : "s");
-      return '<button type="button" class="dna-held-item pf-row' + (x.key === selectedHolding ? ' selected' : '') + '" data-holding="' + x.key + '"><strong>' + holdingLabel(x) + '</strong><span>' + meta + '</span><b>' + fmtPct(ret) + '</b></button>';
+      var currentPrice = x.kind === "option" ? '<em class="dna-held-price">Current ' + fmtMoney(x.data.current_price) + '</em>' : '';
+      return '<button type="button" class="dna-held-item pf-row' + (x.key === selectedHolding ? ' selected' : '') + '" data-holding="' + x.key + '"><strong>' + holdingLabel(x) + '</strong><span>' + meta + '</span>' + currentPrice + '<b>' + fmtPct(ret) + '</b></button>';
     }).join("") || '<div class="copy">No open positions on this asset.</div>';
     var closeButton = pick ? '<button class="pf-close" data-pid="' + pick.data.position_id + '" data-legs="' + JSON.stringify(pick.data.leg_ids) + '" data-label="' + holdingLabel(pick) + '">Close</button>' : '<button class="pf-close" disabled>Close</button>';
     var timelineHtml = timeline ? '<div class="dna-timeline"><div class="dna-timeline-head"><strong>Entry → expiration</strong><span>' + timeline.progress + '</span></div><div class="dna-timeline-track"><span class="dna-timeline-fill" style="width:' + timeline.width + '"></span><i class="dna-timeline-dot" style="left:' + timeline.width + '"></i></div><div class="dna-timeline-labels"><span>' + timeline.entry + '</span><span>' + timeline.today + '</span><span>' + timeline.expiry + '</span></div></div>' : '';
@@ -1423,13 +1469,22 @@
     chart += '<section class="dna-panel dna-signals"><div class="dna-signals-head"><div><h3>Timeframe signals</h3><span>Compact evidence under the active chart</span></div></div><details class="raw" open><summary>Show timeframe ladder</summary><div class="raw-body"><div class="scroll"><table><thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Last event</th><th>Updated</th></tr></thead><tbody>' + signalRows + '</tbody></table></div></div></details></section></div>';
 
     var acts = actionsFor(sym, a);
-    var actionHtml = acts.length ? acts.slice(0,3).map(function (x) { return '<div class="action ' + x.level + '"><div class="ic">' + x.ic + '</div><div><div class="a-title">' + x.title + '</div><div class="a-text">' + x.text + '</div></div></div>'; }).join("") : '<div class="no-actions">Nothing crosses an action threshold right now.</div>';
+    var actionHtml;
+    if (acts.length) {
+      actionHtml = acts.slice(0,3).map(function (x) { return '<div class="action ' + x.level + '"><div class="ic">' + x.ic + '</div><div><div class="a-title">' + x.title + '</div><div class="a-text">' + x.text + '</div></div></div>'; }).join("");
+    } else if (holdingRead.bullets.length) {
+      var fallbackLevel = primary && primary.tone === "neg" ? "critical" : primary && primary.tone === "warn" ? "watch" : "opportunity";
+      var fallbackTitles = ["Position context", "DNA context", "Potential action"];
+      actionHtml = holdingRead.bullets.slice(0,3).map(function (line, i) { return '<div class="action ' + fallbackLevel + '"><div class="ic">' + ["•","◎","→"][i] + '</div><div><div class="a-title">' + fallbackTitles[i] + '</div><div class="a-text">' + line + '</div></div></div>'; }).join("");
+    } else {
+      actionHtml = '<div class="no-actions">Select a holding to see position-specific navigation.</div>';
+    }
     var insightTiers = [t.owner,t.confirm,t.timing].filter(function (x) { return x && !x.empty; });
     var insightHtml = insightTiers.map(function (x) { return '<div class="dna-insight-row"><strong>' + x.tier.label + ' · ' + tfLabel(x.lead.timeframe) + '</strong><span>' + x.text + ' · health ' + (x.lead.health != null ? x.lead.health + '%' : '—') + '</span><span class="dna-pill ' + (x.tone === 'neg' ? 'red' : x.tone === 'pos' ? 'green' : '') + '">' + (x.lead.phase || 'WAIT') + '</span></div>'; }).join("");
-    var middle = '<div class="dna-middle"><section class="dna-panel"><div class="stage-head"><h2>Action plan</h2><span class="hint">only threshold-crossing guidance</span></div><div class="actions">' + actionHtml + '</div></section><section class="dna-panel"><div class="stage-head"><h2>Why this matters</h2><span class="hint">current campaign evidence</span></div>' + (insightHtml || '<div class="no-actions">No tier evidence available.</div>') + '</section></div>';
+    var middle = '<div class="dna-middle"><section class="dna-panel"><div class="stage-head"><h2>Action plan</h2><span class="hint">position navigation + catalyst attention</span></div><div class="dna-catalyst-watch" data-sym="' + sym + '">' + catalystWatchHtml(sym) + '</div><div class="actions">' + actionHtml + '</div></section><section class="dna-panel"><div class="stage-head"><h2>Why this matters</h2><span class="hint">current campaign evidence</span></div>' + (insightHtml || '<div class="no-actions">No tier evidence available.</div>') + '</section></div>';
 
     var progressionTiers = [t.backbone,t.owner,t.confirm,t.timing];
-    var progression = '<div class="dna-lower-grid"><section class="dna-panel"><div class="stage-head"><h2>Trade progression</h2><span class="hint">backbone → campaign → confirmation → timing</span></div><div class="dna-progression">' + progressionTiers.map(function (x, i) { var empty = !x || x.empty; var cls = empty ? '' : toneClass(x.tone); return '<div class="dna-stage ' + cls + '"><div class="dna-stage-head"><span class="dna-stage-dot">' + (i+1) + '</span><div><strong>' + ["Backbone","Campaign","Confirmation","Timing"][i] + '</strong><small>' + (empty ? 'no data' : tfLabel(x.lead.timeframe)) + '</small></div></div><div class="dna-stage-state">' + (empty ? 'Waiting' : x.text) + '</div></div>'; }).join("") + '</div></section><section class="dna-panel"><div class="stage-head"><h2>News stream</h2><span class="hint">media sources</span></div><div class="dna-news-empty">No verified media source connected yet.</div></section></div>';
+    var progression = '<div class="dna-lower-grid"><section class="dna-panel"><div class="stage-head"><h2>Trade progression</h2><span class="hint">backbone → campaign → confirmation → timing</span></div><div class="dna-progression">' + progressionTiers.map(function (x, i) { var empty = !x || x.empty; var cls = empty ? '' : toneClass(x.tone); return '<div class="dna-stage ' + cls + '"><div class="dna-stage-head"><span class="dna-stage-dot">' + (i+1) + '</span><div><strong>' + ["Backbone","Campaign","Confirmation","Timing"][i] + '</strong><small>' + (empty ? 'no data' : tfLabel(x.lead.timeframe)) + '</small></div></div><div class="dna-stage-state">' + (empty ? 'Waiting' : x.text) + '</div></div>'; }).join("") + '</div></section><section class="dna-panel"><div class="stage-head"><h2>News stream</h2><span class="hint">media sources</span></div><div class="dna-news" data-sym="' + sym + '"><div class="dna-news-empty">Loading media sources…</div></div></section></div>';
 
     var radar = assets.filter(function (x) { return x.symbol !== sym; }).map(function (x) { var rc = cache[x.symbol], ra = rc && rc.assess; var rs = rc ? rc.states : []; var quick = ["15","60","240","D"].map(function (tf) { var row = rs.filter(function (r) { return String(r.timeframe) === tf; })[0]; return '<span class="dna-radar-tf ' + (row ? toneClass(phaseTone(row.phase)) : 'warn') + '">' + tfLabel(tf) + '</span>'; }).join(""); return '<button type="button" class="dna-radar-item" data-sym="' + x.symbol + '"><span class="dna-radar-top"><strong>' + x.symbol + '</strong><span class="dna-pill ' + (ra && ra.level === 'critical' ? 'red' : ra && ra.level === 'opportunity' ? 'green' : '') + '">' + (ra ? ra.headline : 'Loading') + '</span></span><span class="dna-radar-tfs">' + quick + '</span></button>'; }).join("");
     var radarHtml = '<section class="dna-panel"><div class="stage-head"><h2>Portfolio campaign radar</h2><span class="hint">quick multi-timeframe view across tracked assets</span></div><div class="dna-radar">' + radar + '</div></section>';
@@ -1737,6 +1792,17 @@
       }
 
       var refs = [], markers = [], firstT = bars[0].t / 1000, lastT = bars[bars.length - 1].t / 1000;
+      var watchBars = bars.slice(-21), watchLast = watchBars[watchBars.length - 1];
+      var priorBars = watchBars.slice(0, -1), priorVolume = priorBars.reduce(function (sum, b) { return sum + (Number(b.v) || 0); }, 0);
+      var avgVolume = priorBars.length ? priorVolume / priorBars.length : null;
+      var premiumHigh = mode === "option" ? watchBars.reduce(function (high, b) { return Math.max(high, Number(b.c) || 0); }, 0) : null;
+      marketWatchBySymbol[sym] = {
+        tf: tfLbl,
+        mode: mode,
+        volumeRatio: watchLast && avgVolume ? (Number(watchLast.v) || 0) / avgVolume : null,
+        premiumCompression: mode === "option" && watchLast && premiumHigh ? Math.max(0, (premiumHigh - Number(watchLast.c)) / premiumHigh * 100) : null
+      };
+      renderCatalystWatch(sym);
 
       if (mode === "option" && optionTarget) {
         var o = optionTarget.data;
@@ -1812,6 +1878,47 @@
     });
   }
 
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function safeNewsUrl(raw) {
+    try {
+      var parsed = new URL(String(raw || ""));
+      return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.href : "#";
+    } catch (_err) {
+      return "#";
+    }
+  }
+
+  // Pull the aggregated headline feed for every open asset's News stream box.
+  function loadNewsStream() {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    Array.prototype.forEach.call(document.querySelectorAll(".dna-news[data-sym]"), function (el) {
+      var sym = el.dataset.sym;
+      fetch(base + "/news/" + encodeURIComponent(sym), { headers: authHeaders() })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .catch(function (err) { return { news: [], error: err && err.message ? err.message : "unavailable" }; })
+        .then(function (d) {
+          var items = d.news || [];
+          newsBySymbol[sym] = items;
+          renderCatalystWatch(sym);
+          if (!items.length) {
+            el.innerHTML = '<div class="dna-news-empty">' + (d.error ? 'News stream unavailable for ' + esc(sym) + '. The media endpoint is not live yet.' : 'No media items found for ' + esc(sym) + '.') + '</div>';
+            return;
+          }
+          el.innerHTML = '<div class="dna-news-list">' + items.slice(0, 8).map(function (n) {
+            var src = n.source === "yahoo" ? "Yahoo" : "Google";
+            return '<a class="dna-news-item" href="' + esc(safeNewsUrl(n.url)) + '" target="_blank" rel="noopener noreferrer">' +
+              '<span class="dna-news-title">' + esc(n.title || "Untitled") + '<span class="dna-news-src">' + esc(src) + '</span></span>' +
+              '<span class="dna-news-meta">' + esc(n.publisher || "media") + ' · ' + age(n.published).text + '</span></a>';
+          }).join("") + '</div><div class="dna-news-foot">' + items.length + ' items · Yahoo Finance + Google News</div>';
+        });
+    });
+  }
+
   function paint() {
     app.innerHTML = selected ? renderApprovedAsset(selected) : renderAssetList();
     wirePortfolio();
@@ -1826,6 +1933,7 @@
     wirePosition();
     if (selected) drawChart(selected);
     populateChainSuggestions();
+    loadNewsStream();
   }
 
   function loadSymbol(sym, repaint) {
