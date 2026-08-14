@@ -437,6 +437,16 @@ def health():
     return jsonify({"status": "ok"})
 
 
+@app.route("/dashboard", methods=["GET"])
+def serve_dashboard():
+    """Serve the dashboard UI straight from the deployment, so it always
+    reflects whatever is currently live (no local file / manual git pull)."""
+    path = Path(__file__).parent / "ui" / "dna_dashboard.html"
+    if not path.exists():
+        return jsonify({"error": "dashboard not found"}), 404
+    return app.response_class(path.read_text(encoding="utf-8"), mimetype="text/html")
+
+
 def _shape_state(symbol, timeframe, latest, watch):
     return {
         "symbol": symbol, "timeframe": timeframe,
