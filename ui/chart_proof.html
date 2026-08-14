@@ -53,6 +53,7 @@
   var TFS = { underlying: ["5m", "15m", "1H", "D"], option: ["D", "1H", "15m", "5m"] };
   var mode = "underlying", tf = "15m";
   var chart = null, candleSeries = null, volSeries = null;
+  var markersPlugin = null, resizeObserver = null;
 
   function status(s) { document.getElementById("status").textContent = s; }
   function hdr() { return { Authorization: "Bearer " + token() }; }
@@ -65,7 +66,17 @@
   }
 
   function makeChart() {
-    if (chart) { chart.remove(); chart = null; }
+    // Lifecycle: tear down the previous chart's own observers/subscriptions so
+    // recreating (symbol/tf/mode/theme switch) never stacks them.
+    if (chart) {
+      if (resizeObserver) { resizeObserver.disconnect(); resizeObserver = null; }
+      if (markersPlugin && markersPlugin.detach) { try { markersPlugin.detach(); } catch (e) {} }
+      markersPlugin = null;
+      chart.remove();
+      chart = null;
+      candleSeries = null;
+      volSeries = null;
+    }
     var c = colors();
     chart = LightweightCharts.createChart(document.getElementById("chart"), {
       layout: { background: { color: c.bg }, textColor: c.fg },
@@ -83,13 +94,14 @@
       var el = document.getElementById("legend");
       if (!param || !param.time || !param.seriesData.has(candleSeries)) { el.innerHTML = "hover a bar for OHLCV"; return; }
       var b = param.seriesData.get(candleSeries);
+      var v = param.seriesData.has(volSeries) ? param.seriesData.get(volSeries).value : null;
       el.innerHTML = "O " + b.open.toFixed(2) + " · H " + b.high.toFixed(2) + " · L " + b.low.toFixed(2) +
-        " · C " + b.close.toFixed(2) + (b.volume != null ? " · V " + b.volume : "");
+        " · C " + b.close.toFixed(2) + (v != null ? " · V " + v : "");
     });
-    var ro = new ResizeObserver(function () {
+    resizeObserver = new ResizeObserver(function () {
       chart.applyOptions({ width: document.getElementById("chart").clientWidth, height: 520 });
     });
-    ro.observe(document.getElementById("chart"));
+    resizeObserver.observe(document.getElementById("chart"));
   }
 
   function setCandlesAndVolume(d) {
@@ -141,12 +153,22 @@
             }
           });
         });
-        // entry markers (v5: createSeriesMarkers + attachPrimitive)
-        var markers = legs.map(function (i) {
-          return { time: new Date(i.entry_time).getTime() / 1000, position: "belowBar", color: "#4FE3C4", shape: "arrowUp", text: "Entry " + i.entry_price };
+        // Entry markers: only place a temporal marker when the entry time is
+        // inside this timeframe's bar range. Out-of-range entries keep their
+        // horizontal entry-price line but get no (clipped) marker.
+        var firstBarTime = d.bars[0].t / 1000;
+        var lastBarTime = d.bars[d.bars.length - 1].t / 1000;
+        var inRange = [], outOfRange = 0;
+        legs.forEach(function (i) {
+          var t = new Date(i.entry_time).getTime() / 1000;
+          if (t >= firstBarTime && t <= lastBarTime) {
+            inRange.push({ time: t, position: "belowBar", color: "#4FE3C4", shape: "arrowUp", text: "Entry " + i.entry_price });
+          } else {
+            outOfRange++;
+          }
         });
-        if (markers.length) {
-          candleSeries.attachPrimitive(LightweightCharts.createSeriesMarkers(candleSeries, markers));
+        if (inRange.length) {
+          markersPlugin = LightweightCharts.createSeriesMarkers(candleSeries, inRange);
         }
         legs.forEach(function (i) {
           candleSeries.createPriceLine({ price: i.entry_price, color: "#4FE3C4", lineWidth: 1, axisLabelVisible: true, title: "entry " + i.entry_price });
@@ -160,7 +182,8 @@
         var last = d.bars[d.bars.length - 1];
         candleSeries.createPriceLine({ price: last.c, color: "#4FE3C4", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: "premium " + last.c.toFixed(2) });
         chart.timeScale().fitContent();
-        status("option: " + d.bar_count + " bars · premium " + last.c.toFixed(2) + " · " + legs.length + " open leg(s) · avg " + (qty > 0 ? (cost / qty).toFixed(3) : "n/a"));
+        var note = outOfRange > 0 ? " · entry predates available " + tf + " history (marker suppressed, entry line kept)" : "";
+        status("option: " + d.bar_count + " bars · premium " + last.c.toFixed(2) + " · " + legs.length + " open leg(s) · avg " + (qty > 0 ? (cost / qty).toFixed(3) : "n/a") + note);
       })
       .catch(function (e) { status("ERROR: " + e.message); });
   }
@@ -174,7 +197,7 @@
       var b = document.createElement("button");
       b.textContent = t;
       if (t === tf) b.classList.add("on");
-      b.addEventListener("click", function () { tf = t; refresh(); });
+      b.addEventListener("click", function () { tf = t; buildTfBar(); refresh(); });
       bar.appendChild(b);
     });
   }
