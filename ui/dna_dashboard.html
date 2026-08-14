@@ -340,9 +340,18 @@
     return null;
   }
   var TF_SORT = { "3":0,"5":1,"15":2,"30":3,"60":4,"120":5,"180":6,"240":7,"D":8,"W":9 };
-  function tfKey(tf){ return TF_SORT.hasOwnProperty(String(tf)) ? TF_SORT[String(tf)] : 99; }
-  function tfLabel(tf) {
+  // Pine's timeframe.period emits "1D"/"1W" for daily/weekly, but this
+  // dashboard keys everything off "D"/"W". Normalize once so Daily isn't
+  // silently dropped from the tier model, the chart, and the TF toggles.
+  function canonTf(tf) {
     tf = String(tf);
+    if (tf === "1D" || tf === "1d") return "D";
+    if (tf === "1W" || tf === "1w") return "W";
+    return tf;
+  }
+  function tfKey(tf){ tf = canonTf(tf); return TF_SORT.hasOwnProperty(tf) ? TF_SORT[tf] : 99; }
+  function tfLabel(tf) {
+    tf = canonTf(String(tf));
     if (tf === "D") return "Daily";
     if (tf === "W") return "Weekly";
     var n = parseInt(tf, 10);
@@ -1578,7 +1587,10 @@
       .then(function (r) { return r.ok ? r.json() : { states: [] }; })
       .catch(function () { return { states: [] }; })
       .then(function (d) {
-        var states = d.states || [];
+        var states = (d.states || []).map(function (s) {
+          s.timeframe = canonTf(s.timeframe);
+          return s;
+        });
         cache[sym] = { states: states, assess: assess(states) };
         if (repaint) paint();
       });
