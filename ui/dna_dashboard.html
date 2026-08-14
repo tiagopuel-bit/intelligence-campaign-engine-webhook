@@ -118,6 +118,13 @@
   .chart-canvas{width:100%; height:230px; display:block}
   .chart-status{font-family:var(--font-display); font-size:11px; color:var(--faint); margin-top:6px}
 
+  /* ---- position insight: entry + current DNA read + suggested action ---- */
+  .insight-wrap{margin-bottom:20px}
+  .insight-block{border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:10px; background:var(--surface); padding:14px 16px; margin-bottom:10px}
+  .insight-title{font-family:var(--font-display); font-weight:700; font-size:13px; margin-bottom:8px}
+  .insight-line{margin:0 0 7px; font-size:13.5px; line-height:1.55; color:var(--text)}
+  .insight-line:last-child{margin-bottom:0}
+
   .flow{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
   @media (max-width:900px){ .flow{grid-template-columns:1fr} }
   .step{background:var(--surface); border:1px solid var(--line); border-radius:11px; padding:16px 18px; position:relative}
@@ -693,6 +700,96 @@
     return renderSharesSection(shares) + renderOptionsSection(strategies);
   }
 
+  // Per-holding narrative: entry context + current DNA read + a suggested
+  // action, in plain language. Every number here is real (holding data from
+  // the loaded portfolio, DNA stats from the already-computed tier assess)
+  // -- this composes existing facts into a sentence, it doesn't predict
+  // anything new. "Primary" DNA read prefers Confirmation/Timing (the tiers
+  // that actually decide whether a position gets challenged) over Direction,
+  // which is too slow to say anything useful about a specific holding.
+  function primaryReadFor(sym) {
+    var c = cache[sym];
+    if (!c) return null;
+    var t = c.assess.tiers;
+    var order = [t.confirm, t.timing, t.owner, t.backbone, t.micro];
+    for (var i = 0; i < order.length; i++) if (order[i] && !order[i].empty) return order[i];
+    return null;
+  }
+
+  function daysBetween(iso, toMs) {
+    var t = new Date(String(iso).replace(" ", "T") + (String(iso).endsWith("Z") ? "" : "Z")).getTime();
+    if (isNaN(t)) return null;
+    return Math.round(((toMs != null ? toMs : Date.now()) - t) / 86400000);
+  }
+
+  function plWord(pct) {
+    if (pct == null) return "flat so far";
+    var abs = Math.abs(pct).toFixed(1);
+    return pct >= 0 ? "up " + abs + "%" : "down " + abs + "%";
+  }
+
+  function shareInsight(sym, s, primary) {
+    var held = daysBetween(s.first_entry);
+    var lines = [];
+    lines.push("You entered these shares " + (held == null ? "recently" : held + " day" + (held === 1 ? "" : "s") + " ago") +
+      " at $" + Number(s.avg_cost).toFixed(2) + " — " + plWord(s.total_return_pct) + " right now.");
+    if (primary) {
+      lines.push("DNA's " + primary.tier.label.toLowerCase() + " read is currently " + primary.text +
+        " (health " + (primary.lead.health != null ? primary.lead.health + "%" : "n/a") + ", " + tfLabel(primary.lead.timeframe) + " chart).");
+      if (primary.tone === "neg") lines.push("That's a broken structure under an open position — this is a protect-the-shares conversation, not an add-more one.");
+      else if (primary.tone === "pos") lines.push("Structure is still constructive here — nothing says trim yet.");
+    }
+    return lines;
+  }
+
+  function optionInsight(sym, o, primary) {
+    var held = daysBetween(o.first_entry);
+    var c = o.contract;
+    var dte = c.expiration ? daysBetween(new Date().toISOString(), new Date(c.expiration).getTime()) : null;
+    var moneyness = o.itm === true ? "in the money" : (o.itm === false ? "out of the money" : "moneyness unknown");
+    var lines = [];
+    lines.push("You entered this " + c.type + " " + (held == null ? "recently" : held + " day" + (held === 1 ? "" : "s") + " ago") +
+      " at $" + Number(o.avg_cost).toFixed(2) + " — " + plWord(o.total_return_pct) + ", currently " + moneyness +
+      (dte != null ? ", " + dte + " day" + (dte === 1 ? "" : "s") + " to expiration" : "") + ".");
+    if (primary) {
+      lines.push("DNA's " + primary.tier.label.toLowerCase() + " read is currently " + primary.text +
+        " (health " + (primary.lead.health != null ? primary.lead.health + "%" : "n/a") + ", " + tfLabel(primary.lead.timeframe) + " chart).");
+    }
+    // Suggested action -- combines moneyness + days-to-expiry + DNA tone.
+    // Every branch states its own reasoning so it reads as a case, not a verdict.
+    if (primary && primary.tone === "neg") {
+      lines.push("Structure has broken down under this position — worth deciding on protect/close rather than waiting it out.");
+    } else if (dte != null && dte <= 10) {
+      lines.push("Under 10 days to expiration — time decay is a real factor here regardless of what the campaign is doing structurally.");
+    } else if (o.itm && primary && primary.tone === "pos" && dte != null && dte > 21) {
+      lines.push("In the money, room left on the clock, and DNA still constructive — rolling up to lock in some of this while staying in the move is a reasonable option, not a must.");
+    } else if (o.itm === false && primary && primary.tone !== "pos") {
+      lines.push("Out of the money and DNA isn't confirming strength — this one needs the underlying to move soon to matter.");
+    }
+    return lines;
+  }
+
+  function renderPositionInsights(sym) {
+    var h = deriveHoldings();
+    var shares = h.shares.filter(function (s) { return s.symbol === sym; });
+    var strategies = h.strategies.filter(function (o) { return o.symbol === sym; });
+    if (!shares.length && !strategies.length) return "";
+    var primary = primaryReadFor(sym);
+    var blocks = [];
+    shares.forEach(function (s) {
+      blocks.push({ title: s.symbol + " shares", lines: shareInsight(sym, s, primary) });
+    });
+    strategies.forEach(function (o) {
+      var c = o.contract;
+      blocks.push({ title: "$" + c.strike + " " + c.type + " · " + fmtExpiry(c.expiration), lines: optionInsight(sym, o, primary) });
+    });
+    return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">entry, current read, and what it suggests</span></div>' +
+      blocks.map(function (b) {
+        return '<div class="insight-block"><div class="insight-title">' + b.title + '</div>' +
+          b.lines.map(function (l) { return '<p class="insight-line">' + l + '</p>'; }).join("") + '</div>';
+      }).join("") + '</div>';
+  }
+
   function closeHolding(pid, legIds, label) {
     var price = window.prompt("Exit price for " + label + "? (blank = no price)", "");
     if (price === null) return;
@@ -1049,6 +1146,8 @@
       '<canvas class="chart-canvas" data-sym="' + sym + '" width="900" height="230"></canvas>' +
       '<div class="chart-status" data-sym="' + sym + '">loading chart…</div></div>';
 
+    var insightHtml = renderPositionInsights(sym);
+
     var openPosHtml = '<div class="open-wrap">' +
       '<button class="open-pos-btn" data-sym="' + sym + '">+ Open a position in ' + sym + '</button>' +
       '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div>' +
@@ -1104,7 +1203,7 @@
         '<td>' + (bf ? '<span class="src-badge bf" title="Reconstructed from historical replay, not fidelity-tested">reconstructed</span>' : '<span class="src-badge live">live</span>') + '</td></tr>';
     }).join("");
 
-    return verdictHtml + chartHtml + openPosHtml + holdingsHtml +
+    return verdictHtml + chartHtml + insightHtml + openPosHtml + holdingsHtml +
       '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
       '<div class="flow">' + flowHtml + '</div>' +
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
@@ -1225,6 +1324,57 @@
         ctx.fillStyle = "rgb(" + colorVar(r.color) + ")";
         ctx.fillText(r.label + " $" + Number(r.price).toFixed(2), pad.l + 4, ry - 3);
       });
+
+      // "Where you got in": one vertical marker per real holding on this
+      // symbol, placed at the bar closest to its actual entry time (never
+      // at an invented spot). Shows the underlying price at that moment --
+      // for options this is the stock price when entered, not the premium,
+      // since the premium doesn't belong on a stock-price y-axis.
+      function nearestBarIndex(iso) {
+        var t = new Date(String(iso).replace(" ", "T") + (String(iso).endsWith("Z") ? "" : "Z")).getTime();
+        if (isNaN(t)) return null;
+        var best = 0, bestDiff = Infinity;
+        bars.forEach(function (b, i) { var diff = Math.abs(b.t - t); if (diff < bestDiff) { bestDiff = diff; best = i; } });
+        return best;
+      }
+      var entryMarkers = [];
+      holdings.shares.filter(function (s) { return s.symbol === sym; }).forEach(function (s) {
+        var idx = nearestBarIndex(s.first_entry);
+        if (idx != null) entryMarkers.push({ idx: idx, label: "In (shares)" });
+      });
+      holdings.strategies.filter(function (o) { return o.symbol === sym; }).forEach(function (o) {
+        var idx = nearestBarIndex(o.first_entry);
+        if (idx != null) entryMarkers.push({ idx: idx, label: "In ($" + o.contract.strike + " " + o.contract.type + ")" });
+      });
+      var accentColor = "rgb(" + colorVar("var(--accent)") + ")";
+      entryMarkers.forEach(function (m) {
+        var mx = x(m.idx), my = y(bars[m.idx].c);
+        ctx.save();
+        ctx.setLineDash([2, 3]);
+        ctx.strokeStyle = accentColor; ctx.globalAlpha = 0.5;
+        ctx.beginPath(); ctx.moveTo(mx, pad.t); ctx.lineTo(mx, pad.t + plotH); ctx.stroke();
+        ctx.restore();
+        ctx.beginPath(); ctx.arc(mx, my, 4, 0, Math.PI * 2);
+        ctx.fillStyle = accentColor; ctx.fill();
+        ctx.strokeStyle = textColor; ctx.lineWidth = 1; ctx.stroke();
+        ctx.save();
+        ctx.translate(mx, pad.t + 10);
+        ctx.fillStyle = accentColor; ctx.font = "9px " + (style.getPropertyValue("--font-display") || "monospace");
+        ctx.fillText(m.label, 4, 0);
+        ctx.restore();
+      });
+
+      // "Where we are now": explicit dot + label on the last bar, since the
+      // line simply ending there is easy to miss at a glance.
+      if (bars.length) {
+        var lastI = bars.length - 1, nx = x(lastI), ny = y(bars[lastI].c);
+        ctx.beginPath(); ctx.arc(nx, ny, 4, 0, Math.PI * 2);
+        ctx.fillStyle = lineColor; ctx.fill();
+        ctx.fillStyle = lineColor; ctx.font = "10px " + (style.getPropertyValue("--font-display") || "monospace");
+        var nowLabel = "Now $" + bars[lastI].c.toFixed(2);
+        var tw = ctx.measureText(nowLabel).width;
+        ctx.fillText(nowLabel, Math.min(nx + 6, w - pad.r - tw), ny - 8);
+      }
 
       function colorVar(token) {
         var m = token.match(/var\((--[\w-]+)\)/);
