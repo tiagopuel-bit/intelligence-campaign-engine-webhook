@@ -774,16 +774,35 @@ def _position_detail(conn, position_id):
 
 
 def _compute_valuation(symbol, instruments):
-    """Enrich open legs with live Massive prices (underlying + option bars).
+    """Enrich open legs with live prices (underlying + option bars).
 
     `instruments` is a list of shaped (open) instrument dicts. Option legs are
-    grouped by (type, strike, expiration); stock legs are pooled. Free-plan
-    reality: option "current" is the latest daily close, not a real-time quote,
-    and there are no Greeks.
+    grouped by (type, strike, expiration); stock legs are pooled. The
+    underlying "current" prefers the latest live_webhook alert close (the
+    TradingView webhook carries a near-real-time close) and falls back to the
+    Massive daily close -- the Massive free plan lags ~1 day, so without this
+    every held asset would value at yesterday's close. Option "current" is the
+    latest option daily close (no live option source on the free plan; no
+    Greeks).
     """
     bars, _meta = massive_ohlc.get_ohlc(symbol, "D")
-    underlying_current = bars[-1]["c"] if bars else None
-    underlying_prev = bars[-2]["c"] if len(bars) >= 2 else underlying_current
+    massive_current = bars[-1]["c"] if bars else None
+    massive_prev = bars[-2]["c"] if len(bars) >= 2 else massive_current
+
+    conn = get_db()
+    live = conn.execute(
+        "SELECT close FROM alerts WHERE symbol=? AND source='live_webhook' "
+        "AND close IS NOT NULL ORDER BY CAST(bar_time AS INTEGER) DESC LIMIT 1",
+        (symbol,),
+    ).fetchone()
+    conn.close()
+
+    if live is not None and live["close"] is not None:
+        underlying_current = live["close"]
+        underlying_prev = massive_current
+    else:
+        underlying_current = massive_current
+        underlying_prev = massive_prev
 
     option_groups: dict[tuple, list] = {}
     stock_legs: list = []

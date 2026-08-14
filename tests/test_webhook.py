@@ -587,6 +587,19 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(d["options"][0]["breakeven"], 2.8)
         self.assertTrue(d["options"][0]["itm"])
 
+    def test_valuation_prefers_live_close_over_massive(self):
+        # Massive daily is stale (2.53); a live webhook alert carries 2.65.
+        bars = [{"t": 1, "o": 2.4, "h": 2.5, "l": 2.3, "c": 2.4, "v": 100},
+                {"t": 2, "o": 2.4, "h": 2.6, "l": 2.4, "c": 2.53, "v": 100}]
+        with mock.patch("massive_ohlc.get_ohlc", return_value=(bars, {})):
+            pid = self._create_position(symbol="LIVEPX").get_json()["id"]
+            self._post(self._strong_start_payload(symbol="LIVEPX", timeframe="3",
+                                                  close=2.65, time="1786700000000"))
+            r = self.client.get(f"/positions/{pid}/valuation", headers=self._state_headers())
+        d = r.get_json()
+        self.assertEqual(d["underlying"]["current"], 2.65)
+        self.assertEqual(d["underlying"]["prev"], 2.53)
+
     def test_poll_can_build_campaign_state(self):
         self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
         from poll_and_recommend import build_campaign_state
