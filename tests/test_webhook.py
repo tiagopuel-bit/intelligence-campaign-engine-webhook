@@ -600,6 +600,18 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(d["underlying"]["current"], 2.65)
         self.assertEqual(d["underlying"]["prev"], 2.53)
 
+    def test_hidden_timeframes_excluded_from_display(self):
+        # A 1m alert is a price tick -- it should feed valuation but not show.
+        self._post(self._strong_start_payload(symbol="TICKT", timeframe="1", close=2.63, time="1786700000000"))
+        self._post(self._strong_start_payload(symbol="TICKT", timeframe="3", close=2.60, time="1786701000000"))
+        d = self.client.get("/state_all/TICKT", headers=self._state_headers()).get_json()
+        tfs = [s["timeframe"] for s in d["states"]]
+        self.assertNotIn("1", tfs)
+        self.assertIn("3", tfs)
+        assets = self.client.get("/assets", headers=self._state_headers()).get_json()["assets"]
+        tickt = [a for a in assets if a["symbol"] == "TICKT"][0]
+        self.assertEqual(tickt["timeframe_count"], 1)
+
     def test_poll_can_build_campaign_state(self):
         self._post(self._strong_start_payload(symbol="POLL", timeframe="240"))
         from poll_and_recommend import build_campaign_state

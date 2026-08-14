@@ -496,7 +496,7 @@ def get_state_all(symbol):
     conn = get_db()
     timeframes = [r["timeframe"] for r in conn.execute(
         "SELECT DISTINCT timeframe FROM alerts WHERE symbol=?", (symbol,)
-    ).fetchall()]
+    ).fetchall() if r["timeframe"] not in _HIDDEN_TIMEFRAMES]
     if not timeframes:
         conn.close()
         return jsonify({"error": f"no alerts recorded yet for {symbol} on any timeframe"}), 404
@@ -518,6 +518,11 @@ def get_state_all(symbol):
 # not real market data. Same allowlist as scripts/cleanup_test_symbols.py.
 _TEST_SYMBOLS = {"PUBTEST", "TEST", "TEST2", "TEST_PING"}
 
+# Timeframes that exist only as a price tick (a 1m DNA alert feeding a fresher
+# close), not real campaign rungs. Hidden from /state_all and /assets so they
+# don't surface in the dashboard, but the live-close valuation still reads them.
+_HIDDEN_TIMEFRAMES = {"1"}
+
 
 @app.route("/assets", methods=["GET"])
 def get_assets():
@@ -530,7 +535,8 @@ def get_assets():
     if not state_is_authorized():
         return jsonify({"error": "unauthorized"}), 401
     conn = get_db()
-    rows = conn.execute("""
+    hidden = ",".join("?" * len(_HIDDEN_TIMEFRAMES))
+    rows = conn.execute(f"""
         SELECT symbol,
                COUNT(DISTINCT timeframe) AS timeframe_count,
                COUNT(*) AS alert_count,
@@ -538,9 +544,10 @@ def get_assets():
                SUM(CASE WHEN source = 'backfill_replay' THEN 1 ELSE 0 END) AS backfill_count,
                SUM(CASE WHEN source = 'live_webhook' THEN 1 ELSE 0 END) AS live_count
         FROM alerts
+        WHERE timeframe NOT IN ({hidden})
         GROUP BY symbol
         ORDER BY symbol
-    """).fetchall()
+    """, list(_HIDDEN_TIMEFRAMES)).fetchall()
     conn.close()
     assets = [
         {
@@ -743,7 +750,7 @@ def _dna_context(conn, symbol, opened_at):
     timeframes = [r["timeframe"] for r in conn.execute(
         "SELECT DISTINCT timeframe FROM alerts WHERE symbol=? AND received_at>=?",
         (symbol, opened_at),
-    ).fetchall()]
+    ).fetchall() if r["timeframe"] not in _HIDDEN_TIMEFRAMES]
     states = []
     for tf in timeframes:
         latest = conn.execute(
