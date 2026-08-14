@@ -564,6 +564,48 @@ class WebhookReceiverTests(unittest.TestCase):
     def test_options_chain_requires_auth(self):
         self.assertEqual(self.client.get("/options/chain/AMC").status_code, 401)
 
+    def test_option_ticker_validation(self):
+        self.assertEqual(massive_options.valid_option_ticker("O:AMC260821C00004000"),
+                         "O:AMC260821C00004000")
+        self.assertEqual(massive_options.valid_option_ticker("o:amc260821p00004000"),
+                         "O:AMC260821P00004000")
+        self.assertIsNone(massive_options.valid_option_ticker("AMC"))
+        self.assertIsNone(massive_options.valid_option_ticker("O:AMC260821X00004000"))
+        self.assertIsNone(massive_options.valid_option_ticker("O:AMC260821C0004000"))
+
+    def test_option_timeframe_resolution(self):
+        self.assertEqual(massive_options.resolve_option_timeframe("5m"), "5m")
+        self.assertEqual(massive_options.resolve_option_timeframe("60"), "1H")
+        self.assertEqual(massive_options.resolve_option_timeframe("1D"), "D")
+        self.assertEqual(massive_options.resolve_option_timeframe("4h"), "4H")
+        self.assertIsNone(massive_options.resolve_option_timeframe("3m"))
+        self.assertIsNone(massive_options.resolve_option_timeframe("W"))
+
+    def test_options_ohlc_requires_auth(self):
+        self.assertEqual(self.client.get("/options/ohlc/O:AMC260821C00004000/5m").status_code, 401)
+
+    def test_options_ohlc_rejects_bad_ticker(self):
+        r = self.client.get("/options/ohlc/NOTATICKER/5m", headers=self._state_headers())
+        self.assertEqual(r.status_code, 400)
+
+    def test_options_ohlc_route(self):
+        bars = [
+            {"t": 1786507200000, "o": 1.8, "h": 2.02, "l": 1.8, "c": 1.96, "v": 6},
+            {"t": 1786507200000, "o": 1.8, "h": 2.02, "l": 1.8, "c": 1.96, "v": 6},  # duplicate
+            {"t": 1786593600000, "o": 1.9, "h": 2.0, "l": 1.9, "c": 1.99, "v": 7},
+        ]
+        massive_options._option_ohlc_cache.clear()
+        with mock.patch.dict(os.environ, {"MASSIVE_API_KEY": "test-key"}), \
+             mock.patch("massive_options._get", return_value=bars):
+            r = self.client.get("/options/ohlc/O:AMC260821C00004000/5m", headers=self._state_headers())
+        self.assertEqual(r.status_code, 200)
+        d = r.get_json()
+        self.assertEqual(d["ticker"], "O:AMC260821C00004000")
+        self.assertEqual(d["timeframe"], "5m")
+        self.assertEqual(d["bar_count"], 2)
+        self.assertEqual(d["bars"][0]["t"], 1786507200000)
+        self.assertEqual(d["bars"][-1]["c"], 1.99)
+
     def test_valuation_requires_auth(self):
         self.assertEqual(self.client.get("/positions/1/valuation").status_code, 401)
 

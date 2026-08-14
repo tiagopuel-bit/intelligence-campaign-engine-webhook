@@ -605,6 +605,30 @@ def get_options_chain(symbol):
     return jsonify(chain)
 
 
+@app.route("/options/ohlc/<contract_ticker>/<timeframe>", methods=["GET"])
+def get_options_ohlc(contract_ticker, timeframe):
+    """RAW option-aggregate bars for one Massive option contract.
+
+    Read-only, gated by state_is_authorized() exactly like /ohlc. The ticker is
+    a Massive contract ticker (e.g. O:AMC260821C00004000); URL-encoding of the
+    colon is handled by the client. Returns the same normalized bar schema as
+    stock OHLC: {t,o,h,l,c,v} with epoch-ms t, ascending + duplicate-free. The
+    latest close is a delayed aggregate close, never a live quote.
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    try:
+        bars, meta = massive_options.get_option_ohlc(contract_ticker, timeframe)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    except massive_options.UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+    if not bars:
+        return jsonify({"error": f"no bars for {contract_ticker} {timeframe}"}), 404
+    return jsonify({**meta, "bars": bars})
+
+
 @app.after_request
 def _add_cors_headers(response):
     """Permissive CORS for the static dashboard/landing pages.

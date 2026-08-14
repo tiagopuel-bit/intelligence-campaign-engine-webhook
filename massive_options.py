@@ -12,6 +12,7 @@ free-plan budget isn't double-spent.
 """
 from __future__ import annotations
 
+import re
 import threading
 import time
 from datetime import datetime, timedelta, timezone
@@ -24,6 +25,43 @@ BASE_URL = "https://api.massive.com"
 CHAIN_TTL_SECONDS = 3600
 QUOTE_TTL_SECONDS = 900
 
+# Bounded option OHLC ladder for the /options/ohlc chart route.
+# canonical timeframe -> (multiplier, span, lookback_days, cache_ttl_seconds)
+OPTION_TIMEFRAMES: dict[str, tuple[int, str, int, int]] = {
+    "5m": (5, "minute", 30, 300),
+    "15m": (15, "minute", 60, 300),
+    "30m": (30, "minute", 90, 300),
+    "1H": (60, "minute", 180, 600),
+    "4H": (240, "minute", 180, 600),
+    "D": (1, "day", 400, 3600),
+}
+
+# Massive option ticker: O:<underlying><YYMMDD><C|P><8-digit strike x1000>.
+_OPTION_TICKER_RE = re.compile(r"^O:[A-Z0-9.\-]{1,10}\d{6}[CP]\d{8}$")
+
+
+def valid_option_ticker(raw: str) -> str | None:
+    ticker = (raw or "").strip().upper()
+    return ticker if _OPTION_TICKER_RE.match(ticker) else None
+
+
+def resolve_option_timeframe(raw: str) -> str | None:
+    if not raw:
+        return None
+    raw = raw.strip()
+    if raw in OPTION_TIMEFRAMES:
+        return raw
+    low = raw.lower()
+    aliases = {
+        "5": "5m", "5m": "5m",
+        "15": "15m", "15m": "15m",
+        "30": "30m", "30m": "30m",
+        "60": "1H", "1h": "1H",
+        "240": "4H", "4h": "4H",
+        "1d": "D", "d": "D", "daily": "D", "day": "D",
+    }
+    return aliases.get(low)
+
 
 class UpstreamError(Exception):
     def __init__(self, status: int, detail: str) -> None:
@@ -34,6 +72,7 @@ class UpstreamError(Exception):
 
 _chain_cache: dict[str, tuple[float, dict]] = {}
 _quote_cache: dict[str, tuple[float, dict]] = {}
+_option_ohlc_cache: dict[tuple[str, str], tuple[float, tuple[list[dict], dict]]] = {}
 _cache_lock = threading.Lock()
 
 
@@ -130,3 +169,67 @@ def get_option_quote(symbol: str, contract_type: str, strike: float, expiration:
     with _cache_lock:
         _quote_cache[ticker] = (time.monotonic(), quote)
     return quote
+
+
+def _shape_bars(rows: list[dict]) -> list[dict]:
+    """Normalize raw Massive bars to {t,o,h,l,c,v}, ascending + duplicate-free."""
+    bars = [
+        {"t": int(r["t"]), "o": r["o"], "h": r["h"], "l": r["l"], "c": r["c"], "v": r["v"]}
+        for r in rows
+    ]
+    bars.sort(key=lambda b: b["t"])
+    seen: set[int] = set()
+    out: list[dict] = []
+    for b in bars:
+        if b["t"] not in seen:
+            seen.add(b["t"])
+            out.append(b)
+    return out
+
+
+def get_option_ohlc(ticker: str, timeframe: str) -> tuple[list[dict], dict]:
+    """Return (bars, meta) of full contract OHLCV for a Massive option ticker.
+
+    Raises ValueError for an invalid ticker/timeframe and UpstreamError for
+    vendor/auth problems. The caller maps those to HTTP responses. "Latest
+    close" here is a delayed daily/aggregate close -- never a live quote.
+    """
+    clean = valid_option_ticker(ticker)
+    if clean is None:
+        raise ValueError(f"invalid option ticker: {ticker}")
+    canonical = resolve_option_timeframe(timeframe)
+    if canonical is None:
+        raise ValueError(f"unsupported timeframe: {timeframe}")
+    if not api_key():
+        raise UpstreamError(503, "Massive API key not configured")
+
+    key = (clean, canonical)
+    multiplier, span, days, ttl = OPTION_TIMEFRAMES[canonical]
+    now = time.monotonic()
+    with _cache_lock:
+        cached = _option_ohlc_cache.get(key)
+        if cached and now - cached[0] < ttl:
+            bars, meta = cached[1]
+            return bars, dict(meta, cached=True)
+
+    end = datetime.now(timezone.utc)
+    start = end - timedelta(days=days)
+    rows = _get(
+        f"{BASE_URL}/v2/aggs/ticker/{clean}/range/{multiplier}/{span}/{start:%Y-%m-%d}/{end:%Y-%m-%d}",
+        {"adjusted": "true", "sort": "asc", "limit": "50000", "apiKey": api_key()},
+    )
+    bars = _shape_bars(rows)
+    meta = {
+        "ticker": clean,
+        "timeframe": canonical,
+        "source": "massive",
+        "adjusted": True,
+        "bar_count": len(bars),
+        "start": datetime.fromtimestamp(bars[0]["t"] / 1000, tz=timezone.utc).isoformat() if bars else None,
+        "end": datetime.fromtimestamp(bars[-1]["t"] / 1000, tz=timezone.utc).isoformat() if bars else None,
+        "cached": False,
+        "fetched_at": datetime.now(timezone.utc).isoformat(),
+    }
+    with _cache_lock:
+        _option_ohlc_cache[key] = (time.monotonic(), (bars, meta))
+    return bars, meta
