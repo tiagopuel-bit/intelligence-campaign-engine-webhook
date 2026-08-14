@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DNA Chart Proof — Lightweight Charts v5</title>
+<style>
+  :root{ --bg:#131722; --fg:#d1d4dc; --grid:#1e222d; --accent:#4FE3C4; }
+  body.light{ --bg:#ffffff; --fg:#131722; --grid:#e7e7e7; }
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,system-ui,sans-serif;font-size:14px}
+  header{padding:12px 16px;border-bottom:1px solid var(--grid);display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  header label{font-size:12px;opacity:.8}
+  input,select,button{background:var(--bg);color:var(--fg);border:1px solid var(--grid);border-radius:6px;padding:5px 9px;font-size:13px}
+  button.on{border-color:var(--accent);color:var(--accent)}
+  #status{margin-left:auto;font-size:12px;opacity:.85;font-family:monospace}
+  #chart{width:100%;height:520px}
+  .legend{display:flex;gap:14px;padding:6px 16px;font-size:12px;opacity:.9;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<header>
+  <label>Mode
+    <select id="mode">
+      <option value="underlying">Underlying (AMC)</option>
+      <option value="option">Option (CALL $1.5 9/18)</option>
+    </select>
+  </label>
+  <label>TF <span id="tfbar"></span></label>
+  <button id="theme">Toggle theme</button>
+  <label>Token <input id="token" type="password" size="36" placeholder="STATE_API_TOKEN"></label>
+  <span id="status">idle</span>
+</header>
+<div class="legend" id="legend"></div>
+<div id="chart"></div>
+
+<script src="vendor/lightweight-charts/lightweight-charts.standalone.production.js"></script>
+<script>
+(function () {
+  var BASE = "https://dna-tradingview-webhook-production.up.railway.app";
+  var SYM = "AMC";
+  var OPT_TICKER = "O:AMC260918C00001500";
+  var OPT_STRIKE = 1.5, OPT_EXP = "2026-09-18";
+
+  function token() {
+    var t = document.getElementById("token").value.trim();
+    if (!t && location.hash.indexOf("token=") !== -1) {
+      t = decodeURIComponent(location.hash.split("token=")[1].split("&")[0]);
+      document.getElementById("token").value = t;
+    }
+    return t;
+  }
+
+  var TFS = { underlying: ["5m", "15m", "1H", "D"], option: ["D", "1H", "15m", "5m"] };
+  var mode = "underlying", tf = "15m";
+  var chart = null, candleSeries = null, volSeries = null;
+
+  function status(s) { document.getElementById("status").textContent = s; }
+  function hdr() { return { Authorization: "Bearer " + token() }; }
+
+  function colors() {
+    var light = document.body.classList.contains("light");
+    return light
+      ? { bg: "#ffffff", fg: "#131722", grid: "#e7e7e7", up: "#089981", down: "#f23645" }
+      : { bg: "#131722", fg: "#d1d4dc", grid: "#1e222d", up: "#26a69a", down: "#ef5350" };
+  }
+
+  function makeChart() {
+    if (chart) { chart.remove(); chart = null; }
+    var c = colors();
+    chart = LightweightCharts.createChart(document.getElementById("chart"), {
+      layout: { background: { color: c.bg }, textColor: c.fg },
+      grid: { vertLines: { color: c.grid }, horzLines: { color: c.grid } },
+      rightPriceScale: { borderColor: c.grid },
+      timeScale: { borderColor: c.grid, timeVisible: true, secondsVisible: false },
+      crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    });
+    candleSeries = chart.addSeries(LightweightCharts.CandlestickSeries, {
+      upColor: c.up, downColor: c.down, borderVisible: false, wickUpColor: c.up, wickDownColor: c.down,
+    });
+    volSeries = chart.addSeries(LightweightCharts.HistogramSeries, { priceFormat: { type: "volume" }, priceScaleId: "" });
+    volSeries.priceScale().applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+    chart.subscribeCrosshairMove(function (param) {
+      var el = document.getElementById("legend");
+      if (!param || !param.time || !param.seriesData.has(candleSeries)) { el.innerHTML = "hover a bar for OHLCV"; return; }
+      var b = param.seriesData.get(candleSeries);
+      el.innerHTML = "O " + b.open.toFixed(2) + " · H " + b.high.toFixed(2) + " · L " + b.low.toFixed(2) +
+        " · C " + b.close.toFixed(2) + (b.volume != null ? " · V " + b.volume : "");
+    });
+    var ro = new ResizeObserver(function () {
+      chart.applyOptions({ width: document.getElementById("chart").clientWidth, height: 520 });
+    });
+    ro.observe(document.getElementById("chart"));
+  }
+
+  function setCandlesAndVolume(d) {
+    var c = colors();
+    candleSeries.setData(d.bars.map(function (b) { return { time: b.t / 1000, open: b.o, high: b.h, low: b.l, close: b.c }; }));
+    volSeries.setData(d.bars.map(function (b) { return { time: b.t / 1000, value: b.v, color: b.c >= b.o ? c.up + "88" : c.down + "88" }; }));
+  }
+
+  function renderUnderlying() {
+    status("loading underlying " + SYM + " " + tf + "…");
+    fetch(BASE + "/ohlc/" + SYM + "/" + tf, { headers: hdr() })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.bars || !d.bars.length) { status("no bars: " + (d.error || "?")); return; }
+        makeChart();
+        setCandlesAndVolume(d);
+        var last = d.bars[d.bars.length - 1];
+        candleSeries.createPriceLine({ price: last.c, color: "#4FE3C4", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: "close " + last.c.toFixed(2) });
+        chart.timeScale().fitContent();
+        status("underlying: " + d.bar_count + " bars · last close " + last.c.toFixed(2));
+      })
+      .catch(function (e) { status("ERROR: " + e.message); });
+  }
+
+  function renderOption() {
+    status("loading option " + OPT_TICKER + " " + tf + "…");
+    fetch(BASE + "/options/ohlc/" + encodeURIComponent(OPT_TICKER) + "/" + tf, { headers: hdr() })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.bars || !d.bars.length) { status("no option bars: " + (d.error || "?")); return; }
+        return fetch(BASE + "/positions?symbol=" + SYM + "&status=OPEN", { headers: hdr() })
+          .then(function (r) { return r.json(); })
+          .then(function (plist) {
+            var summaries = plist.positions || [];
+            return Promise.all(summaries.map(function (p) {
+              return fetch(BASE + "/positions/" + p.id, { headers: hdr() }).then(function (r) { return r.json(); });
+            })).then(function (details) { return { d: d, details: details }; });
+          });
+      })
+      .then(function (res) {
+        var d = res.d;
+        makeChart();
+        setCandlesAndVolume(d);
+        var legs = [];
+        res.details.forEach(function (pd) {
+          (pd.instruments || []).forEach(function (i) {
+            if (i.status === "OPEN" && i.instrument_type !== "SHARE" && i.strike === OPT_STRIKE && i.expiration === OPT_EXP) {
+              legs.push(i);
+            }
+          });
+        });
+        // entry markers (v5: createSeriesMarkers + attachPrimitive)
+        var markers = legs.map(function (i) {
+          return { time: new Date(i.entry_time).getTime() / 1000, position: "belowBar", color: "#4FE3C4", shape: "arrowUp", text: "Entry " + i.entry_price };
+        });
+        if (markers.length) {
+          candleSeries.attachPrimitive(LightweightCharts.createSeriesMarkers(candleSeries, markers));
+        }
+        legs.forEach(function (i) {
+          candleSeries.createPriceLine({ price: i.entry_price, color: "#4FE3C4", lineWidth: 1, axisLabelVisible: true, title: "entry " + i.entry_price });
+        });
+        var qty = legs.reduce(function (s, i) { return s + i.quantity; }, 0);
+        var cost = legs.reduce(function (s, i) { return s + i.entry_price * i.quantity; }, 0);
+        if (qty > 0) {
+          var avg = cost / qty;
+          candleSeries.createPriceLine({ price: avg, color: "#f0b90b", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dotted, axisLabelVisible: true, title: "avg " + avg.toFixed(3) });
+        }
+        var last = d.bars[d.bars.length - 1];
+        candleSeries.createPriceLine({ price: last.c, color: "#4FE3C4", lineWidth: 1, lineStyle: LightweightCharts.LineStyle.Dashed, axisLabelVisible: true, title: "premium " + last.c.toFixed(2) });
+        chart.timeScale().fitContent();
+        status("option: " + d.bar_count + " bars · premium " + last.c.toFixed(2) + " · " + legs.length + " open leg(s) · avg " + (qty > 0 ? (cost / qty).toFixed(3) : "n/a"));
+      })
+      .catch(function (e) { status("ERROR: " + e.message); });
+  }
+
+  function refresh() { if (mode === "underlying") renderUnderlying(); else renderOption(); }
+
+  function buildTfBar() {
+    var bar = document.getElementById("tfbar");
+    bar.innerHTML = "";
+    TFS[mode].forEach(function (t) {
+      var b = document.createElement("button");
+      b.textContent = t;
+      if (t === tf) b.classList.add("on");
+      b.addEventListener("click", function () { tf = t; refresh(); });
+      bar.appendChild(b);
+    });
+  }
+
+  document.getElementById("mode").addEventListener("change", function (e) {
+    mode = e.target.value; tf = TFS[mode][0]; buildTfBar(); refresh();
+  });
+  document.getElementById("theme").addEventListener("click", function () {
+    document.body.classList.toggle("light"); refresh();
+  });
+
+  if (!token()) { status("enter token (or #token= in URL)"); }
+  buildTfBar();
+  refresh();
+})();
+</script>
+</body>
+</html>
