@@ -115,16 +115,12 @@
 
   /* ---- price chart: real OHLC closes + entry/Trade-Box reference lines ---- */
   .chart-wrap{border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:14px 16px 10px; margin-bottom:20px}
+  .chart-toggles{display:flex; gap:4px; margin-bottom:8px}
+  .chart-toggles .tf-btn{font-family:var(--font-display); font-size:11px; padding:4px 9px; border-radius:6px; border:1px solid transparent; background:transparent; color:var(--muted); cursor:pointer}
+  .chart-toggles .tf-btn:hover{border-color:var(--line)}
+  .chart-toggles .tf-btn.on{background:var(--surface-2); color:var(--text); border-color:var(--line)}
   .chart-canvas{width:100%; height:230px; display:block}
   .chart-status{font-family:var(--font-display); font-size:11px; color:var(--faint); margin-top:6px}
-
-  /* ---- position insight: entry + current DNA read + suggested action ---- */
-  .insight-wrap{margin-bottom:20px}
-  .insight-block{border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:10px; background:var(--surface); padding:14px 16px; margin-bottom:10px}
-  .insight-title{font-family:var(--font-display); font-weight:700; font-size:13px; margin-bottom:8px}
-  .insight-line{margin:0 0 7px; font-size:13.5px; line-height:1.55; color:var(--text)}
-  .insight-line:last-child{margin-bottom:0}
-  .insight-prompt{border:1px dashed var(--line); border-radius:10px; padding:14px 16px; font-size:13.5px; color:var(--faint); line-height:1.55}
 
   .flow{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px}
   @media (max-width:900px){ .flow{grid-template-columns:1fr} }
@@ -243,6 +239,7 @@
   .action .a-title{font-size:13.5px; font-weight:700; margin-bottom:2px}
   .action .a-text{font-size:13.5px; color:var(--text); line-height:1.5}
   .action .a-why{font-size:11.5px; color:var(--faint); margin-top:5px; font-family:var(--font-display)}
+  .action .a-text.chain-line{font-style:italic; color:var(--muted); margin-top:6px}
   .no-actions{color:var(--faint); font-size:13px; padding:16px; border:1px dashed var(--line); border-radius:10px}
 
   /* ---- collapsed raw data ---- */
@@ -260,6 +257,10 @@
   tr:last-child td{border-bottom:none}
   tr.st td{opacity:.5}
   .tier-tag{font-family:var(--font-display); font-size:9.5px; color:var(--faint); text-transform:uppercase; letter-spacing:.06em}
+  .phase-pill{display:inline-block; font-family:var(--font-display); font-size:10.5px; font-weight:700; letter-spacing:.03em; padding:3px 10px; border-radius:20px; background:var(--surface-2); color:var(--muted)}
+  .phase-pill.pos{background:var(--positive-glow); color:var(--positive)}
+  .phase-pill.warn{background:var(--warning-glow); color:var(--warning)}
+  .phase-pill.neg{background:var(--critical-glow); color:var(--critical)}
 
   .note{font-size:11.5px; color:var(--faint); line-height:1.6; margin-top:28px; padding-top:16px; border-top:1px solid var(--line); max-width:88ch}
   .msg{padding:44px 0; text-align:center; color:var(--faint); font-size:13.5px}
@@ -533,6 +534,15 @@
   // survives a repaint even though holding objects themselves get rebuilt.
   var selectedHolding = null;
   function holdingKey(legIds) { return (legIds || []).join(","); }
+  // Manual chart-timeframe pick per symbol (keyed by OHLC label, e.g. "1H").
+  // Empty/absent means "auto" -- drawChart widens on its own to fit the
+  // selected holding's entry instead of always opening on the shortest bar.
+  var chartTfOverride = {};
+  function parseIsoMs(iso) {
+    if (iso == null) return null;
+    var t = new Date(String(iso).replace(" ", "T") + (String(iso).endsWith("Z") ? "" : "Z")).getTime();
+    return isNaN(t) ? null : t;
+  }
 
   function realizedPnl(p) {
     var sum = 0;
@@ -821,7 +831,10 @@
   // Tracks exactly one holding at a time -- the one clicked in Shares/Options
   // below -- instead of printing every holding's insight block at once.
   // Auto-picks when there's only one holding total (no reason to make that
-  // click mandatory); otherwise prompts you to pick which one.
+  // click mandatory); otherwise prompts you to pick which one. Styled and
+  // titled to match "What to do" (same .action card language) and sits
+  // directly above it, since this IS a what-to-do read -- just scoped to
+  // the position you're actually in, instead of the whole campaign.
   function renderPositionInsights(sym) {
     var h = deriveHoldings();
     var shares = h.shares.filter(function (s) { return s.symbol === sym; });
@@ -830,10 +843,11 @@
       .concat(strategies.map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
     if (!all.length) return "";
 
+    var head = '<div class="stage-head"><h2>Campaign insights</h2><span class="hint">what DNA says about the position you\'re actually in</span></div>';
+
     var pick = all.length === 1 ? all[0] : all.filter(function (x) { return x.key === selectedHolding; })[0];
     if (!pick) {
-      return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">pick a holding below</span></div>' +
-        '<div class="insight-prompt">You\'re holding ' + all.length + ' different things on ' + sym + ' — click one in Shares/Options below to see its chart markers and insight here.</div></div>';
+      return head + '<div class="no-actions">You\'re holding ' + all.length + ' different things on ' + sym + ' — click one in Shares/Options below to see its insight here.</div>';
     }
 
     var primary = primaryReadFor(sym);
@@ -846,9 +860,12 @@
       lines = optionInsight(sym, pick.data, primary);
       chainSlot = '<div class="chain-suggest" data-sym="' + sym + '" data-strike="' + c.strike + '" data-exp="' + c.expiration + '" data-type="' + c.type + '" data-tone="' + (primary ? primary.tone : "") + '"></div>';
     }
-    return '<div class="insight-wrap"><div class="stage-head"><h2>Position insight</h2><span class="hint">' + title + '</span></div>' +
-      '<div class="insight-block"><div class="insight-title">' + title + '</div>' +
-        lines.map(function (l) { return '<p class="insight-line">' + l + '</p>'; }).join("") + chainSlot + '</div></div>';
+    var level = primary ? ({ neg: "critical", warn: "watch", pos: "opportunity" }[primary.tone] || "") : "";
+    var ic = { critical: "⚠", watch: "⚠", opportunity: "▲" }[level] || "•";
+    return head + '<div class="actions"><div class="action ' + level + '"><div class="ic">' + ic + '</div><div>' +
+      '<div class="a-title">' + title + '</div>' +
+      lines.map(function (l) { return '<div class="a-text">' + l + '</div>'; }).join("") +
+      chainSlot + '</div></div></div>';
   }
 
   function closeHolding(pid, legIds, label) {
@@ -1219,6 +1236,7 @@
       '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
 
     var chartHtml = '<div class="chart-wrap">' +
+      '<div class="chart-toggles" data-sym="' + sym + '"></div>' +
       '<canvas class="chart-canvas" data-sym="' + sym + '" width="900" height="230"></canvas>' +
       '<div class="chart-status" data-sym="' + sym + '">loading chart…</div></div>';
 
@@ -1266,12 +1284,12 @@
         }).join("")
       : '<div class="no-actions">Nothing actionable on ' + sym + ' right now. The engine has readings, but none of them cross a threshold worth interrupting you for.</div>';
 
-    var rows = states.slice().sort(function (x, y) { return tfKey(y.timeframe) - tfKey(x.timeframe); }).map(function (r) {
+    var rows = states.slice().sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); }).map(function (r) {
       var ag = age(r.bar_time), tr = tierOf(r.timeframe);
       var bf = r.source === "backfill_replay";
       return '<tr class="' + (ag.stale ? "st" : "") + '"><td class="tabular" style="font-family:var(--font-display);font-weight:600">' + tfLabel(r.timeframe) + '</td>' +
         '<td><span class="tier-tag">' + (tr ? tr.label : "—") + '</span></td>' +
-        '<td>' + (r.phase || "—") + '</td>' +
+        '<td>' + (r.phase ? '<span class="phase-pill ' + phaseTone(r.phase) + '">' + r.phase + '</span>' : "—") + '</td>' +
         '<td class="tabular">' + (r.health != null ? r.health + "%" : "—") + '</td>' +
         '<td class="tabular">' + (r.confidence != null ? r.confidence + "%" : "—") + '</td>' +
         '<td>' + (r.recent_event || "—") + '</td>' +
@@ -1279,12 +1297,13 @@
         '<td>' + (bf ? '<span class="src-badge bf" title="Reconstructed from historical replay, not fidelity-tested">reconstructed</span>' : '<span class="src-badge live">live</span>') + '</td></tr>';
     }).join("");
 
-    return verdictHtml + chartHtml + insightHtml + openPosHtml + holdingsHtml +
+    return verdictHtml + chartHtml + openPosHtml + holdingsHtml +
       '<div class="stage-head"><h2>The flow</h2><span class="hint">campaign first, short-term last</span></div>' +
       '<div class="flow">' + flowHtml + '</div>' +
+      insightHtml +
       '<div class="stage-head"><h2>What to do</h2><span class="hint">only what crosses a threshold</span></div>' +
       '<div class="actions">' + actHtml + '</div>' +
-      '<details class="raw"><summary>Every timeframe, raw</summary><div class="raw-body"><div class="scroll"><table>' +
+      '<details class="raw" open><summary>Every timeframe, raw</summary><div class="raw-body"><div class="scroll"><table>' +
       '<thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Conf</th><th>Last event</th><th>Updated</th><th>Source</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div></div></details>' +
       '<p class="note"><strong>How to read this:</strong> every reading above is real, straight from the alerts table. The grouping into Direction / Campaign / Confirmation / Timing / Right&nbsp;now follows the tier model in the coordinator spec, and the wording is a fixed rule-based translation of those readings — not a prediction, and not a coordinator verdict (the coordinator isn\'t wired to live data yet). Positions are a manual log; nothing here opens or closes anything automatically.</p>';
@@ -1313,19 +1332,60 @@
   function drawChart(sym) {
     var canvas = document.querySelector('.chart-canvas[data-sym="' + sym + '"]');
     var statusEl2 = document.querySelector('.chart-status[data-sym="' + sym + '"]');
+    var togglesEl = document.querySelector('.chart-toggles[data-sym="' + sym + '"]');
     if (!canvas) return;
     var c = cache[sym];
     var states = (c && c.states) || [];
     var sorted = states.slice().sort(function (a, b) { return tfKey(a.timeframe) - tfKey(b.timeframe); });
     var candidates = sorted.map(function (r) { return OHLC_TF_MAP[String(r.timeframe)]; }).filter(Boolean);
+    candidates = candidates.filter(function (v, i) { return candidates.indexOf(v) === i; }); // de-dupe (two coordinator TFs can share an OHLC label)
     if (!candidates.length) candidates = ["15m"];
 
-    function tryNext(i) {
+    // Which holding (if any) the chart should keep in view -- same selection
+    // as renderPositionInsights. Computed up front so the default timeframe
+    // can widen until the entry actually fits in the window, instead of
+    // always opening on the shortest timeframe where an entry from days ago
+    // falls off the left edge (the "chart is fixed on 3m" problem).
+    var holdings = deriveHoldings();
+    var symAll = holdings.shares.filter(function (s) { return s.symbol === sym; })
+      .map(function (s) { return { kind: "share", data: s, key: holdingKey(s.leg_ids) }; })
+      .concat(holdings.strategies.filter(function (o) { return o.symbol === sym; })
+        .map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
+    var chartPick = symAll.length === 1 ? symAll[0] : symAll.filter(function (x) { return x.key === selectedHolding; })[0];
+    var entryMs = chartPick ? parseIsoMs(chartPick.data.first_entry) : null;
+
+    if (togglesEl) {
+      togglesEl.innerHTML = candidates.map(function (tf) {
+        var on = (chartTfOverride[sym] || "") === tf;
+        return '<button type="button" class="tf-btn' + (on ? " on" : "") + '" data-tf="' + tf + '">' + tf + '</button>';
+      }).join("");
+      Array.prototype.forEach.call(togglesEl.querySelectorAll(".tf-btn"), function (btn) {
+        btn.addEventListener("click", function () {
+          chartTfOverride[sym] = (chartTfOverride[sym] === btn.dataset.tf) ? null : btn.dataset.tf;
+          drawChart(sym);
+        });
+      });
+    }
+
+    function autoTry(i) {
       if (i >= candidates.length) { if (statusEl2) statusEl2.textContent = "No chart data available for " + sym + "."; return; }
       loadOhlc(sym, candidates[i]).then(function (d) {
-        if (!d || !d.bars || !d.bars.length) return tryNext(i + 1);
+        if (!d || !d.bars || !d.bars.length) return autoTry(i + 1);
+        // Entry isn't inside this window yet -- widen to the next longer
+        // timeframe rather than render a chart with no marker on it.
+        if (entryMs != null && d.bars[0].t > entryMs && i < candidates.length - 1) return autoTry(i + 1);
         render(d, candidates[i]);
       });
+    }
+
+    var manualTf = chartTfOverride[sym];
+    if (manualTf && candidates.indexOf(manualTf) !== -1) {
+      loadOhlc(sym, manualTf).then(function (d) {
+        if (d && d.bars && d.bars.length) return render(d, manualTf);
+        autoTry(0);
+      });
+    } else {
+      autoTry(0);
     }
 
     function render(d, tfLbl) {
@@ -1344,7 +1404,6 @@
       // Trade Box entry/stop/target if a box is currently open on any
       // reporting timeframe. Real values only -- never invented.
       var refs = [];
-      var holdings = deriveHoldings();
       holdings.shares.filter(function (s) { return s.symbol === sym; }).forEach(function (s) {
         refs.push({ price: s.avg_cost, label: "Your entry (shares)", color: "var(--accent)" });
       });
@@ -1413,15 +1472,9 @@
         bars.forEach(function (b, i) { var diff = Math.abs(b.t - t); if (diff < bestDiff) { bestDiff = diff; best = i; } });
         return best;
       }
-      // Marks only the one holding selected below (same selection logic as
-      // renderPositionInsights: auto-pick when there's just one, otherwise
-      // require a click) instead of stacking every holding's entry on top
-      // of each other.
-      var symShares = holdings.shares.filter(function (s) { return s.symbol === sym; });
-      var symStrategies = holdings.strategies.filter(function (o) { return o.symbol === sym; });
-      var symAll = symShares.map(function (s) { return { kind: "share", data: s, key: holdingKey(s.leg_ids) }; })
-        .concat(symStrategies.map(function (o) { return { kind: "option", data: o, key: holdingKey(o.leg_ids) }; }));
-      var chartPick = symAll.length === 1 ? symAll[0] : symAll.filter(function (x) { return x.key === selectedHolding; })[0];
+      // Marks only the one holding selected below (chartPick, computed in
+      // the outer scope -- same selection logic as renderPositionInsights)
+      // instead of stacking every holding's entry on top of each other.
       var entryMarkers = [];
       if (chartPick) {
         var idx = nearestBarIndex(chartPick.data.first_entry);
@@ -1476,8 +1529,6 @@
 
       if (statusEl2) statusEl2.textContent = sym + " · " + tfLbl + " · " + bars.length + " bars · source: massive" + (d.cached ? " (cached)" : "");
     }
-
-    tryNext(0);
   }
 
   // Fill in each option holding's "worth a look" roll candidate from the
@@ -1495,8 +1546,8 @@
         bySymbol[sym].forEach(function (el) {
           var cand = suggestRollCandidate(chain, Number(el.dataset.strike), el.dataset.exp, el.dataset.type, el.dataset.tone);
           if (!cand) return;
-          el.innerHTML = '<p class="insight-line chain-line">Worth a look: <strong>$' + cand.strike + ' ' + cand.contract_type +
-            ' · ' + fmtExpiry(cand.expiration) + '</strong> — from the real chain, DNA-agreeing direction. Strike/expiry only, no live pricing on the free plan to size it precisely.</p>';
+          el.innerHTML = '<div class="a-text chain-line">Worth a look: <strong>$' + cand.strike + ' ' + cand.contract_type +
+            ' · ' + fmtExpiry(cand.expiration) + '</strong> — from the real chain, DNA-agreeing direction. Strike/expiry only, no live pricing on the free plan to size it precisely.</div>';
         });
       });
     });
