@@ -6,36 +6,36 @@
 <title>DNA Dashboard</title>
 <style>
   :root{
-    --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
-    --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
-    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14); --accent2:#0F766E;
-    --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
-    --positive-glow:rgba(47,158,91,.12); --warning-glow:rgba(180,121,12,.12); --critical-glow:rgba(196,67,58,.12);
+    --ink:#F6FAF8; --surface:#FFFFFF; --surface-2:#EEF4F1; --line:#D7E3DD;
+    --text:#122019; --muted:#54685F; --faint:#8AA098;
+    --accent:#0F9E82; --accent-glow:rgba(15,158,130,.08); --accent2:#0B7A64;
+    --positive:#1C9A57; --warning:#B96A22; --critical:#C93F32;
+    --positive-glow:rgba(28,154,87,.10); --warning-glow:rgba(185,106,34,.10); --critical-glow:rgba(201,63,50,.10);
     --font-display: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, monospace;
     --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   }
   @media (prefers-color-scheme: dark){
     :root{
-      --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
-      --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
-      --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12); --accent2:#319795;
-      --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
-      --positive-glow:rgba(111,207,124,.11); --warning-glow:rgba(231,178,76,.11); --critical-glow:rgba(226,104,92,.11);
+      --ink:#0B0F0E; --surface:#121917; --surface-2:#182220; --line:#24312D;
+      --text:#E7F1EC; --muted:#8FA39B; --faint:#5C6E67;
+      --accent:#45E0C2; --accent-glow:rgba(69,224,194,.10); --accent2:#2FA891;
+      --positive:#35D07F; --warning:#F0A868; --critical:#FF6B5E;
+      --positive-glow:rgba(53,208,127,.12); --warning-glow:rgba(240,168,104,.12); --critical-glow:rgba(255,107,94,.12);
     }
   }
   :root[data-theme="dark"]{
-    --ink:#0A0F0D; --surface:#101613; --surface-2:#141C18; --line:#1E2925;
-    --text:#E7EDE9; --muted:#84948C; --faint:#59665F;
-    --accent:#4FE3C4; --accent-glow:rgba(79,227,196,.12); --accent2:#319795;
-    --positive:#6FCF7C; --warning:#E7B24C; --critical:#E2685C;
-    --positive-glow:rgba(111,207,124,.11); --warning-glow:rgba(231,178,76,.11); --critical-glow:rgba(226,104,92,.11);
+    --ink:#0B0F0E; --surface:#121917; --surface-2:#182220; --line:#24312D;
+    --text:#E7F1EC; --muted:#8FA39B; --faint:#5C6E67;
+    --accent:#45E0C2; --accent-glow:rgba(69,224,194,.10); --accent2:#2FA891;
+    --positive:#35D07F; --warning:#F0A868; --critical:#FF6B5E;
+    --positive-glow:rgba(53,208,127,.12); --warning-glow:rgba(240,168,104,.12); --critical-glow:rgba(255,107,94,.12);
   }
   :root[data-theme="light"]{
-    --ink:#F4F7F5; --surface:#FFFFFF; --surface-2:#EDF2EF; --line:#DCE5E0;
-    --text:#10201A; --muted:#5C6D66; --faint:#8B9A93;
-    --accent:#0E9E85; --accent-glow:rgba(14,158,133,.14); --accent2:#0F766E;
-    --positive:#2F9E5B; --warning:#B4790C; --critical:#C4433A;
-    --positive-glow:rgba(47,158,91,.12); --warning-glow:rgba(180,121,12,.12); --critical-glow:rgba(196,67,58,.12);
+    --ink:#F6FAF8; --surface:#FFFFFF; --surface-2:#EEF4F1; --line:#D7E3DD;
+    --text:#122019; --muted:#54685F; --faint:#8AA098;
+    --accent:#0F9E82; --accent-glow:rgba(15,158,130,.08); --accent2:#0B7A64;
+    --positive:#1C9A57; --warning:#B96A22; --critical:#C93F32;
+    --positive-glow:rgba(28,154,87,.10); --warning-glow:rgba(185,106,34,.10); --critical-glow:rgba(201,63,50,.10);
   }
 
   *{box-sizing:border-box}
@@ -900,12 +900,19 @@
   // one expands in place (renderAssetBody) instead of a separate section
   // living elsewhere on the page. One expanded at a time, click to switch.
   function renderAssetList() {
+    // What you're actually holding comes first (portfolio position), then
+    // urgency, then name -- so an asset you have money in never gets buried
+    // under a "nothing to do" one you don't hold.
+    var held = {};
+    portfolio.forEach(function (p) { held[p.summary.symbol] = true; });
     var ranked = assets.slice().sort(function (x, y) {
+      var hx = held[x.symbol] ? 0 : 1, hy = held[y.symbol] ? 0 : 1;
+      if (hx !== hy) return hx - hy;
       var ax = cache[x.symbol], ay = cache[y.symbol];
       var lx = ax ? LEVEL_ORDER[ax.assess.level] : 9, ly = ay ? LEVEL_ORDER[ay.assess.level] : 9;
       return lx - ly || x.symbol.localeCompare(y.symbol);
     });
-    return '<div class="stage-head"><h2>Assets</h2><span class="hint">ranked by urgency · click one to open it</span></div>' +
+    return '<div class="stage-head"><h2>Assets</h2><span class="hint">held positions first, then by urgency · click one to open it</span></div>' +
       '<div class="asset-list">' + ranked.map(function (as) {
         var c = cache[as.symbol];
         var expanded = as.symbol === selected;
