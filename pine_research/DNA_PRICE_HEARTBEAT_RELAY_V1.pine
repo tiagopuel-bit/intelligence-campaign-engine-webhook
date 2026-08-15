@@ -13,8 +13,8 @@ matchedBars = math.min(bar_index + 1, 9999)
 sessionLabel = session.ismarket ? "RTH" : session.ispremarket ? "PRE" : session.ispostmarket ? "POST" : "CLOSED"
 
 if barstate.isconfirmed and timeframe.isminutes and timeframe.multiplier == 1
-    common = '"kind":"' + relayType + '","symbol":"' + underlying + '","ticker":"' + syminfo.tickerid + '","timeframe":"1","time":' + str.tostring(time) + ',"close":' + str.tostring(close) + ',"session":"' + sessionLabel + '"'
-    optionFields = ',"position_ref":"' + positionRef + '","instrument_ref":"' + instrumentRef + '","volume":' + str.tostring(volume) + ',"option_return":' + str.tostring(optionReturn) + ',"matched_bars":' + str.tostring(matchedBars) + ',"activity_ratio":' + str.tostring(nz(activityRatio, 0.0))
-    alert('{' + common + (relayType == "OPTION_HEARTBEAT" ? optionFields : "") + '}', alert.freq_once_per_bar_close)
+    common = "\"kind\":\"" + relayType + "\",\"symbol\":\"" + underlying + "\",\"ticker\":\"" + syminfo.tickerid + "\",\"timeframe\":\"1\",\"time\":" + str.tostring(time) + ",\"close\":" + str.tostring(close) + ",\"session\":\"" + sessionLabel + "\""
+    optionFields = ",\"position_ref\":\"" + positionRef + "\",\"instrument_ref\":\"" + instrumentRef + "\",\"volume\":" + str.tostring(volume) + ",\"option_return\":" + str.tostring(optionReturn) + ",\"matched_bars\":" + str.tostring(matchedBars) + ",\"activity_ratio\":" + str.tostring(nz(activityRatio, 0.0))
+    alert("{" + common + (relayType == "OPTION_HEARTBEAT" ? optionFields : "") + "}", alert.freq_once_per_bar_close)
 
 plot(close, "Relay close", color=color.new(color.blue, 0), display=display.data_window)
