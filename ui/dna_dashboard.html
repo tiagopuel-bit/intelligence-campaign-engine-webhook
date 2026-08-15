@@ -98,6 +98,7 @@
   .asset-row.watch .ar-state{color:var(--warning)}
   .asset-row.opportunity .ar-state{color:var(--positive)}
   .asset-row.quiet .ar-state{color:var(--faint)}
+  .ar-warmup{font-family:var(--font-display); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); background:var(--accent-glow); border:1px solid var(--accent); border-radius:20px; padding:2px 8px; white-space:nowrap}
   .ar-why{color:var(--muted); font-size:13px; line-height:1.4}
   .asset-row.expanded .ar-why{flex:1 1 200px}
   .ar-chev{display:none}
@@ -112,6 +113,8 @@
   .verdict.opportunity .em{color:var(--positive)}
   .verdict.quiet .em{color:var(--muted)}
   .verdict-sub{font-size:12.5px; color:var(--faint); margin-bottom:26px}
+  .warmup-note{margin:-14px 0 26px; padding:10px 14px; border:1px solid var(--accent); border-radius:9px; background:var(--accent-glow); font-size:13px; line-height:1.5; color:var(--text)}
+  .warmup-flag{display:inline-block; font-family:var(--font-display); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); margin-right:8px}
 
   /* ---- price chart: real OHLC closes + entry/Trade-Box reference lines ---- */
   .chart-wrap{border:1px solid var(--line); border-radius:12px; background:var(--surface); padding:14px 16px 10px; margin-bottom:20px}
@@ -290,6 +293,8 @@
   .dna-slice-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
   .dna-slice-head strong{font-size:18px}.dna-portfolio-slice:first-child .dna-slice-head strong{font-size:28px;line-height:1;letter-spacing:-.035em}
   .dna-pill{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:700;background:rgba(37,99,235,.10);color:#1d4ed8;white-space:nowrap}
+  .dna-warmup{display:inline-flex;vertical-align:middle;margin-left:6px;padding:2px 8px;border-radius:999px;font-family:var(--font-display);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent);white-space:nowrap}
+  .warmup-note-inline{margin-top:6px;padding:8px 10px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-glow);color:var(--text);font-size:10.5px;line-height:1.45}
   .dna-pill.green{background:rgba(28,154,87,.10);color:#0d7f4b}.dna-pill.red{background:var(--critical-glow);color:var(--critical)}
   .dna-slice-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
   .dna-k{font-size:9px;color:color-mix(in srgb,currentColor 62%,transparent)}
@@ -534,10 +539,30 @@
     }
     if (allStale) why = "nothing new in " + (newest > 2880 ? Math.round(newest / 1440) + " days" : Math.round(newest / 60) + " hours");
 
-    return { tiers: t, level: level, headline: headline, why: why, allStale: allStale, newest: newest };
+    return { tiers: t, level: level, headline: headline, why: why, allStale: allStale, newest: newest, warmup: warmingUp(t) };
   }
 
   var LEVEL_ORDER = { critical: 0, watch: 1, opportunity: 2, quiet: 3 };
+
+  // --- Warming up: campaign already constructive, confirmation hasn't
+  // caught up yet, and a fresh entry-type signal just fired on timing/
+  // micro. This is the state *before* "campaign and confirmation agree"
+  // (which requires confirmation to already be pos) -- an earlier, looser
+  // flag, not a score. Deliberately discrete (a real signal_event fired,
+  // recently) rather than a synthesized number, so it can't imply more
+  // precision than the underlying reads actually have.
+  var WARMUP_SIGNALS = ["STRONG START", "RELOAD", "ADD", "CAMPAIGN START", "FIRE ADD", "ACCUMULATE"];
+  function warmingUp(t) {
+    if (t.owner.empty || t.owner.tone !== "pos") return null;
+    if (t.confirm.tone === "pos" || t.confirm.tone === "neg") return null;
+    var lowerRows = (t.timing.rows || []).concat(t.micro.rows || []);
+    var fresh = lowerRows.filter(function (r) {
+      return WARMUP_SIGNALS.indexOf(String(r.signal_event || "").toUpperCase()) !== -1 && !age(r.bar_time).stale;
+    });
+    if (!fresh.length) return null;
+    fresh.sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); });
+    return { row: fresh[0], ownerText: t.owner.text, ownerTf: t.owner.lead.timeframe };
+  }
 
   // --- Actions: only what's actionable now, never a running commentary --
   function actionsFor(sym, a) {
@@ -1060,6 +1085,7 @@
             '<span class="ar-sym">' + as.symbol + '</span>' +
             (px != null ? '<span class="ar-price tabular">$' + px + '</span>' : '') +
             '<span class="ar-state">' + a.headline + '</span>' +
+            (a.warmup ? '<span class="ar-warmup" title="Campaign already constructive, confirmation has not caught up yet, fresh entry signal on ' + tfLabel(a.warmup.row.timeframe) + '">warming up</span>' : '') +
           '</span>' +
           '<span class="ar-why">' + a.why + '</span>' +
           '<span class="ar-chev">›</span></button>';
@@ -1714,8 +1740,10 @@
     var riskTier = [t.confirm,t.owner,t.backbone].filter(function (x) { return x && !x.empty && x.tone === "neg"; })[0];
     var riskText = riskTier ? tfLabel(riskTier.lead.timeframe) + " structure is " + riskTier.text : "Pressure propagating into the campaign";
 
+    var warmupBadge = a.warmup ? ' <span class="dna-warmup" title="Campaign already constructive, confirmation has not caught up yet, fresh entry signal on ' + tfLabel(a.warmup.row.timeframe) + '">warming up</span>' : '';
+    var warmupNote = a.warmup ? '<div class="copy warmup-note-inline">Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up — ' + tfLabel(a.warmup.row.timeframe) + ' just fired <b>' + a.warmup.row.signal_event + '</b>. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '';
     var decision = '<section class="dna-decision" aria-label="Current campaign decision">' +
-      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span></h2><div class="copy">' + a.why + '</div></div>' +
+      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span>' + warmupBadge + '</h2><div class="copy">' + a.why + '</div>' + warmupNote + '</div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Recommended action</div><div class="big">' + action + '</div><div class="copy">Rule-based DNA guidance</div></div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Next confirmation</div><div class="copy" style="color:#2563eb;font-weight:700">' + nextText + '</div><div class="copy">Timing before action</div></div>' +
       '<div class="dna-decision-cell risk"><div class="eyebrow">Main risk</div><div class="copy critical" style="font-weight:700">' + riskText + '</div><div class="copy">Slower structure remains the authority</div></div></section>';
@@ -1782,7 +1810,7 @@
     var progressionTiers = [t.backbone,t.owner,t.confirm,t.timing];
     var progression = '<div class="dna-lower-grid"><section class="dna-panel"><div class="stage-head"><h2>Trade progression</h2><span class="hint">backbone → campaign → confirmation → timing</span></div><div class="dna-progression">' + progressionTiers.map(function (x, i) { var empty = !x || x.empty; var cls = empty ? '' : toneClass(x.tone); return '<div class="dna-stage ' + cls + '"><div class="dna-stage-head"><span class="dna-stage-dot">' + (i+1) + '</span><div><strong>' + ["Backbone","Campaign","Confirmation","Timing"][i] + '</strong><small>' + (empty ? 'no data' : tfLabel(x.lead.timeframe)) + '</small></div></div><div class="dna-stage-state">' + (empty ? 'Waiting' : x.text) + '</div></div>'; }).join("") + '</div></section><section class="dna-panel"><div class="stage-head"><h2>News stream</h2><span class="hint">media sources</span></div><div class="dna-news" data-sym="' + sym + '"><div class="dna-news-empty">Loading media sources…</div></div></section></div>';
 
-    var radar = assets.filter(function (x) { return x.symbol !== sym; }).map(function (x) { var rc = cache[x.symbol], ra = rc && rc.assess; var rs = rc ? rc.states : []; var quick = ["15","60","240","D"].map(function (tf) { var row = rs.filter(function (r) { return String(r.timeframe) === tf; })[0]; return '<span class="dna-radar-tf ' + (row ? toneClass(phaseTone(row.phase)) : 'warn') + '">' + tfLabel(tf) + '</span>'; }).join(""); return '<button type="button" class="dna-radar-item" data-sym="' + x.symbol + '"><span class="dna-radar-top"><strong>' + x.symbol + '</strong><span class="dna-pill ' + (ra && ra.level === 'critical' ? 'red' : ra && ra.level === 'opportunity' ? 'green' : '') + '">' + (ra ? ra.headline : 'Loading') + '</span></span><span class="dna-radar-tfs">' + quick + '</span></button>'; }).join("");
+    var radar = assets.filter(function (x) { return x.symbol !== sym; }).map(function (x) { var rc = cache[x.symbol], ra = rc && rc.assess; var rs = rc ? rc.states : []; var quick = ["15","60","240","D"].map(function (tf) { var row = rs.filter(function (r) { return String(r.timeframe) === tf; })[0]; return '<span class="dna-radar-tf ' + (row ? toneClass(phaseTone(row.phase)) : 'warn') + '">' + tfLabel(tf) + '</span>'; }).join(""); return '<button type="button" class="dna-radar-item" data-sym="' + x.symbol + '"><span class="dna-radar-top"><strong>' + x.symbol + '</strong><span class="dna-pill ' + (ra && ra.level === 'critical' ? 'red' : ra && ra.level === 'opportunity' ? 'green' : '') + '">' + (ra ? ra.headline : 'Loading') + '</span>' + (ra && ra.warmup ? '<span class="dna-warmup">warming up</span>' : '') + '</span><span class="dna-radar-tfs">' + quick + '</span></button>'; }).join("");
     var radarHtml = '<section class="dna-panel"><div class="stage-head"><h2>Portfolio campaign radar</h2><span class="hint">quick multi-timeframe view across tracked assets</span></div><div class="dna-radar">' + radar + '</div></section>';
     var paperCommand = renderPaperChallenge(sym);
 
@@ -1800,7 +1828,8 @@
     var a = c.assess, t = a.tiers, states = c.states;
 
     var verdictHtml = '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
-      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>';
+      '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>' +
+      (a.warmup ? '<div class="warmup-note"><span class="warmup-flag">warming up</span> Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up yet — ' + tfLabel(a.warmup.row.timeframe) + ' just fired <b>' + a.warmup.row.signal_event + '</b>. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '');
 
     var chartHtml = '<div class="chart-wrap">' +
       '<div class="chart-toprow">' +
