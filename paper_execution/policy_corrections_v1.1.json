@@ -1,0 +1,25 @@
+{
+  "version": "1.1",
+  "status": "PRE_ACTIVATION_POLICY_CORRECTION",
+  "supersedes": "1",
+  "superseded_sha256": "7688b012a2355aec55261ab9abbfa1256bb5b0ac7c87c74c5fd8d3cc26254448",
+  "provenance": "policy_v1.json remains frozen and unmodified; this record versions the pre-activation corrections without rewriting the original contract.",
+  "corrections": [
+    {"id": "zero_age_freshness_fallback", "description": "an age of exactly zero minutes is fresh; a missing/None age is not fresh"},
+    {"id": "future_timestamp_rejection", "description": "a bar timestamp in the future (negative age) is rejected, never treated as fresh"},
+    {"id": "live_freshness_2_minutes", "description": "live underlying and live option freshness gate is approximately 2 minutes"},
+    {"id": "delayed_source_ineligible", "description": "delayed provider sources (Massive daily close) are ineligible for VERY_HIGH; no silent fallback"},
+    {"id": "action_direction_compatibility", "description": "the proposal action must be compatible with the position direction (LONG/SHORT)"},
+    {"id": "very_high_auto_actions_enforcement", "description": "only partial_reduce and close may auto-execute under AUTO_IF_VERY_HIGH_PAPER"},
+    {"id": "finite_positive_prices", "description": "fill prices must be finite and strictly positive"},
+    {"id": "integer_quantities", "description": "fill quantities must be positive integers"},
+    {"id": "option_100x_multiplier", "description": "option contract notional applies the 100-share-per-contract multiplier"},
+    {"id": "signed_roll_debit_credit", "description": "a roll reports a signed net (credit positive, debit negative) across both legs"},
+    {"id": "globally_unique_kill_switch", "description": "exactly one GLOBAL kill switch row per experiment"},
+    {"id": "auto_mode_filtering", "description": "due-proposal processing only considers proposals whose mode permits auto-execution"},
+    {"id": "atomic_due_proposal_claiming", "description": "concurrent runners atomically claim a due proposal before revalidation"}
+  ],
+  "live_freshness_max_minutes": 2,
+  "very_high_auto_actions": ["partial_reduce", "close"],
+  "option_contract_multiplier": 100
+}

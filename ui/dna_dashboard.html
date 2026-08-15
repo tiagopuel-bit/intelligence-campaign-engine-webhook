@@ -321,8 +321,25 @@
   .dna-news-foot{font-size:9px;color:var(--faint);margin-top:8px;font-family:var(--font-display)}
   .dna-catalyst-watch{margin-bottom:10px;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}.dna-watch-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.dna-watch-head strong{font-family:var(--font-display);font-size:10px;text-transform:uppercase;letter-spacing:.05em}.dna-watch-status{padding:3px 7px;border-radius:999px;font-size:8px;font-weight:750;background:var(--surface);color:var(--faint)}.dna-watch-status.active{background:var(--warning-glow);color:var(--warning)}.dna-watch-status.high{background:var(--critical-glow);color:var(--critical)}.dna-watch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.dna-watch-item{padding:7px 8px;border-left:3px solid var(--line);background:var(--surface);border-radius:5px}.dna-watch-item.hit{border-color:var(--warning)}.dna-watch-item.high{border-color:var(--critical)}.dna-watch-item strong{display:block;font-size:9px}.dna-watch-item span{display:block;margin-top:2px;font-size:8.5px;line-height:1.35;color:var(--muted)}.dna-watch-note{margin-top:7px;font-size:8px;color:var(--faint)}
   .dna-radar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dna-radar-item{padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);cursor:pointer}.dna-radar-item:hover{border-color:#2563eb}.dna-radar-top{display:flex;justify-content:space-between;gap:6px;margin-bottom:7px}.dna-radar-top strong{font-family:var(--font-display);font-size:11px}.dna-radar-tfs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}.dna-radar-tf{text-align:center;padding:4px 2px;border-radius:4px;font-size:8px;font-weight:700;background:var(--positive-glow);color:var(--positive)}.dna-radar-tf.warn{background:var(--warning-glow);color:var(--warning)}.dna-radar-tf.neg{background:var(--critical-glow);color:var(--critical)}
-  @media(max-width:980px){.dna-workspace,.dna-middle,.dna-lower-grid{grid-template-columns:1fr}.dna-portfolio{grid-template-columns:1fr}.dna-portfolio-slice+.dna-portfolio-slice{border-left:0;border-top:1px solid #97d8b0}.dna-decision{height:auto;grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:600px){.dna-decision{grid-template-columns:1fr}.dna-slice-metrics{grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:1fr}.dna-progression,.dna-watch-grid{grid-template-columns:1fr}.dna-insight-row{grid-template-columns:1fr}}
+  .pionex-wallet{margin-bottom:16px}.pionex-total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-family:var(--font-display);font-size:13px;font-weight:700;margin-bottom:9px}.pionex-total b{font-size:20px}.pionex-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.pionex-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);font-size:11px}.pionex-coin{font-family:var(--font-display);font-weight:750}.pionex-qty{color:var(--muted)}.pionex-val{font-family:var(--font-display);font-weight:650}.pionex-note{margin-top:9px;color:var(--faint);font-size:9px}.pionex-unpriced{color:var(--warning)}
+  /* ---- AMC paper portfolio challenge -------------------------------- */
+  .paper-command{padding:0;overflow:hidden;border-color:color-mix(in srgb,#2563eb 28%,var(--line));box-shadow:0 12px 34px rgba(37,99,235,.06)}
+  .paper-command-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line);background:linear-gradient(110deg,rgba(37,99,235,.10),rgba(14,165,233,.035) 52%,transparent)}
+  .paper-command-title{display:flex;align-items:center;gap:10px;min-width:0}.paper-command-title h2{margin:0;font-size:15px}.paper-command-title p{margin:3px 0 0;font-size:9.5px;color:var(--muted)}
+  .paper-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-family:var(--font-display);font-size:8.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}.paper-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:#2563eb}.paper-badge.ready{background:var(--positive-glow);color:var(--positive)}.paper-badge.ready:before{background:var(--positive)}.paper-badge.locked{background:var(--warning-glow);color:var(--warning)}.paper-badge.locked:before{background:var(--warning)}
+  .paper-head-actions{display:flex;align-items:center;gap:8px}.paper-head-actions button{min-height:30px;padding:6px 10px;font-size:9px}
+  .paper-command-body{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(310px,.88fr);gap:0}
+  .paper-progress{padding:15px 16px;border-right:1px solid var(--line)}.paper-queue{padding:15px 16px;min-width:0}
+  .paper-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.paper-kpi{padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}.paper-kpi span{display:block;font-size:8.5px;color:var(--muted)}.paper-kpi strong{display:block;margin-top:4px;font-family:var(--font-display);font-size:15px}.paper-kpi small{display:block;margin-top:3px;font-size:8px;color:var(--faint)}
+  .paper-target{margin-top:13px}.paper-target-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.paper-target-top strong{font-size:11px}.paper-target-top span{font-family:var(--font-display);font-size:9px;color:var(--muted)}.paper-track{position:relative;height:10px;margin-top:9px;border-radius:999px;background:var(--surface-2);overflow:visible}.paper-track-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#38bdf8,#2563eb);min-width:2px}.paper-track-mark{position:absolute;top:-3px;width:2px;height:16px;background:var(--muted);opacity:.45}.paper-track-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:8px}.paper-track-label{padding:6px 7px;border:1px solid var(--line);border-radius:7px;background:var(--surface);font-size:8px;color:var(--muted)}.paper-track-label strong{display:block;margin-top:2px;color:var(--text);font-size:9px}.paper-track-label.reached{border-color:color-mix(in srgb,var(--positive) 35%,var(--line));background:var(--positive-glow)}
+  .paper-allocation{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;padding:9px 10px;border-radius:8px;background:var(--surface-2);font-size:9px}.paper-allocation strong{font-family:var(--font-display);font-size:10px}.paper-allocation em{font-style:normal;color:var(--muted)}
+  .paper-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.paper-section-head strong{font-family:var(--font-display);font-size:10px;text-transform:uppercase;letter-spacing:.05em}.paper-section-head span{font-size:8.5px;color:var(--faint)}
+  .paper-proposals{display:grid;gap:7px;max-height:246px;overflow:auto;padding-right:2px}.paper-proposal{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2)}.paper-proposal-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.paper-proposal-top strong{font-size:10.5px;text-transform:capitalize}.paper-status{padding:3px 7px;border-radius:999px;background:var(--surface);font-family:var(--font-display);font-size:7.5px;font-weight:750;color:var(--muted)}.paper-status.pending,.paper-status.approved{background:#dbeafe;color:#1d4ed8}.paper-status.filled,.paper-status.executed{background:var(--positive-glow);color:var(--positive)}.paper-status.cancelled,.paper-status.rejected,.paper-status.expired{background:var(--critical-glow);color:var(--critical)}.paper-proposal-meta{display:flex;flex-wrap:wrap;gap:5px 9px;margin-top:5px;font-size:8px;color:var(--muted)}.paper-proposal-reason{margin-top:6px;font-size:8.5px;line-height:1.35;color:var(--text)}.paper-proposal-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.paper-proposal-actions button{min-height:27px;padding:5px 8px;font-size:8px}.paper-proposal-actions .danger{border-color:color-mix(in srgb,var(--critical) 40%,var(--line));color:var(--critical)}
+  .paper-empty{min-height:92px;display:grid;place-items:center;text-align:center;padding:14px;border:1px dashed var(--line);border-radius:9px;color:var(--faint);font-size:9px;line-height:1.45}.paper-lock-note{margin-top:8px;padding:7px 9px;border-radius:7px;background:var(--warning-glow);color:var(--warning);font-size:8px;line-height:1.35}
+  .paper-daily{grid-column:1/-1;padding:13px 16px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--surface-2) 62%,transparent)}.paper-daily-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.paper-daily-item{padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.paper-daily-item span{display:block;font-family:var(--font-display);font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}.paper-daily-item strong{display:block;margin-top:4px;font-size:9.5px;line-height:1.3}.paper-daily-item small{display:block;margin-top:3px;font-size:8px;line-height:1.35;color:var(--faint)}
+  .paper-api-msg{min-height:16px;margin-top:7px;font-size:8px;color:var(--critical)}
+  @media(max-width:980px){.dna-workspace,.dna-middle,.dna-lower-grid{grid-template-columns:1fr}.dna-portfolio{grid-template-columns:1fr}.dna-portfolio-slice+.dna-portfolio-slice{border-left:0;border-top:1px solid #97d8b0}.dna-decision{height:auto;grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:repeat(2,1fr)}.paper-command-body{grid-template-columns:1fr}.paper-progress{border-right:0;border-bottom:1px solid var(--line)}.paper-kpis{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.dna-decision{grid-template-columns:1fr}.dna-slice-metrics{grid-template-columns:1fr 1fr}.dna-radar{grid-template-columns:1fr}.dna-progression,.dna-watch-grid{grid-template-columns:1fr}.dna-insight-row{grid-template-columns:1fr}.paper-command-head{align-items:flex-start;flex-direction:column}.paper-head-actions{width:100%}.paper-head-actions button{flex:1}.paper-kpis,.paper-daily-grid{grid-template-columns:1fr 1fr}.paper-track-labels{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -597,7 +614,10 @@
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
   var portfolio = [], realized = 0, portfolioById = {};
-  var newsBySymbol = {}, marketWatchBySymbol = {};
+  var newsBySymbol = {}, marketWatchBySymbol = {}, filingsBySymbol = {};
+  var paperChallenge = { health: null, experiment: null, proposals: [], reports: [], error: null, loading: false, seq: 0 };
+  var paperCountdownTimer = null;
+  var paperExperimentId = Number(localStorage.getItem("dna_paper_experiment_id") || 1);
   // Which single holding (share line or option contract) the chart + insight
   // panel currently track. null = nothing picked yet. Keyed by leg_ids so it
   // survives a repaint even though holding objects themselves get rebuilt.
@@ -1022,7 +1042,10 @@
       var lx = ax ? LEVEL_ORDER[ax.assess.level] : 9, ly = ay ? LEVEL_ORDER[ay.assess.level] : 9;
       return lx - ly || x.symbol.localeCompare(y.symbol);
     });
-    return '<div class="stage-head"><h2>Assets</h2><span class="hint">held positions first, then by urgency · click one to open it</span></div>' +
+    var pionex = '<section class="dna-panel pionex-wallet" data-role="pionex">' +
+      '<div class="stage-head"><h2>Pionex</h2><span class="hint">crypto spot wallet · read-only · bots and earn excluded</span></div>' +
+      '<div class="pionex-body"><div class="dna-news-empty">Loading Pionex wallet…</div></div></section>';
+    return pionex + '<div class="stage-head"><h2>Assets</h2><span class="hint">held positions first, then by urgency · click one to open it</span></div>' +
       '<div class="asset-list">' + ranked.map(function (as) {
         var c = cache[as.symbol];
         var expanded = as.symbol === selected;
@@ -1357,13 +1380,54 @@
     return { title: title, summary: context + " · " + dna, bullets: lines.slice(0, 3) };
   }
 
+  // --- SEC filing watch (Catalyst Watch integration) ----------------------
+  function secSafeUrl(raw) {
+    try {
+      var u = new URL(String(raw || ""));
+      return u.protocol === "https:" && u.hostname === "www.sec.gov" ? u.href : "#";
+    } catch (_err) { return "#"; }
+  }
+  function secFilingLabel(f) {
+    if (f.category === "DILUTION_WATCH") return f.severity === "HIGH" ? "offering / dilution watch" : "financing capacity registered";
+    if (f.category === "MATERIAL_FILING") return "material filing";
+    return "ownership filing — direction unclassified";
+  }
+  function secFilingText(f) {
+    return f.form + (f.variant ? " (" + f.variant + ")" : "") + " · " + secFilingLabel(f) + " · " + (f.filing_date || "no date");
+  }
+  function secPriority(f) {
+    if (f.category === "DILUTION_WATCH" && f.severity === "HIGH") return 1;
+    if (f.category === "DILUTION_WATCH") return 2;
+    if (f.category === "MATERIAL_FILING") return 3;
+    return 4;
+  }
+  function secTopFiling(filings) {
+    if (!filings) return null;
+    var list = (filings.new || []).concat(filings.recent || []);
+    if (!list.length) return null;
+    return list.slice().sort(function (a, b) { return secPriority(a) - secPriority(b); })[0];
+  }
+  function secStateText(filings, top) {
+    if (filings == null) return "Loading SEC filings…";
+    if (filings.configured === false) return "SEC filing watch not configured — SEC_USER_AGENT missing.";
+    if (filings.error) return "SEC filing watch unavailable — " + filings.error + ".";
+    if (filings.seeded === false) return "SEC filing watch not yet seeded — first poll pending.";
+    if (filings.stale) return "SEC filing watch is stale — last successful poll over 24h ago.";
+    if (top) return secFilingText(top);
+    return "No new SEC filings in the alert window.";
+  }
+
   function catalystWatchHtml(sym) {
     var c = cache[sym], states = c ? c.states : [], market = marketWatchBySymbol[sym] || {};
     var news = newsBySymbol[sym] || [];
+    var filings = filingsBySymbol[sym];
+    var secTop = secTopFiling(filings);
+    var secOffering = secTop && secTop.category === "DILUTION_WATCH" && secTop.severity === "HIGH";
     var catalystPattern = /\b(424b5|s-3|fwp|offering|at-the-market|\batm\b|dilution|share count|8-k|10-q|10-k|earnings|guidance|sec filing)\b/i;
     var highPriorityPattern = /\b(424b5|s-3|fwp|offering|at-the-market|\batm\b|dilution|share count)\b/i;
     var catalyst = news.filter(function (n) { return catalystPattern.test(n.title || ""); })[0] || null;
-    var highPriority = catalyst && highPriorityPattern.test(catalyst.title || "");
+    var hasSecNew = filings && filings.new && filings.new.length > 0;
+    var highPriority = secOffering || (catalyst && highPriorityPattern.test(catalyst.title || ""));
     var lower = states.filter(function (s) { return tfKey(s.timeframe) <= tfKey("60"); });
     var constructive = lower.filter(function (s) { return phaseTone(s.phase) === "pos"; }).length;
     var failures = lower.filter(function (s) { return /FAIL/i.test(s.recent_event || "") || phaseTone(s.phase) === "neg"; }).length;
@@ -1371,7 +1435,7 @@
     var premiumHit = market.premiumCompression != null && market.premiumCompression >= 20;
     var technicalHit = constructive >= 2 || failures >= 2;
     var confluence = [volumeHit, premiumHit, technicalHit].filter(Boolean).length;
-    var active = Boolean(highPriority || (catalyst && confluence >= 1) || confluence >= 2);
+    var active = Boolean(highPriority || hasSecNew || (catalyst && confluence >= 1) || confluence >= 2);
     var statusClass = highPriority ? " high" : active ? " active" : "";
     var status = highPriority ? "CATALYST RISK" : active ? "WATCH ACTIVE" : "MONITORING";
     var volumeText = market.volumeRatio == null ? "Waiting for chart volume." : market.volumeRatio.toFixed(2) + "× the prior 20-bar average on " + market.tf + ".";
@@ -1380,6 +1444,7 @@
     var catalystText = catalyst ? catalyst.title : "No catalyst-keyword headline in the current media feed.";
     return '<div class="dna-watch-head"><strong>Catalyst watch</strong><span class="dna-watch-status' + statusClass + '">' + status + '</span></div>' +
       '<div class="dna-watch-grid">' +
+        '<div class="dna-watch-item' + (secOffering ? ' high' : secTop ? ' hit' : '') + '"><strong>SEC filing</strong><span>' + esc(secStateText(filings, secTop)) + (secTop && secTop.filing_url ? ' <a href="' + esc(secSafeUrl(secTop.filing_url)) + '" target="_blank" rel="noopener noreferrer">view</a>' : '') + '</span></div>' +
         '<div class="dna-watch-item' + (highPriority ? ' high' : catalyst ? ' hit' : '') + '"><strong>Catalyst</strong><span>' + esc(catalystText) + '</span></div>' +
         '<div class="dna-watch-item' + (volumeHit ? ' hit' : '') + '"><strong>Volume</strong><span>' + volumeText + '</span></div>' +
         '<div class="dna-watch-item' + (premiumHit ? ' hit' : '') + '"><strong>Premium compression</strong><span>' + premiumText + '</span></div>' +
@@ -1390,6 +1455,237 @@
   function renderCatalystWatch(sym) {
     Array.prototype.forEach.call(document.querySelectorAll('.dna-catalyst-watch[data-sym="' + sym + '"]'), function (el) {
       el.innerHTML = catalystWatchHtml(sym);
+    });
+  }
+
+  // --- AMC paper portfolio challenge (P3 UI boundary) -------------------
+  // The approved Asset Page remains authoritative for positions and DNA.
+  // This layer reads the isolated PAPER_ONLY API when it is mounted. Until
+  // the backend reports an authoritative live provider, execution controls
+  // stay locked and the figures are explicitly labelled as a live preview.
+  function livePortfolioTotals() {
+    var out = { value: 0, today: 0, pnl: 0, amc: 0, options: 0, optionPositions: 0 };
+    portfolio.forEach(function (p) {
+      var v = p.valuation, s = v && v.summary;
+      if (!s) return;
+      var value = Number(s.total_value || 0);
+      out.value += value;
+      out.today += Number(s.total_today_pnl || 0);
+      out.pnl += Number(s.total_pnl || 0);
+      out.options += Number(s.options_value || 0);
+      out.optionPositions += Number(s.options_contracts || 0) > 0 ? 1 : 0;
+      if (String(p.summary.symbol || "").toUpperCase() === "AMC") out.amc += value;
+    });
+    return out;
+  }
+
+  function paperJson(raw, fallback) {
+    if (raw == null) return fallback;
+    if (typeof raw === "object") return raw;
+    try { return JSON.parse(raw); } catch (_err) { return fallback; }
+  }
+
+  function paperMilestones() {
+    var defaults = [
+      { name: "Silver", value: 6000 }, { name: "Gold", value: 8000 },
+      { name: "Premium", value: 10000 }, { name: "Diamond", value: 15000 }
+    ];
+    var raw = paperChallenge.experiment && paperJson(paperChallenge.experiment.milestones_json, null);
+    if (!raw) return defaults;
+    if (Array.isArray(raw)) {
+      var rows = raw.map(function (x) { return { name: x.name || x.label, value: Number(x.value || x.target) }; }).filter(function (x) { return x.name && isFinite(x.value); });
+      return rows.length ? rows.sort(function (a, b) { return a.value - b.value; }) : defaults;
+    }
+    var mapped = Object.keys(raw).map(function (key) { return { name: key.charAt(0).toUpperCase() + key.slice(1), value: Number(raw[key]) }; }).filter(function (x) { return isFinite(x.value); });
+    return mapped.length ? mapped.sort(function (a, b) { return a.value - b.value; }) : defaults;
+  }
+
+  function latestPaperReport() {
+    if (!paperChallenge.reports.length) return null;
+    return paperChallenge.reports.slice().sort(function (a, b) { return String(a.report_date || "").localeCompare(String(b.report_date || "")); }).pop();
+  }
+
+  function paperApiMounted() {
+    return Boolean(paperChallenge.health && paperChallenge.health.paper_only === true && !paperChallenge.error);
+  }
+
+  function paperExecutionReady() {
+    var h = paperChallenge.health || {};
+    return paperApiMounted() && h.authoritative_provider_ready === true &&
+      h.runner_ready === true && h.global_auto_disabled !== true;
+  }
+
+  function paperTimeLeft(expiresAt) {
+    var ms = new Date(expiresAt || "").getTime() - Date.now();
+    if (!isFinite(ms)) return "no deadline";
+    if (ms <= 0) return "deadline reached";
+    var min = Math.floor(ms / 60000), sec = Math.floor((ms % 60000) / 1000);
+    return min + ":" + String(sec).padStart(2, "0") + " left";
+  }
+
+  function paperStatusClass(status) {
+    var s = String(status || "").toLowerCase();
+    if (s.indexOf("fill") >= 0 || s.indexOf("execut") >= 0) return "filled";
+    if (s.indexOf("cancel") >= 0 || s.indexOf("reject") >= 0 || s.indexOf("expir") >= 0) return "cancelled";
+    if (s.indexOf("approv") >= 0) return "approved";
+    return "pending";
+  }
+
+  function paperCurrentSnapshot() {
+    var totals = livePortfolioTotals();
+    var report = latestPaperReport();
+    var cash = paperChallenge.experiment && paperChallenge.experiment.starting_cash != null ? Number(paperChallenge.experiment.starting_cash) : 100;
+    var current = report && report.portfolio_value != null ? Number(report.portfolio_value) : totals.value + cash;
+    var high = current;
+    paperChallenge.reports.forEach(function (r) { if (r.portfolio_value != null) high = Math.max(high, Number(r.portfolio_value)); });
+    var drawdown = report && report.drawdown_pct != null ? Number(report.drawdown_pct) : (high > 0 ? (current - high) / high * 100 : 0);
+    return {
+      totals: totals, report: report, cash: cash, current: current, drawdown: drawdown,
+      amcPct: current > 0 ? totals.amc / current * 100 : 0,
+      source: report ? "frozen daily paper report" : "manual holdings + declared cash preview"
+    };
+  }
+
+  function paperProposalHtml(p) {
+    var status = p.current_status || p.status || "UNKNOWN";
+    var pending = status === "PENDING_APPROVAL";
+    var api = paperApiMounted(), ready = paperExecutionReady();
+    var approveEnabled = pending && Number(p.very_high) === 1 && ready;
+    var rejectEnabled = pending && api;
+    var modifyEnabled = pending && ready;
+    var reason = p.time_sensitive_reason || (Number(p.very_high) === 1 ? "All four evidence roots were present at proposal time." : "Evidence is incomplete; observation only until every required root is present.");
+    return '<article class="paper-proposal"><div class="paper-proposal-top"><strong><span class="paper-badge">Paper</span> ' + esc(p.symbol || "AMC") + ' · ' + esc(String(p.action || "observe").replace(/_/g, " ")) + '</strong><span class="paper-status ' + paperStatusClass(status) + '">' + esc(status.replace(/_/g, " ")) + '</span></div>' +
+      '<div class="paper-proposal-meta"><span>#' + esc(p.id) + ' · v' + esc(p.version || 1) + '</span><span>' + esc(p.mode || "APPROVAL_REQUIRED") + '</span><span class="paper-countdown" data-expires="' + esc(p.expires_at || "") + '">' + paperTimeLeft(p.expires_at) + '</span></div>' +
+      '<div class="paper-proposal-reason">' + esc(reason) + '</div>' +
+      (pending ? '<div class="paper-proposal-actions"><button data-paper-decision="approve" data-paper-id="' + esc(p.id) + '"' + (approveEnabled ? '' : ' disabled title="Requires P2A provider readiness and VERY_HIGH evidence"') + '>Approve</button><button data-paper-decision="modify" data-paper-id="' + esc(p.id) + '" data-paper-action="' + esc(p.action) + '"' + (modifyEnabled ? '' : ' disabled') + '>Modify</button><button class="danger" data-paper-decision="reject" data-paper-id="' + esc(p.id) + '"' + (rejectEnabled ? '' : ' disabled') + '>Reject</button></div>' : '') + '</article>';
+  }
+
+  function renderPaperChallenge(sym) {
+    var snap = paperCurrentSnapshot(), milestones = paperMilestones();
+    var diamond = milestones[milestones.length - 1].value;
+    var progress = diamond > 0 ? Math.max(0, Math.min(100, snap.current / diamond * 100)) : 0;
+    var next = milestones.filter(function (m) { return snap.current < m.value; })[0] || milestones[milestones.length - 1];
+    var daysLeft = Math.max(0, Math.ceil((new Date("2027-02-01T00:00:00-08:00").getTime() - Date.now()) / 86400000));
+    var readiness = paperExecutionReady(), mounted = paperApiMounted();
+    var readinessText = readiness ? "Execution ready" : mounted ? "Safety locked" : "P2A integration pending";
+    var readinessClass = readiness ? " ready" : " locked";
+    var proposals = paperChallenge.proposals.slice().sort(function (a, b) { return Number(b.id || 0) - Number(a.id || 0); }).slice(0, 5);
+    var queue = proposals.length ? proposals.map(paperProposalHtml).join("") : '<div class="paper-empty">No paper proposals yet.<br>DNA decisions will appear here with evidence and a 10-minute approval window.</div>';
+    var amc = cache.AMC, assessment = amc && amc.assess;
+    var tiers = assessment && assessment.tiers;
+    var confirm = tiers && (!tiers.confirm.empty ? tiers.confirm : tiers.timing);
+    var allHoldings = deriveHoldings();
+    var amcShares = allHoldings.shares.filter(function (x) { return x.symbol === "AMC"; });
+    var amcOptions = allHoldings.strategies.filter(function (x) { return x.symbol === "AMC"; });
+    var amcHoldingCount = amcShares.length + amcOptions.length;
+    var filing = secTopFiling(filingsBySymbol.AMC);
+    var paperActivity = paperChallenge.proposals.filter(function (p) { return /FILLED|EXECUTED/.test(p.current_status || p.status || ""); }).length + " executed · " + paperChallenge.proposals.filter(function (p) { return (p.current_status || p.status) === "PENDING_APPROVAL"; }).length + " pending";
+    var reportDate = snap.report && snap.report.report_date ? snap.report.report_date : "Live preview";
+    var trackMarks = milestones.map(function (m) { return '<i class="paper-track-mark" style="left:' + Math.min(100, m.value / diamond * 100) + '%"></i>'; }).join("");
+    var milestoneLabels = milestones.map(function (m) { return '<div class="paper-track-label' + (snap.current >= m.value ? ' reached' : '') + '">' + esc(m.name) + '<strong>' + fmtMoney(m.value) + '</strong></div>'; }).join("");
+    var apiMessage = paperChallenge.loading ? "Loading isolated paper API…" : paperChallenge.error ? "Paper API not mounted: " + paperChallenge.error : !readiness ? "P2A is correcting approval, fill persistence, and the authoritative cloud provider. Controls remain locked." : "Fresh provider verified. Every approval is still revalidated server-side.";
+    return '<section class="dna-panel paper-command" data-role="paper-command"><div class="paper-command-head"><div class="paper-command-title"><span class="paper-badge">Paper only</span><div><h2>AMC Portfolio Challenge</h2><p>January 2027 North Star · user + DNA decision journal · no broker path</p></div></div><div class="paper-head-actions"><span class="paper-badge' + readinessClass + '">' + readinessText + '</span><button type="button" disabled title="Enabled only after the P2A kill-switch endpoint is accepted">Cancel auto</button></div></div>' +
+      '<div class="paper-command-body"><div class="paper-progress"><div class="paper-kpis">' +
+        '<div class="paper-kpi"><span>Total portfolio value</span><strong>' + fmtMoney(snap.current) + '</strong><small>' + esc(snap.source) + '</small></div>' +
+        '<div class="paper-kpi"><span>Open-position P&amp;L</span><strong class="' + (snap.totals.pnl >= 0 ? 'pos' : 'neg') + '">' + fmtSigned(snap.totals.pnl) + '</strong><small>Realized ' + fmtSigned(realized) + '</small></div>' +
+        '<div class="paper-kpi"><span>Drawdown from high</span><strong class="' + (snap.drawdown < -10 ? 'neg' : '') + '">' + fmtPct(snap.drawdown) + '</strong><small>Frozen limit −25.0%</small></div>' +
+        '<div class="paper-kpi"><span>Time remaining</span><strong>' + daysLeft + ' days</strong><small>Ends Jan 31, 2027</small></div></div>' +
+        '<div class="paper-target"><div class="paper-target-top"><strong>North Star progress · ' + progress.toFixed(1) + '%</strong><span>Next: ' + esc(next.name) + ' · ' + fmtMoney(Math.max(0, next.value - snap.current)) + ' away</span></div><div class="paper-track"><div class="paper-track-fill" style="width:' + progress + '%"></div>' + trackMarks + '</div><div class="paper-track-labels">' + milestoneLabels + '</div></div>' +
+        '<div class="paper-allocation"><span><strong>AMC allocation ' + snap.amcPct.toFixed(1) + '%</strong><br><em>Strategic floor 30% while campaign confidence remains intact</em></span><span class="paper-status ' + (snap.amcPct >= 30 ? 'filled' : 'pending') + '">' + (snap.amcPct >= 30 ? 'Floor held' : 'Review needed') + '</span></div></div>' +
+      '<div class="paper-queue"><div class="paper-section-head"><strong>Decision queue</strong><span>' + proposals.length + ' recent proposals</span></div><div class="paper-proposals">' + queue + '</div><div class="paper-lock-note">' + esc(apiMessage) + '</div><div class="paper-api-msg" data-role="paper-api-message"></div></div>' +
+      '<div class="paper-daily"><div class="paper-section-head"><strong>Daily AMC report · ' + esc(reportDate) + '</strong><span>evidence first · outcomes remain append-only</span></div><div class="paper-daily-grid">' +
+        '<div class="paper-daily-item"><span>Portfolio progress</span><strong>' + fmtMoney(snap.current) + ' · ' + progress.toFixed(1) + '% of Diamond</strong><small>Today ' + fmtSigned(snap.totals.today) + ' · cash assumption ' + fmtMoney(snap.cash) + '</small></div>' +
+        '<div class="paper-daily-item"><span>AMC campaign</span><strong>' + esc(assessment ? assessment.headline : "Awaiting DNA state") + '</strong><small>' + esc(assessment ? assessment.why : "No authoritative campaign read available.") + '</small></div>' +
+        '<div class="paper-daily-item"><span>Decision window</span><strong>' + esc(confirm && !confirm.empty ? confirm.tier.label + " · " + confirm.text : "Waiting for confirmation") + '</strong><small>' + esc(confirm && !confirm.empty ? tfLabel(confirm.lead.timeframe) + " health " + (confirm.lead.health == null ? "—" : confirm.lead.health + "%") : "No current confirmation timeframe") + '</small></div>' +
+        '<div class="paper-daily-item"><span>Position decisions</span><strong>' + amcHoldingCount + ' AMC holdings · ' + amcOptions.length + ' option lines</strong><small>' + esc(selected === "AMC" && selectedHolding ? "Position Manager is tracking the selected holding." : "Select a holding for contract-specific navigation.") + '</small></div>' +
+        '<div class="paper-daily-item"><span>Contract efficiency / catalyst</span><strong>' + snap.totals.optionPositions + ' option positions under observation</strong><small>' + esc(filing ? filing.form + " · " + secFilingLabel(filing) : "No new high-priority SEC filing in the loaded window.") + '</small></div>' +
+        '<div class="paper-daily-item"><span>Paper actions / baseline</span><strong>' + esc(paperActivity) + '</strong><small>' + (snap.report && snap.report.progress_vs_baseline != null ? 'Frozen baseline delta ' + fmtPct(Number(snap.report.progress_vs_baseline)) : 'Awaiting the first frozen daily report for benchmark comparison.') + '</small></div>' +
+      '</div></div></div></section>';
+  }
+
+  function updatePaperCountdowns() {
+    Array.prototype.forEach.call(document.querySelectorAll(".paper-countdown[data-expires]"), function (el) { el.textContent = paperTimeLeft(el.dataset.expires); });
+  }
+
+  function paperMessage(text, bad) {
+    var el = document.querySelector('[data-role="paper-api-message"]');
+    if (!el) return;
+    el.textContent = text || "";
+    el.style.color = bad ? "var(--critical)" : "var(--positive)";
+  }
+
+  function paperMutation(proposalId, decision, existingAction) {
+    var body = null, endpoint = decision;
+    if (decision === "modify") {
+      var action = window.prompt("Paper action: hold, open, add, partial_reduce, close, or roll", existingAction || "partial_reduce");
+      if (action == null) return;
+      action = action.trim().toLowerCase();
+      if (["hold","open","add","partial_reduce","close","roll"].indexOf(action) < 0) { paperMessage("Unknown paper action.", true); return; }
+      var reason = window.prompt("Why is this time-sensitive?", "User-adjusted paper proposal");
+      if (reason == null) return;
+      body = { action: action, time_sensitive_reason: reason, idempotency_key: "ui-modify-" + proposalId + "-" + Date.now() };
+    }
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    paperMessage("Submitting paper decision…", false);
+    fetch(base + "/paper/proposals/" + encodeURIComponent(proposalId) + "/" + endpoint, {
+      method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+      body: body ? JSON.stringify(body) : "{}"
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.detail || d.error || "HTTP " + r.status); return d; }); })
+      .then(function () { paperMessage("Decision recorded. Refreshing queue…", false); loadPaperChallenge(true); })
+      .catch(function (err) { paperMessage("Paper decision blocked: " + err.message, true); });
+  }
+
+  function wirePaperControls() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-paper-decision]"), function (button) {
+      button.addEventListener("click", function () { paperMutation(button.dataset.paperId, button.dataset.paperDecision, button.dataset.paperAction); });
+    });
+    if (paperCountdownTimer) clearInterval(paperCountdownTimer);
+    paperCountdownTimer = setInterval(updatePaperCountdowns, 1000);
+    updatePaperCountdowns();
+  }
+
+  function refreshPaperChallengeDom() {
+    var old = document.querySelector('[data-role="paper-command"]');
+    if (!old) return;
+    var holder = document.createElement("div");
+    holder.innerHTML = renderPaperChallenge(selected || "AMC");
+    old.replaceWith(holder.firstElementChild);
+    wirePaperControls();
+  }
+
+  function loadPaperChallenge(force) {
+    if (paperChallenge.loading && !force) return;
+    var base = baseInput.value.trim().replace(/\/$/, ""), seq = ++paperChallenge.seq;
+    paperChallenge.loading = true;
+    var request = function (path, auth) {
+      return fetch(base + path, { headers: auth ? authHeaders() : {} }).then(function (r) { if (!r.ok) throw new Error(path + " returned HTTP " + r.status); return r.json(); });
+    };
+    request("/paper/health", false).then(function (health) {
+      if (seq !== paperChallenge.seq) return null;
+      paperChallenge.health = health;
+      if (health.active_experiment_id != null && isFinite(Number(health.active_experiment_id))) {
+        paperExperimentId = Number(health.active_experiment_id);
+        localStorage.setItem("dna_paper_experiment_id", String(paperExperimentId));
+      }
+      return Promise.all([
+        request("/paper/experiments/" + paperExperimentId, true).catch(function () { return null; }),
+        request("/paper/proposals", true).catch(function () { return []; }),
+        request("/paper/reports", true).catch(function () { return []; })
+      ]);
+    }).then(function (rows) {
+      if (seq !== paperChallenge.seq || rows == null) return;
+      paperChallenge.experiment = rows[0];
+      paperChallenge.proposals = Array.isArray(rows[1]) ? rows[1] : [];
+      paperChallenge.reports = Array.isArray(rows[2]) ? rows[2] : [];
+      paperChallenge.error = null;
+    }).catch(function (err) {
+      if (seq !== paperChallenge.seq) return;
+      paperChallenge.health = null;
+      paperChallenge.error = err.message || "unavailable";
+    }).finally(function () {
+      if (seq !== paperChallenge.seq) return;
+      paperChallenge.loading = false;
+      refreshPaperChallengeDom();
     });
   }
 
@@ -1488,8 +1784,9 @@
 
     var radar = assets.filter(function (x) { return x.symbol !== sym; }).map(function (x) { var rc = cache[x.symbol], ra = rc && rc.assess; var rs = rc ? rc.states : []; var quick = ["15","60","240","D"].map(function (tf) { var row = rs.filter(function (r) { return String(r.timeframe) === tf; })[0]; return '<span class="dna-radar-tf ' + (row ? toneClass(phaseTone(row.phase)) : 'warn') + '">' + tfLabel(tf) + '</span>'; }).join(""); return '<button type="button" class="dna-radar-item" data-sym="' + x.symbol + '"><span class="dna-radar-top"><strong>' + x.symbol + '</strong><span class="dna-pill ' + (ra && ra.level === 'critical' ? 'red' : ra && ra.level === 'opportunity' ? 'green' : '') + '">' + (ra ? ra.headline : 'Loading') + '</span></span><span class="dna-radar-tfs">' + quick + '</span></button>'; }).join("");
     var radarHtml = '<section class="dna-panel"><div class="stage-head"><h2>Portfolio campaign radar</h2><span class="hint">quick multi-timeframe view across tracked assets</span></div><div class="dna-radar">' + radar + '</div></section>';
+    var paperCommand = renderPaperChallenge(sym);
 
-    return '<div class="dna-page">' + radarHtml + decision + portfolioBand + '<div class="dna-workspace">' + manager + chart + '</div>' + middle + progression + '<p class="note"><strong>Evidence boundary:</strong> this page translates live database state and manual position records into advisory navigation. It does not place orders, and reconstructed backfill remains visually distinct in the timeframe table.</p></div>';
+    return '<div class="dna-page">' + radarHtml + decision + portfolioBand + paperCommand + '<div class="dna-workspace">' + manager + chart + '</div>' + middle + progression + '<p class="note"><strong>Evidence boundary:</strong> live positions and DNA state remain distinct from the isolated paper experiment. Every simulated action is labelled PAPER, requires server-side evidence reconstruction, and never reaches a broker.</p></div>';
   }
 
   // Everything for one expanded asset row: verdict, open-position control,
@@ -1681,6 +1978,28 @@
       .then(function (d) { if (d && d.bars) ohlcCache[key] = d; return d; });
   }
 
+  // Live underlying close (near-real-time webhook close) for a symbol, or null
+  // when no open valuation supplies one. Used to overlay the current price on
+  // the chart so its reference price matches the header instead of lagging the
+  // Massive daily close.
+  function liveUnderlyingCurrent(sym) {
+    var current = null;
+    portfolio.some(function (p) {
+      if (p.summary.symbol === sym && p.valuation && p.valuation.underlying &&
+          p.valuation.underlying.current != null) {
+        current = p.valuation.underlying.current;
+        return true;
+      }
+      return false;
+    });
+    if (current != null) return current;
+    var c2 = cache[sym];
+    var states = (c2 && c2.states) || [];
+    var latest = states.slice().sort(function (a, b) { return tfKey(a.timeframe) - tfKey(b.timeframe); })
+      .filter(function (s) { return s.close != null; })[0];
+    return latest ? latest.close : null;
+  }
+
   function drawChart(sym) {
     var drawId = ++chartDrawSeq;
     var container = document.querySelector('.chart-container[data-sym="' + sym + '"]');
@@ -1840,6 +2159,10 @@
         }
         var lastB = bars[bars.length - 1];
         refs.push({ price: lastB.c, color: c.accent, style: LightweightCharts.LineStyle.Dashed, title: "close " + lastB.c.toFixed(2) });
+        var liveCur = liveUnderlyingCurrent(sym);
+        if (liveCur != null && Math.abs(Number(liveCur) - Number(lastB.c)) > 1e-9) {
+          refs.push({ price: liveCur, color: c.accent, style: LightweightCharts.LineStyle.Solid, title: "current " + Number(liveCur).toFixed(2) });
+        }
       }
 
       if (markers.length) {
@@ -1852,7 +2175,15 @@
       chartCtl.chart.timeScale().fitContent();
 
       var label = mode === "option" ? ticker : sym;
-      if (statusEl2) statusEl2.textContent = label + " · " + tfLbl + " · " + bars.length + " bars · source: massive" + (d.cached ? " (cached)" : "");
+      var statusNote = "";
+      if (mode === "underlying") {
+        var liveCur2 = liveUnderlyingCurrent(sym);
+        var lastC = bars.length ? bars[bars.length - 1].c : null;
+        if (liveCur2 != null && lastC != null && Math.abs(Number(liveCur2) - Number(lastC)) > 1e-9) {
+          statusNote = " · live $" + Number(liveCur2).toFixed(2) + " · candles delayed ~1d (Massive)";
+        }
+      }
+      if (statusEl2) statusEl2.textContent = label + " · " + tfLbl + " · " + bars.length + " bars · source: massive" + (d.cached ? " (cached)" : "") + statusNote;
     }
   }
 
@@ -1919,6 +2250,38 @@
     });
   }
 
+  function loadPionex() {
+    var el = document.querySelector('[data-role="pionex"]');
+    if (!el) return;
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    fetch(base + "/portfolio/pionex", { headers: authHeaders() })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .catch(function () { return null; })
+      .then(function (d) {
+        var body = el.querySelector(".pionex-body");
+        if (!body) return;
+        if (!d || !Array.isArray(d.balances)) {
+          body.innerHTML = '<div class="dna-news-empty">Pionex spot wallet unavailable.</div>';
+          return;
+        }
+        var rows = d.balances.slice(0, 12).map(function (b) {
+          var total = Number(b.total);
+          var qty = isFinite(total) ? total.toLocaleString(undefined, { maximumFractionDigits: 6 }) : "—";
+          var value = b.value_usd == null ? "—" : fmtMoney(Number(b.value_usd));
+          return '<div class="pionex-row"><span class="pionex-coin">' + esc(b.coin) + '</span>' +
+            '<span class="pionex-qty tabular">' + qty + '</span>' +
+            '<span class="pionex-val tabular">' + value + '</span></div>';
+        }).join("");
+        var totalValue = Number(d.total_value_usd);
+        var unpriced = Array.isArray(d.unpriced_coins) && d.unpriced_coins.length
+          ? '<span class="pionex-unpriced"> · unpriced: ' + d.unpriced_coins.map(esc).join(", ") + '</span>' : '';
+        body.innerHTML = '<div class="pionex-total"><span>Spot wallet total</span><b>' +
+          (isFinite(totalValue) ? fmtMoney(totalValue) : "—") + '</b></div>' +
+          '<div class="pionex-list">' + (rows || '<div class="dna-news-empty">No spot balances reported.</div>') + '</div>' +
+          '<div class="pionex-note">Trading-account balances only; Pionex bot and earn balances are not exposed by this API.' + unpriced + '</div>';
+      });
+  }
+
   function paint() {
     app.innerHTML = selected ? renderApprovedAsset(selected) : renderAssetList();
     wirePortfolio();
@@ -1934,6 +2297,26 @@
     if (selected) drawChart(selected);
     populateChainSuggestions();
     loadNewsStream();
+    loadFilings();
+    loadPionex();
+    wirePaperControls();
+    loadPaperChallenge(false);
+  }
+
+  // Pull SEC filing watch state for every open asset's Catalyst Watch box.
+  // The endpoint is read-only (SQLite); it never triggers a poll.
+  function loadFilings() {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    Array.prototype.forEach.call(document.querySelectorAll(".dna-catalyst-watch[data-sym]"), function (el) {
+      var sym = el.dataset.sym;
+      fetch(base + "/filings/" + encodeURIComponent(sym), { headers: authHeaders() })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .catch(function (err) { return { configured: false, error: err && err.message ? err.message : "unavailable" }; })
+        .then(function (d) {
+          filingsBySymbol[sym] = d;
+          renderCatalystWatch(sym);
+        });
+    });
   }
 
   function loadSymbol(sym, repaint) {

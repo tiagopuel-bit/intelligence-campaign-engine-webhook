@@ -1,0 +1,20 @@
+{
+  "version": "1.2",
+  "status": "PRE_ACTIVATION_POLICY_CORRECTION",
+  "supersedes": "1.1",
+  "superseded_sha256": "cdbaec667761bc83fcee3e5ed3988cd54d84a01350b25127f4f8309b110fcc44",
+  "provenance": "policy_v1.json (7688b012…) and policy_corrections_v1.1.json (cdbaec66…) remain frozen; this record versions a further pre-activation safety correction without rewriting them.",
+  "corrections": [
+    {"id": "explicit_source_allowlists", "description": "live and delayed sources are explicit allowlists; any unknown source is a veto, never silently treated as live"},
+    {"id": "claim_enforces_all_gates", "description": "atomic due-proposal claiming independently enforces auto mode, VERY_HIGH, allowed action, active experiment, and kill switches"},
+    {"id": "instrument_type_multiplier", "description": "contract multiplier is derived from instrument type (CALL/PUT 100x, SHARE 1x), not a caller default"},
+    {"id": "scenario_close_reduce_triggers", "description": "close/reduce require a pre-registered scenario trigger; unknown/absent triggers fail closed"},
+    {"id": "fail_closed_malformed_numerics", "description": "malformed or non-finite evidence numerics fail closed rather than crashing or passing"}
+  ],
+  "live_sources": ["live", "live_webhook", "live_contract_bar", "heartbeat"],
+  "delayed_sources": ["delayed", "massive", "delayed_provider_bar"],
+  "close_reduce_triggers": {
+    "close": ["DRAW_DOWN_PROTECTION", "CAMPAIGN_BREAK", "CONFIDENCE_WITHDRAWN", "TIME_DECAY_EXPIRY", "USER_DIRECTED"],
+    "partial_reduce": ["DRAW_DOWN_PROTECTION", "EXPOSURE_CAP", "USER_DIRECTED"]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "status": "FROZEN_APPROVED_V1",
+  "approved_at": "2026-08-14T00:00:00-07:00",
+  "paper_only": true,
+  "program": "January 2027 Portfolio Challenge",
+  "symbol": "AMC",
+  "timezone": "America/Los_Angeles",
+  "approval_window_seconds": 600,
+  "auto_mode": "AUTO_IF_VERY_HIGH_PAPER",
+
+  "chronology": {
+    "start": {"value": "first verified AMC 1-minute heartbeat after activation and atomic portfolio snapshot", "confirmation_status": "APPROVED"},
+    "end": {"value": "2027-01-31T16:00:00-08:00", "note": "January 31 2027 market close, America/Los_Angeles", "confirmation_status": "APPROVED"}
+  },
+
+  "starting_portfolio": {
+    "holdings": {"value": "immutable snapshot of live holdings at activation", "confirmation_status": "APPROVED"},
+    "cash": {"value": 100.00, "confirmation_status": "APPROVED"},
+    "valuation_method": {"value": "marked market value via the valuation endpoint", "confirmation_status": "APPROVED"}
+  },
+
+  "milestones": {
+    "measure": "total_portfolio_value",
+    "primary_target_tier": {"value": "Diamond", "confirmation_status": "APPROVED"},
+    "tiers": [
+      {"name": "Silver", "target_total_value_usd": 6000, "confirmation_status": "APPROVED"},
+      {"name": "Gold", "target_total_value_usd": 8000, "confirmation_status": "APPROVED"},
+      {"name": "Premium", "target_total_value_usd": 10000, "confirmation_status": "APPROVED"},
+      {"name": "Diamond", "target_total_value_usd": 15000, "confirmation_status": "APPROVED"}
+    ]
+  },
+
+  "allocation_limits": {
+    "amc_target_floor_pct": {"value": 30, "confirmation_status": "APPROVED"},
+    "amc_max_new_allocation_pct": {"value": 70, "confirmation_status": "APPROVED"},
+    "total_options_max_pct": {"value": 50, "confirmation_status": "APPROVED"},
+    "single_expiration_max_pct": {"value": 25, "confirmation_status": "APPROVED"},
+    "single_contract_max_pct": {"value": 15, "confirmation_status": "APPROVED"},
+    "grandfathering": "immutable starting holdings are grandfathered; no forced opening trade or liquidation to satisfy a newly introduced boundary"
+  },
+
+  "risk_limits": {
+    "max_drawdown_pct": {"value": 25, "confirmation_status": "APPROVED"},
+    "max_daily_paper_loss_pct": {"value": 5, "confirmation_status": "APPROVED"},
+    "max_paper_auto_executions_per_day": {"value": 3, "confirmation_status": "APPROVED"},
+    "auto_shutdown_consecutive_failed_revalidations": {"value": 3, "confirmation_status": "APPROVED"}
+  },
+
+  "deposits_withdrawals": {
+    "policy": {"value": "ALLOWED_TRACKED_SEPARATELY", "note": "recorded separately and excluded from trading performance", "confirmation_status": "APPROVED"}
+  },
+
+  "actions": {
+    "allowed": ["hold", "add", "open", "partial_reduce", "close", "roll"],
+    "confirmation_status": "APPROVED"
+  },
+
+  "benchmarks": {
+    "value": [
+      "frozen starting portfolio",
+      "AMC share buy-and-hold",
+      "actual user-managed path",
+      "DNA paper-managed path"
+    ],
+    "confirmation_status": "APPROVED"
+  },
+
+  "observation": {
+    "min_proposals": {"value": 30, "confirmation_status": "APPROVED"},
+    "min_paper_auto_executions": {"value": 10, "confirmation_status": "APPROVED"}
+  },
+
+  "confidence": {"status": "INTACT"},
+
+  "pending_confirmations": []
+}

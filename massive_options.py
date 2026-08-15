@@ -172,11 +172,15 @@ def get_option_quote(symbol: str, contract_type: str, strike: float, expiration:
 
 
 def _shape_bars(rows: list[dict]) -> list[dict]:
-    """Normalize raw Massive bars to {t,o,h,l,c,v}, ascending + duplicate-free."""
-    bars = [
-        {"t": int(r["t"]), "o": r["o"], "h": r["h"], "l": r["l"], "c": r["c"], "v": r["v"]}
-        for r in rows
-    ]
+    """Normalize aggregates, preserving optional VWAP/transaction count."""
+    bars = []
+    for r in rows:
+        bar = {"t": int(r["t"]), "o": r["o"], "h": r["h"], "l": r["l"], "c": r["c"], "v": r["v"]}
+        if r.get("vw") is not None:
+            bar["vw"] = r["vw"]
+        if r.get("n") is not None:
+            bar["n"] = r["n"]
+        bars.append(bar)
     bars.sort(key=lambda b: b["t"])
     seen: set[int] = set()
     out: list[dict] = []

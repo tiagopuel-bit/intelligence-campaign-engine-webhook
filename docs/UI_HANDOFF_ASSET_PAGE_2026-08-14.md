@@ -17,6 +17,26 @@ Current live sections:
 - Trade Progression
 - Empty News Stream / Media Sources placeholder
 
+New PAPER_ONLY challenge surface (local, not deployed):
+
+- AMC Portfolio Challenge North Star through January 31, 2027
+- Silver $6,000 / Gold $8,000 / Premium $10,000 / Diamond $15,000 milestones
+- total value, open-position P&L, realized P&L, drawdown, time remaining and
+  AMC allocation versus the frozen 30% strategic floor
+- decision queue with PAPER badges, lifecycle status, evidence reason and
+  second-by-second approval countdown
+- Approve / Modify / Reject controls wired to the authenticated `/paper/*`
+  API boundary
+- six-part daily AMC brief: portfolio, campaign, decision window, position
+  decisions, contract/catalyst context and paper actions versus baseline
+
+The challenge controls fail closed. They are disabled unless
+`GET /paper/health` returns `paper_only: true` and
+`authoritative_provider_ready: true`. If the Blueprint is not mounted or the
+P2A cloud provider is blocked, the dashboard still renders the challenge using
+the current manual holdings plus the declared $100 cash as a clearly labelled
+preview, but it cannot approve or modify an execution.
+
 The dashboard defaults to AMC when AMC exists in `/assets`.
 
 ## Changes in the latest UI pass
@@ -109,10 +129,13 @@ For News Stream, build only the visual/data boundary until a verified source is 
 - No Pine, DNA engine, webhook ingestion, Railway database schema, alert, or research artifact changes unless separately authorized.
 - Preserve RAW/HA provenance and reconstructed/live distinctions wherever shown.
 - No deployment without explicit user authorization.
+- The Portfolio Challenge is a simulated decision journal. It never calls a
+  broker endpoint and never mutates the user's manual/live position records.
+- The UI never submits `very_high`, evidence, freshness, price source,
+  execution price, policy eligibility or mode; those remain server-owned.
 
 ## Verification command
 
 ```bash
 PYTHONPYCACHEPREFIX=/tmp/dna_dashboard_verify python3 -m unittest discover -s tests -v
 ```
-

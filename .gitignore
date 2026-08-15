@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.pyo
 dna_alerts.db*
+paper_execution/*.db*
 *.log
 .env
 *.pem

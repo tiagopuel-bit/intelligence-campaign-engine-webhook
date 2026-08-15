@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "status": "EXPERIMENTAL_HEURISTIC_PRE_REGISTERED",
+  "paper_only": true,
+  "declared_not_validated": true,
+  "options_dna_relationship": "none for VERY_HIGH; the CALL/14 CONFIRMATION_FAILURE finding is HISTORICAL_RESEARCH_FINDING_NEEDS_EXTERNAL_REPLICATION and is explicitly excluded from eligibility",
+  "position_management_relationship": "BLOCKED_INSUFFICIENT_REPLAY_COVERAGE; any open-position policy below is EXPERIMENTAL_HEURISTIC",
+  "allowed_modes": ["ADVISORY_ONLY", "APPROVAL_REQUIRED", "AUTO_IF_VERY_HIGH_PAPER", "PROTECTION_ONLY_PAPER"],
+  "only_auto_mode": "AUTO_IF_VERY_HIGH_PAPER",
+  "approval_window_seconds": 600,
+  "kill_switch_wins_over_timer": true,
+  "very_high_requires_all_four_roots": true,
+  "very_high_roots": {
+    "underlying_dna": {
+      "named_timeframe_agreement": "confirmation (60/120) and timing (15/30) tiers share tone",
+      "no_disqualifying_conflict": "no FAIL/FAIL TEST on Direction, Campaign, or Confirmation tiers",
+      "event_recency_max_minutes": 720,
+      "causal_fields": ["state.phase", "state.recent_event", "state.bar_time"]
+    },
+    "contract_response": {
+      "active_print_required": "non-zero causal contract option_return at the decision bar",
+      "min_matched_history_bars": 12,
+      "min_activity_ratio": 0.50,
+      "no_unchanged_print_inference": true,
+      "no_missing_bar_as_evidence": true,
+      "causal_fields": ["contract.option_return", "contract.volume_ratio", "contract.range_expansion", "contract.activity_ratio"]
+    },
+    "execution_quality": {
+      "max_bar_staleness_minutes": 15,
+      "price_reference": "latest recorded bar close (no bid/ask, no midpoint, no real-time quote)",
+      "no_stale_or_ambiguous_quote": true,
+      "causal_fields": ["state.bar_time", "bar.close"]
+    },
+    "portfolio_risk": {
+      "reduction_requires_existing_position": true,
+      "exposure_limits_checked": true,
+      "duplicate_order_check": true,
+      "conflict_order_check": true,
+      "daily_loss_limit_checked": true,
+      "causal_fields": ["positions", "valuation", "proposal_ledger"]
+    }
+  },
+  "action_policies": {
+    "hold": {"mode": "ADVISORY_ONLY", "no_order_required": true},
+    "open": {"mode": "APPROVAL_REQUIRED", "requires": ["underlying_dna", "execution_quality", "portfolio_risk"], "time_sensitive_reason": "new campaign evidence"},
+    "add": {"mode": "APPROVAL_REQUIRED", "requires": ["underlying_dna", "contract_response", "execution_quality", "portfolio_risk"], "time_sensitive_reason": "confirmation of an existing campaign"},
+    "partial_reduce": {"mode": "APPROVAL_REQUIRED", "requires": ["portfolio_risk", "execution_quality"], "risk_reducing": true},
+    "close": {"mode": "APPROVAL_REQUIRED", "requires": ["portfolio_risk", "execution_quality"], "risk_reducing": true},
+    "roll": {"mode": "APPROVAL_REQUIRED", "requires": ["underlying_dna", "contract_response", "execution_quality", "portfolio_risk"], "two_leg_decision": true, "time_sensitive_reason": "expiry/time-decay pressure"}
+  },
+  "very_high_auto_actions": ["partial_reduce", "close"],
+  "fill_model": {
+    "paper_only": true,
+    "price_reference": "latest available option aggregate bar close at revalidation time",
+    "conservative_declared": "delayed bar-close fill; no bid/ask, no midpoint, no spread, no fee, no slippage",
+    "missing_price": "UNSCORABLE_EXECUTION_DATA",
+    "roll_fill": "two legs each require their own price reference; otherwise UNSCORABLE_EXECUTION_DATA"
+  },
+  "vetoes": {
+    "sec_catalyst": "independent veto or policy modifier, never folded into a score",
+    "conflicting_order": "veto",
+    "stale_input": "veto",
+    "missing_contract_bar": "veto, never inferred"
+  },
+  "catalyst_policy": {
+    "source": "SEC PUBLIC_ACCEPTANCE filings",
+    "role": "urgency/context modifier or independent veto; never a directional root"
+  },
+  "milestones": {
+    "measure": "Total Portfolio Value only (not AMC-only value, option premium, realized P&L, or cumulative trade proceeds)",
+    "tiers": [
+      {"name": "Silver", "target_total_value_usd": 6000},
+      {"name": "Gold", "target_total_value_usd": 8000},
+      {"name": "Premium", "target_total_value_usd": 10000},
+      {"name": "Diamond", "target_total_value_usd": 15000}
+    ],
+    "diamond_assumption": "Diamond recorded as $15,000 from user shorthand '15$'; PENDING_CONFIRMATION before freezing the goal contract",
+    "tier_cannot": ["change execution eligibility", "loosen risk limits", "encourage additional trades merely because the deadline approaches"],
+    "daily_report": ["highest achieved tier", "distance to next tier", "progress versus do-nothing baseline"]
+  },
+  "strategic_allocation": {
+    "amc_target_floor_pct_of_total_value": 30,
+    "numerator": "marked market value of AMC shares plus AMC option positions",
+    "delta_equivalent": "report later only if trustworthy Greeks become available; never invent now",
+    "floor_is_strategic_target_not_order": true,
+    "below_floor_behavior": "report the gap and evaluate an action; never auto-buy solely to restore the percentage",
+    "suspension_conditions": [
+      "the versioned DNA campaign-break definition is objectively satisfied",
+      "the AI records a structured CONFIDENCE_WITHDRAWN decision with evidence",
+      "the user explicitly records agreement",
+      "any reduction still passes the normal proposal/revalidation workflow"
+    ],
+    "confidence_states": ["INTACT", "CONFIDENCE_WITHDRAWN", "DECISION_REQUIRED", "DISAGREEMENT"],
+    "dna_damage_without_user_agreement": "position becomes DECISION_REQUIRED and unattended exposure-increasing orders are prohibited",
+    "user_lost_confidence_without_dna_confirmation": "record the disagreement and require manual approval for changes",
+    "cash_is_valid_allocation": true,
+    "upper_bounds_still_required": "maximum AMC allocation and option-risk cap must still be defined in the goal contract"
+  },
+  "data_freshness": {
+    "massive_feed_is_not_real_time": true,
+    "statuses": ["LIVE_CONTRACT_BAR", "DELAYED_PROVIDER_BAR", "STALE_CONTRACT_DATA", "NO_LIVE_CONTRACT_SOURCE"],
+    "underlying_heartbeat_pending": "separate smallest task + acceptance test; no Pine change inside P0",
+    "option_premium_freshness_unsolved_by_underlying_heartbeat": true,
+    "delayed_option_aggregate_close_labelled_delayed": true,
+    "no_silent_fallback_from_live_bar_to_delayed_close": true,
+    "stale_option_resolution": ["BLOCKED_STALE_OPTION_QUOTE", "UNSCORABLE_EXECUTION_DATA"],
+    "no_real_time_option_order_path_until_bid_ask_verified": true
+  },
+  "option_watchlist": {
+    "do_not_stream_full_chain": true,
+    "categories": ["HELD", "ENTRY_CANDIDATE", "ROLL_CANDIDATE", "EXIT_WATCH"],
+    "provisional_capacity": "all held contracts + no more than 3 entry candidates + 2 roll candidates",
+    "required_fields_per_contract": [
+      "canonical option ticker, underlying, type, strike, expiration",
+      "watch reason, linked position/proposal, priority",
+      "created/last-needed/expires timestamps",
+      "latest causal OHLCV bar timestamp and source",
+      "data age and session",
+      "active/paused/stale/error status",
+      "automatic retirement rule"
+    ]
+  }
+}

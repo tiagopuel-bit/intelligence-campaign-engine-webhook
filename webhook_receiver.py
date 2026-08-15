@@ -42,7 +42,14 @@ import requests
 
 import massive_ohlc
 import massive_options
+import pionex_bridge
 import positions
+import sec_filings
+from paper_execution import db as paper_db
+from paper_execution.activation import activate_if_ready
+from paper_execution.api import create_blueprint as create_paper_blueprint
+from paper_execution.cloud_state import cloud_state_provider
+from paper_execution.runner import run_once as run_paper_once
 
 
 # -- Database path -----------------------------------------------------------
@@ -56,6 +63,17 @@ def resolve_db_path() -> Path:
 
 
 DB_PATH = resolve_db_path()
+
+
+def resolve_paper_db_path() -> Path:
+    if os.environ.get("PAPER_DATABASE_PATH"):
+        return Path(os.environ["PAPER_DATABASE_PATH"]).expanduser()
+    if os.environ.get("RAILWAY_VOLUME_MOUNT_PATH"):
+        return Path(os.environ["RAILWAY_VOLUME_MOUNT_PATH"]) / "paper.db"
+    return Path(__file__).parent / "paper_execution" / "paper.db"
+
+
+PAPER_DB_PATH = resolve_paper_db_path()
 
 # -- Auth configuration ------------------------------------------------------
 
@@ -200,7 +218,39 @@ def init_db():
     """)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_positions_symbol_status ON positions(symbol, status)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_instruments_position ON position_instruments(position_id)")
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS underlying_heartbeats (
+            symbol TEXT NOT NULL,
+            timeframe TEXT NOT NULL,
+            bar_time INTEGER NOT NULL,
+            close REAL NOT NULL,
+            session TEXT NOT NULL DEFAULT 'UNKNOWN',
+            source TEXT NOT NULL,
+            received_at TEXT NOT NULL,
+            PRIMARY KEY (symbol, bar_time)
+        )
+    """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS option_heartbeats (
+            instrument_ref TEXT NOT NULL,
+            position_ref TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            ticker TEXT NOT NULL,
+            timeframe TEXT NOT NULL,
+            bar_time INTEGER NOT NULL,
+            close REAL NOT NULL,
+            option_return REAL,
+            matched_bars INTEGER NOT NULL,
+            activity_ratio REAL NOT NULL,
+            volume REAL,
+            session TEXT NOT NULL DEFAULT 'UNKNOWN',
+            source TEXT NOT NULL,
+            received_at TEXT NOT NULL,
+            PRIMARY KEY (instrument_ref, bar_time)
+        )
+    """)
     _ensure_alert_columns(conn)
+    sec_filings.ensure_schema(conn)
     conn.commit()
     conn.close()
 
@@ -359,6 +409,88 @@ def _parse_str_or_none(value) -> str | None:
     return str(value)
 
 
+def _record_price_heartbeat(conn, payload: dict, now: str):
+    """Persist an explicit TradingView heartbeat without creating a DNA event.
+
+    Heartbeats must be emitted on every 1-minute bar by the separate relay
+    script. Ordinary DNA event alerts never enter these tables.
+    """
+    kind = str(payload.get("kind") or "").strip().upper()
+    if kind not in {"UNDERLYING_HEARTBEAT", "OPTION_HEARTBEAT"}:
+        return None
+    symbol = str(payload.get("symbol") or "").strip().upper()
+    timeframe = str(payload.get("timeframe") or "").strip().lower()
+    close = _parse_float_or_none(payload.get("close"))
+    try:
+        bar_time = int(payload.get("time"))
+    except (TypeError, ValueError):
+        bar_time = 0
+    if not symbol or timeframe not in {"1", "1m"} or close is None or close <= 0 or bar_time <= 0:
+        return jsonify({"error": "heartbeat requires symbol, 1m timeframe, positive close and epoch-ms time"}), 400
+    if bar_time > int(datetime.now(timezone.utc).timestamp() * 1000) + 60_000:
+        return jsonify({"error": "future heartbeat timestamp rejected"}), 400
+    if kind == "UNDERLYING_HEARTBEAT":
+        session = str(payload.get("session") or "UNKNOWN").strip().upper()
+        conn.execute(
+            "INSERT INTO underlying_heartbeats (symbol,timeframe,bar_time,close,session,source,received_at) "
+            "VALUES (?,?,?,?,?,?,?) ON CONFLICT(symbol,bar_time) DO UPDATE SET "
+            "close=excluded.close, received_at=excluded.received_at",
+            (symbol, timeframe, bar_time, close, session, "live_webhook", now),
+        )
+        conn.commit()
+        _paper_tick_safely()
+        return jsonify({"status": "heartbeat_recorded", "kind": kind, "symbol": symbol, "bar_time": bar_time})
+
+    position_ref = str(payload.get("position_ref") or "").strip()
+    instrument_ref = str(payload.get("instrument_ref") or "").strip()
+    ticker = str(payload.get("ticker") or "").strip().upper()
+    if not position_ref.isdigit() or not instrument_ref.isdigit() or not ticker:
+        return jsonify({"error": "option heartbeat requires numeric position_ref/instrument_ref and ticker"}), 400
+    exact = conn.execute(
+        "SELECT i.id FROM positions p JOIN position_instruments i ON i.position_id=p.id "
+        "WHERE p.id=? AND i.id=? AND p.symbol=? AND p.status='OPEN' AND i.status='OPEN' "
+        "AND i.instrument_type IN ('CALL','PUT')",
+        (int(position_ref), int(instrument_ref), symbol),
+    ).fetchone()
+    if exact is None:
+        return jsonify({"error": "option heartbeat does not match an open option instrument"}), 409
+    option_return = _parse_float_or_none(payload.get("option_return"))
+    activity_ratio = _parse_float_or_none(payload.get("activity_ratio"))
+    volume = _parse_float_or_none(payload.get("volume"))
+    session = str(payload.get("session") or "UNKNOWN").strip().upper()
+    try:
+        matched_bars = max(0, int(payload.get("matched_bars", 0)))
+    except (TypeError, ValueError):
+        matched_bars = 0
+    if activity_ratio is None or not 0 <= activity_ratio <= 1:
+        return jsonify({"error": "option heartbeat requires activity_ratio between 0 and 1"}), 400
+    conn.execute(
+        "INSERT INTO option_heartbeats (instrument_ref,position_ref,symbol,ticker,timeframe,bar_time,close,"
+        "option_return,matched_bars,activity_ratio,volume,session,source,received_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(instrument_ref,bar_time) DO UPDATE SET close=excluded.close, option_return=excluded.option_return, "
+        "matched_bars=excluded.matched_bars, activity_ratio=excluded.activity_ratio, volume=excluded.volume, "
+        "received_at=excluded.received_at",
+        (instrument_ref, position_ref, symbol, ticker, timeframe, bar_time, close, option_return,
+         matched_bars, activity_ratio, volume, session, "live_contract_bar", now),
+    )
+    conn.commit()
+    _paper_tick_safely()
+    return jsonify({"status": "heartbeat_recorded", "kind": kind, "symbol": symbol,
+                    "instrument_ref": instrument_ref, "bar_time": bar_time})
+
+
+def _paper_tick_safely() -> None:
+    """Event-driven cloud runner tick; errors never corrupt webhook ingestion."""
+    if app.config.get("TESTING"):
+        return
+    try:
+        activation = activate_if_ready(PAPER_DB_PATH, DB_PATH, "AMC")
+        if activation.get("status") in {"ACTIVATED", "ALREADY_ACTIVE"}:
+            run_paper_once(str(PAPER_DB_PATH), cloud_state_provider(str(DB_PATH)))
+    except Exception as exc:  # fail closed and keep the heartbeat durable
+        print(f"paper_tick_blocked={type(exc).__name__}", flush=True)
+
+
 # -- Routes ------------------------------------------------------------------
 
 @app.route("/webhook", methods=["POST"])
@@ -381,6 +513,10 @@ def webhook():
     now = datetime.now(timezone.utc).isoformat()
 
     conn = get_db()
+    heartbeat_response = _record_price_heartbeat(conn, payload, now)
+    if heartbeat_response is not None:
+        conn.close()
+        return heartbeat_response
     conn.execute("""
         INSERT INTO alerts (symbol, timeframe, phase, health, score, confidence,
             momentum, status, action, exhaustion_warning, reload_quality,
@@ -631,6 +767,50 @@ def get_news(symbol):
     with _NEWS_CACHE_LOCK:
         _NEWS_CACHE[symbol] = (now, body)
     return jsonify(body)
+
+
+@app.route("/portfolio/pionex", methods=["GET"])
+def get_pionex_portfolio():
+    """Return the read-only Pionex spot wallet (bot/earn funds unavailable)."""
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    try:
+        data = pionex_bridge.portfolio_summary()
+    except Exception:  # noqa: BLE001 -- provider failures map to one safe boundary
+        return jsonify({
+            "error": "pionex_unavailable",
+            "detail": "Pionex spot wallet is temporarily unavailable",
+        }), 502
+    return jsonify({
+        "source": "pionex",
+        "scope": "spot_wallet_only",
+        "bots_included": False,
+        **data,
+    })
+
+
+@app.route("/filings/<symbol>", methods=["GET"])
+def get_filings(symbol):
+    """Read-only SEC filing watch state for one symbol (SQLite only).
+
+    Returns recent watched filings plus those first seen within a bounded alert
+    window, along with configuration/seed/health status. Never makes a
+    synchronous SEC request and never acknowledges/consumes an alert — the
+    scheduled poll command is the sole writer.
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    clean = positions.clean_symbol(symbol)
+    if not clean:
+        return jsonify({"error": "invalid symbol"}), 400
+    if clean not in sec_filings.SYMBOL_TO_CIK:
+        return jsonify({"error": f"symbol {clean} is not mapped for SEC filings"}), 404
+    window_hours = request.args.get("window_hours", type=int)
+    if window_hours is None:
+        window_hours = sec_filings.DEFAULT_ALERT_WINDOW_HOURS
+    if not (1 <= window_hours <= 720):
+        return jsonify({"error": "window_hours must be between 1 and 720"}), 400
+    return jsonify(sec_filings.get_filings_state(DB_PATH, clean, window_hours))
 
 
 # Symbols excluded from the asset list: internal pipeline smoke-test rows,
@@ -1325,6 +1505,10 @@ def get_position_valuation(position_id):
 
 
 init_db()
+paper_db.init_db(PAPER_DB_PATH)
+app.register_blueprint(
+    create_paper_blueprint(str(PAPER_DB_PATH), STATE_API_TOKEN, cloud_state_provider(str(DB_PATH)))
+)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5000"))

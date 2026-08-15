@@ -237,6 +237,52 @@ class WebhookReceiverTests(unittest.TestCase):
         tfs = sorted(s["timeframe"] for s in data["states"])
         self.assertEqual(tfs, ["240", "60"])
 
+    def test_underlying_heartbeat_is_distinct_from_dna_alerts(self):
+        payload = {
+            "kind": "UNDERLYING_HEARTBEAT", "symbol": "AMC", "timeframe": "1",
+            "close": 2.63, "time": 1786764000000, "secret": TEST_SECRET,
+        }
+        response = self._post(payload)
+        self.assertEqual(response.status_code, 200)
+        conn = webhook_receiver.get_db()
+        heartbeat = conn.execute(
+            "SELECT close, source FROM underlying_heartbeats WHERE symbol='AMC' AND bar_time=1786764000000"
+        ).fetchone()
+        alert_count = conn.execute(
+            "SELECT COUNT(*) n FROM alerts WHERE symbol='AMC' AND bar_time='1786764000000'"
+        ).fetchone()["n"]
+        conn.close()
+        self.assertEqual(heartbeat["close"], 2.63)
+        self.assertEqual(heartbeat["source"], "live_webhook")
+        self.assertEqual(alert_count, 0)
+
+    def test_option_heartbeat_requires_exact_open_instrument(self):
+        created = self._create_position(symbol="HBOPT", instrument={
+            "type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+            "quantity": 1, "entry_price": 0.5, "entry_time": "2026-08-13T14:30:00Z",
+        }).get_json()
+        position_ref = created["id"]
+        instrument_ref = created["instruments"][0]["id"]
+        payload = {
+            "kind": "OPTION_HEARTBEAT", "symbol": "HBOPT", "ticker": "O:HBOPT260918C00002500",
+            "timeframe": "1", "time": 1786764060000, "close": 1.14, "volume": 10,
+            "option_return": 0.02, "matched_bars": 20, "activity_ratio": 0.8,
+            "position_ref": position_ref, "instrument_ref": instrument_ref, "secret": TEST_SECRET,
+        }
+        response = self._post(payload)
+        self.assertEqual(response.status_code, 200)
+        conn = webhook_receiver.get_db()
+        row = conn.execute(
+            "SELECT ticker, close, source FROM option_heartbeats WHERE instrument_ref=?",
+            (str(instrument_ref),),
+        ).fetchone()
+        conn.close()
+        self.assertEqual(row["ticker"], "O:HBOPT260918C00002500")
+        self.assertEqual(row["source"], "live_contract_bar")
+        payload["instrument_ref"] = 999999
+        payload["time"] += 60000
+        self.assertEqual(self._post(payload).status_code, 409)
+
     def test_unknown_state_returns_404(self):
         resp = self.client.get("/state/NOEXIST/240", headers=self._state_headers())
         self.assertEqual(resp.status_code, 404)
@@ -606,6 +652,14 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(d["bars"][0]["t"], 1786507200000)
         self.assertEqual(d["bars"][-1]["c"], 1.99)
 
+    def test_option_bar_shaping_preserves_optional_vwap_and_trade_count(self):
+        shaped = massive_options._shape_bars([{
+            "t": 1786000000000, "o": 0.8, "h": 1.0, "l": 0.7,
+            "c": 0.95, "v": 120, "vw": 0.91, "n": 37,
+        }])
+        self.assertEqual(shaped[0]["vw"], 0.91)
+        self.assertEqual(shaped[0]["n"], 37)
+
     def test_valuation_requires_auth(self):
         self.assertEqual(self.client.get("/positions/1/valuation").status_code, 401)
 
@@ -900,6 +954,10 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertIn("premiumCompression", html)
         self.assertIn("Attention mode only", html)
         self.assertIn("safeNewsUrl", html)
+        self.assertIn("Pionex", html)
+        self.assertIn("bots and earn excluded", html)
+        self.assertIn("loadPionex", html)
+        self.assertIn("/portfolio/pionex", html)
         self.assertIn("/positions/", html)
         self.assertIn("/state_all/", html)
 
@@ -915,6 +973,43 @@ class WebhookReceiverTests(unittest.TestCase):
     def test_news_requires_state_auth(self):
         resp = self.client.get("/news/AMC")
         self.assertEqual(resp.status_code, 401)
+
+    def test_pionex_portfolio_requires_state_auth(self):
+        resp = self.client.get("/portfolio/pionex")
+        self.assertEqual(resp.status_code, 401)
+
+    def test_pionex_portfolio_returns_spot_scope(self):
+        summary = {
+            "total_value_usd": 81.15,
+            "balances": [{
+                "coin": "DOGE", "free": 1150.0, "frozen": 0.0,
+                "total": 1150.0, "price_usd": 0.069857,
+                "value_usd": 80.34,
+            }],
+            "unpriced_coins": [],
+        }
+        with mock.patch.object(
+                webhook_receiver.pionex_bridge, "portfolio_summary",
+                return_value=summary):
+            resp = self.client.get(
+                "/portfolio/pionex", headers=self._state_headers()
+            )
+        self.assertEqual(resp.status_code, 200)
+        body = resp.get_json()
+        self.assertEqual(body["source"], "pionex")
+        self.assertEqual(body["scope"], "spot_wallet_only")
+        self.assertFalse(body["bots_included"])
+        self.assertEqual(body["balances"][0]["coin"], "DOGE")
+
+    def test_pionex_portfolio_maps_provider_failure_without_detail_leak(self):
+        with mock.patch.object(
+                webhook_receiver.pionex_bridge, "portfolio_summary",
+                side_effect=RuntimeError("secret provider detail")):
+            resp = self.client.get(
+                "/portfolio/pionex", headers=self._state_headers()
+            )
+        self.assertEqual(resp.status_code, 502)
+        self.assertNotIn("secret provider detail", resp.get_data(as_text=True))
 
     def test_news_rejects_invalid_symbol(self):
         resp = self.client.get("/news/AMC%20bad", headers=self._state_headers())

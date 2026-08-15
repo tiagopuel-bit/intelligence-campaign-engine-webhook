@@ -35,6 +35,20 @@ field, no custom message, no credential in the URL.
 Each timeframe needs its own TradingView alert instance if separate timeframe
 state is desired.
 
+### PAPER_ONLY price heartbeat relay
+
+Use `pine_research/DNA_PRICE_HEARTBEAT_RELAY_V1.pine` on 1-minute charts with
+alert type **Any alert() function call** and the same `/webhook` URL.
+
+- AMC chart: select `UNDERLYING_HEARTBEAT`.
+- Each held AMC option chart: select `OPTION_HEARTBEAT` and enter the exact
+  position and instrument IDs returned by `/positions`.
+
+The relay emits confirmed 1-minute OHLCV bars—not ticks or bid/ask—and is only
+for the isolated paper experiment. Ordinary DNA event alerts never count as
+heartbeats. `/paper/health` stays fail-closed until the underlying and every
+held option relay are fresh.
+
 ## Authentication
 
 ### POST /webhook (alerts)
