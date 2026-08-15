@@ -1,0 +1,2373 @@
+{
+  "contracts": [
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250613C00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250613C00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250613C00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250613C00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250613C00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250613C00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250613C00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250613C00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250613C00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250613C00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250613C00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250613C00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250613C00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250613C00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250613P00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250613P00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250613P00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250613P00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250613P00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250613P00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250613P00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250613P00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250613P00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250613P00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250613P00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250613P00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250613P00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-13",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250613P00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 0.5,
+      "ticker": "O:AMC2250620C00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 1,
+      "ticker": "O:AMC2250620C00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 1.5,
+      "ticker": "O:AMC2250620C00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 2,
+      "ticker": "O:AMC2250620C00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 2.5,
+      "ticker": "O:AMC2250620C00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 3,
+      "ticker": "O:AMC2250620C00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 3.5,
+      "ticker": "O:AMC2250620C00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 4,
+      "ticker": "O:AMC2250620C00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 4.5,
+      "ticker": "O:AMC2250620C00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 5,
+      "ticker": "O:AMC2250620C00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 5.5,
+      "ticker": "O:AMC2250620C00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 7,
+      "ticker": "O:AMC2250620C00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 10,
+      "ticker": "O:AMC2250620C00010000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 12,
+      "ticker": "O:AMC2250620C00012000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 15,
+      "ticker": "O:AMC2250620C00015000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 17,
+      "ticker": "O:AMC2250620C00017000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 0.5,
+      "ticker": "O:AMC2250620P00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 1,
+      "ticker": "O:AMC2250620P00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 1.5,
+      "ticker": "O:AMC2250620P00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 2,
+      "ticker": "O:AMC2250620P00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 2.5,
+      "ticker": "O:AMC2250620P00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 3,
+      "ticker": "O:AMC2250620P00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 3.5,
+      "ticker": "O:AMC2250620P00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 4,
+      "ticker": "O:AMC2250620P00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 4.5,
+      "ticker": "O:AMC2250620P00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 5,
+      "ticker": "O:AMC2250620P00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 5.5,
+      "ticker": "O:AMC2250620P00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 7,
+      "ticker": "O:AMC2250620P00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 10,
+      "ticker": "O:AMC2250620P00010000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 12,
+      "ticker": "O:AMC2250620P00012000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 15,
+      "ticker": "O:AMC2250620P00015000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 3.74,
+          "type": "currency",
+          "underlying": "USD"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 2,
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 11,
+      "strike_price": 17,
+      "ticker": "O:AMC2250620P00017000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250620C00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250620C00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250620C00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250620C00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250620C00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250620C00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250620C00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250620C00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250620C00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250620C00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250620C00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250620C00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250620C00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250620C00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 8,
+      "ticker": "O:AMC250620C00008000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 10,
+      "ticker": "O:AMC250620C00010000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 12,
+      "ticker": "O:AMC250620C00012000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:AMC250620C00015000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:AMC250620C00017000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:AMC250620C00020000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:AMC250620C00022000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:AMC250620C00025000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:AMC250620C00027000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250620P00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250620P00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250620P00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250620P00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250620P00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250620P00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250620P00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250620P00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250620P00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250620P00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250620P00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250620P00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250620P00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250620P00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 8,
+      "ticker": "O:AMC250620P00008000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 10,
+      "ticker": "O:AMC250620P00010000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 12,
+      "ticker": "O:AMC250620P00012000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:AMC250620P00015000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:AMC250620P00017000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:AMC250620P00020000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:AMC250620P00022000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:AMC250620P00025000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-20",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:AMC250620P00027000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250627C00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250627C00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250627C00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250627C00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250627C00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250627C00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250627C00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250627C00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250627C00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250627C00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250627C00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250627C00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250627C00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250627C00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250627P00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250627P00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250627P00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250627P00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250627P00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250627P00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250627P00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250627P00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250627P00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250627P00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250627P00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250627P00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250627P00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-06-27",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250627P00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250703C00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250703C00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250703C00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250703C00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250703C00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250703C00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250703C00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250703C00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250703C00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250703C00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250703C00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250703C00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250703C00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250703C00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250703P00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250703P00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250703P00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250703P00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250703P00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250703P00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250703P00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250703P00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250703P00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250703P00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250703P00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250703P00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250703P00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-03",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250703P00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250711C00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250711C00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250711C00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250711C00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250711C00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250711C00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250711C00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250711C00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250711C00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250711C00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250711C00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250711C00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6.5,
+      "ticker": "O:AMC250711C00006500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250711C00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250711C00007500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 0.5,
+      "ticker": "O:AMC250711P00000500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1,
+      "ticker": "O:AMC250711P00001000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 1.5,
+      "ticker": "O:AMC250711P00001500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2,
+      "ticker": "O:AMC250711P00002000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 2.5,
+      "ticker": "O:AMC250711P00002500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:AMC250711P00003000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3.5,
+      "ticker": "O:AMC250711P00003500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4,
+      "ticker": "O:AMC250711P00004000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 4.5,
+      "ticker": "O:AMC250711P00004500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:AMC250711P00005000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5.5,
+      "ticker": "O:AMC250711P00005500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6,
+      "ticker": "O:AMC250711P00006000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 6.5,
+      "ticker": "O:AMC250711P00006500",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7,
+      "ticker": "O:AMC250711P00007000",
+      "underlying_ticker": "AMC"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2025-07-11",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 7.5,
+      "ticker": "O:AMC250711P00007500",
+      "underlying_ticker": "AMC"
+    }
+  ],
+  "session_date": "2025-06-11"
+}

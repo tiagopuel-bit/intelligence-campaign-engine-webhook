@@ -1,0 +1,57 @@
+{
+  "active_print_insufficient_coverage_candidates": 105,
+  "active_print_liquidity_sensitive_candidates": 35,
+  "active_print_supported_candidates": 20,
+  "candidate_conditions_frozen_on": "DISCOVERY",
+  "countertarget_clear_audits": 6,
+  "direction_preserved_candidates": 7,
+  "entry_rows": 361,
+  "finding_status": "HISTORICAL_RESEARCH_FINDING_NEEDS_EXTERNAL_REPLICATION",
+  "guidance_emitted": false,
+  "holdout_used_for_candidate_generation": false,
+  "holdout_used_for_promotion": false,
+  "holdout_used_for_validation": true,
+  "original_candidate_count": 160,
+  "position_management_status": "BLOCKED_INSUFFICIENT_REPLAY_COVERAGE",
+  "research_only": true,
+  "rules_fitted": false,
+  "scope": "OBSERVE_ENTRY",
+  "searches": [
+    {
+      "candidates": 80,
+      "countertarget_clear": 0,
+      "liquidity_sensitive": 20,
+      "preserved": 0,
+      "scope": "OBSERVE_ENTRY",
+      "status": "EVALUATED_UNCHANGED_HOLDOUT",
+      "target": "EARLY_PREMIUM_CONFIRMATION"
+    },
+    {
+      "candidates": 80,
+      "countertarget_clear": 6,
+      "liquidity_sensitive": 40,
+      "preserved": 7,
+      "scope": "OBSERVE_ENTRY",
+      "status": "EVALUATED_UNCHANGED_HOLDOUT",
+      "target": "CONFIRMATION_FAILURE"
+    },
+    {
+      "candidates": 0,
+      "countertarget_clear": 0,
+      "liquidity_sensitive": 0,
+      "preserved": 0,
+      "reason": "PUT/30: need 5 positive groups; found 3",
+      "scope": "OBSERVE_ENTRY",
+      "status": "INSUFFICIENT_EVIDENCE",
+      "target": "RETAINED_EXPANSION"
+    }
+  ],
+  "shadow_eligible": false,
+  "stage": "ENTRY_CANDIDATE_VALIDATION_CORRECTED",
+  "status": "RESEARCH_ONLY_NO_GUIDANCE",
+  "supported_candidates": 1,
+  "target_freeze_manifest_sha256": "54968e7dbc620c584f2ce98662a0cfba079cda964a1487ff64f7dcb1dedfed43",
+  "tautological_rejections": 22,
+  "unique_supported_signal_families": 1,
+  "validated_candidates": 160
+}

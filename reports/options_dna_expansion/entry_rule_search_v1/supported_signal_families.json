@@ -1,0 +1,26 @@
+[
+  {
+    "candidate_ids": [
+      "CAND-5674c9b8e8112185"
+    ],
+    "conditions": [
+      {
+        "feature": "contract__close_location",
+        "operator": "<=",
+        "threshold": 0.33333333333333354
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 31.600000000000005
+      }
+    ],
+    "contract_type": "CALL",
+    "discovery_full_sample_triggers": 9,
+    "dte_target": "14",
+    "family_id": "FAM-5674c9b8e8112185",
+    "holdout_active_print_triggers": 3,
+    "holdout_full_sample_triggers": 4,
+    "target": "CONFIRMATION_FAILURE"
+  }
+]

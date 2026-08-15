@@ -1,0 +1,92 @@
+[
+  {
+    "anchor_id": "AMC15X-077",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-057",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-058",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-078",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-060",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-061",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-080",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-063",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-083",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-085",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-064",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-065",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-086",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-087",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-088",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15X-089",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-069",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  },
+  {
+    "anchor_id": "AMC15SUP-070",
+    "error": "no regular contract within DTE tolerance",
+    "stage": "selection"
+  }
+]

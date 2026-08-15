@@ -1,0 +1,641 @@
+[
+  {
+    "candidate_id": "CAND-ce4c2a6e03ea0472",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__drawdown_from_high_pct",
+        "operator": "<=",
+        "threshold": 33.70370370370371
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 1,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-3b3f313c868a4c9d",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__drawdown_from_high_pct",
+        "operator": "<=",
+        "threshold": 33.70370370370371
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 2,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-31d1aff09b6fd96d",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 3,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-79f1308962c696da",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 4,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-9928b558bfd1cd43",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__relative_response_z",
+        "operator": "<=",
+        "threshold": 1.2846191829156481
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 5,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-2eaab1b7756f35f9",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__relative_response_z",
+        "operator": "<=",
+        "threshold": 1.2846191829156481
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 6,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-95e7c49904c06d3b",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__volume_ratio",
+        "operator": ">=",
+        "threshold": 0.1301709401709402
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 7,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-9834a238d454d25b",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__volume_ratio",
+        "operator": ">=",
+        "threshold": 0.1301709401709402
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 8,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-d5d73e3acd645cea",
+    "conditions": [
+      {
+        "feature": "contract__drawdown_from_high_pct",
+        "operator": "<=",
+        "threshold": 33.70370370370371
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 10,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-80a64b79d2eb8a7a",
+    "conditions": [
+      {
+        "feature": "contract__drawdown_from_high_pct",
+        "operator": "<=",
+        "threshold": 33.70370370370371
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 11,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-b44eaa945f6c059f",
+    "conditions": [
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 12,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-aa3c86f380e7b435",
+    "conditions": [
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 13,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-9f0db13405a20548",
+    "conditions": [
+      {
+        "feature": "contract__relative_response_z",
+        "operator": "<=",
+        "threshold": 1.2846191829156481
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 14,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-152784c32e4e4d3b",
+    "conditions": [
+      {
+        "feature": "contract__relative_response_z",
+        "operator": "<=",
+        "threshold": 1.2846191829156481
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 15,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-83a0045c5ad460a5",
+    "conditions": [
+      {
+        "feature": "contract__volume_ratio",
+        "operator": ">=",
+        "threshold": 0.1301709401709402
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 46.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 16,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-2fceb4d41b29b181",
+    "conditions": [
+      {
+        "feature": "contract__volume_ratio",
+        "operator": ">=",
+        "threshold": 0.1301709401709402
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": "<=",
+        "threshold": 40.800000000000004
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 2.9999999999999996,
+    "discovery_precision": 0.6,
+    "discovery_rank": 17,
+    "discovery_recall": 0.6,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "candidate_id": "CAND-d84c1298060079f9",
+    "conditions": [
+      {
+        "feature": "contract__close_location",
+        "operator": "<=",
+        "threshold": 1.0
+      },
+      {
+        "feature": "underlying__event_family",
+        "operator": "==",
+        "threshold": "THESIS_PRESSURE"
+      }
+    ],
+    "contract_type": "CALL",
+    "discovery_coverage": 0.08888888888888889,
+    "discovery_groups": 90,
+    "discovery_lift": 2.8125,
+    "discovery_precision": 0.5,
+    "discovery_rank": 7,
+    "discovery_recall": 0.25,
+    "discovery_triggered_groups": 8,
+    "dte_target": "14",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "candidate_id": "CAND-b8095e7634bc569d",
+    "conditions": [
+      {
+        "feature": "contract__close_location",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__event_family",
+        "operator": "==",
+        "threshold": "THESIS_PRESSURE"
+      }
+    ],
+    "contract_type": "CALL",
+    "discovery_coverage": 0.08888888888888889,
+    "discovery_groups": 90,
+    "discovery_lift": 2.8125,
+    "discovery_precision": 0.5,
+    "discovery_rank": 8,
+    "discovery_recall": 0.25,
+    "discovery_triggered_groups": 8,
+    "dte_target": "14",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "candidate_id": "CAND-51b4f7ee1981048a",
+    "conditions": [
+      {
+        "feature": "catalyst__active",
+        "operator": "==",
+        "threshold": false
+      },
+      {
+        "feature": "contract__close_location",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__event_family",
+        "operator": "==",
+        "threshold": "THESIS_PRESSURE"
+      }
+    ],
+    "contract_type": "CALL",
+    "discovery_coverage": 0.07777777777777778,
+    "discovery_groups": 90,
+    "discovery_lift": 2.4107142857142856,
+    "discovery_precision": 0.42857142857142855,
+    "discovery_rank": 13,
+    "discovery_recall": 0.1875,
+    "discovery_triggered_groups": 7,
+    "dte_target": "14",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "candidate_id": "CAND-3c3e33275329ac60",
+    "conditions": [
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": ">=",
+        "threshold": 99.2
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 1.875,
+    "discovery_precision": 0.6,
+    "discovery_rank": 6,
+    "discovery_recall": 0.375,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "candidate_id": "CAND-6b42bd1d63d02cfb",
+    "conditions": [
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__event_family",
+        "operator": "==",
+        "threshold": "CONTINUATION"
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.2,
+    "discovery_groups": 25,
+    "discovery_lift": 1.875,
+    "discovery_precision": 0.6,
+    "discovery_rank": 7,
+    "discovery_recall": 0.375,
+    "discovery_triggered_groups": 5,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "candidate_id": "CAND-6e882dbb44f7aca8",
+    "conditions": [
+      {
+        "feature": "contract__range_expansion",
+        "operator": ">=",
+        "threshold": 0.0
+      },
+      {
+        "feature": "underlying__phase_confidence",
+        "operator": ">=",
+        "threshold": 63.6
+      }
+    ],
+    "contract_type": "PUT",
+    "discovery_coverage": 0.36,
+    "discovery_groups": 25,
+    "discovery_lift": 1.3888888888888888,
+    "discovery_precision": 0.4444444444444444,
+    "discovery_rank": 16,
+    "discovery_recall": 0.5,
+    "discovery_triggered_groups": 9,
+    "dte_target": "30",
+    "group_field": "anchor_id",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  }
+]

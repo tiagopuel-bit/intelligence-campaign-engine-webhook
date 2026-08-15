@@ -1,0 +1,11 @@
+{
+  "cost_model": "none",
+  "episodes": 11,
+  "execution_model": "exact next option bar open",
+  "future_target_rows": 91,
+  "max_calendar_days": 21,
+  "outcome_windows": 455,
+  "rejections": 60,
+  "research_only": true,
+  "snapshots": 91
+}

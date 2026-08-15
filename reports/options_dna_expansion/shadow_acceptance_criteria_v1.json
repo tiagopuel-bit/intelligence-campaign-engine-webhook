@@ -1,0 +1,35 @@
+{
+  "frozen_before_expansion_results": true,
+  "max_ineligible_fraction_per_cell": 0.2,
+  "max_reversal_fraction_per_cell": 0.2,
+  "min_calendar_days_per_cell": 20,
+  "min_contracts_per_cell": 3,
+  "min_labeled_observations_per_cell": 10,
+  "min_transitions_per_cell": 10,
+  "min_unique_decisions_per_cell": 20,
+  "notes": [
+    "Every threshold is evaluated independently by contract type and target DTE.",
+    "Unclassified observations cannot satisfy a required cell.",
+    "This gate validates freshness and transition stability, not trade profitability.",
+    "Passing does not authorize production guidance or exact trade orders."
+  ],
+  "required_cells": [
+    [
+      "CALL",
+      14
+    ],
+    [
+      "CALL",
+      30
+    ],
+    [
+      "PUT",
+      14
+    ],
+    [
+      "PUT",
+      30
+    ]
+  ],
+  "version": "options-dna-shadow-acceptance-v1"
+}

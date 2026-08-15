@@ -1,0 +1,589 @@
+{
+  "assets": [
+    "SPY",
+    "TSLA",
+    "GME",
+    "U",
+    "RBLX",
+    "PYPL",
+    "LULU",
+    "VALE"
+  ],
+  "assets_with_direction": 2,
+  "contract_type": "CALL",
+  "countertarget": "EARLY_PREMIUM_CONFIRMATION",
+  "dte_target": "14",
+  "max_single_asset_weight": 0.125,
+  "passing_assets": [],
+  "per_asset": {
+    "GME": {
+      "active_direction_preserved": true,
+      "asset_passes": false,
+      "control_superior": true,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.14285714285714285,
+          "coverage": 1.0,
+          "groups": 14,
+          "lift": 1.0,
+          "precision": 0.14285714285714285,
+          "recall": 1.0,
+          "triggered_groups": 14
+        },
+        "contract_only": {
+          "base_rate": 0.13333333333333333,
+          "coverage": 0.4666666666666667,
+          "groups": 15,
+          "lift": 1.0714285714285714,
+          "precision": 0.14285714285714285,
+          "recall": 0.5,
+          "triggered_groups": 7
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.13333333333333333,
+          "coverage": 1.0,
+          "groups": 15,
+          "lift": 1.0,
+          "precision": 0.13333333333333333,
+          "recall": 1.0,
+          "triggered_groups": 15
+        },
+        "underlying_only": {
+          "base_rate": 0.13333333333333333,
+          "coverage": 0.3333333333333333,
+          "groups": 15,
+          "lift": 1.5,
+          "precision": 0.2,
+          "recall": 0.5,
+          "triggered_groups": 5
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": true,
+      "discovery_scored_groups": 26,
+      "holdout_active_candidate": {
+        "base_rate": 0.14285714285714285,
+        "coverage": 0.14285714285714285,
+        "groups": 14,
+        "lift": 3.5,
+        "precision": 0.5,
+        "recall": 0.5,
+        "triggered_groups": 2
+      },
+      "holdout_active_triggered_groups": 2,
+      "holdout_candidate": {
+        "base_rate": 0.13333333333333333,
+        "coverage": 0.13333333333333333,
+        "groups": 15,
+        "lift": 3.75,
+        "precision": 0.5,
+        "recall": 0.5,
+        "triggered_groups": 2
+      },
+      "holdout_positive_groups": 2,
+      "holdout_scored_groups": 15,
+      "symbol": "GME"
+    },
+    "LULU": {
+      "active_direction_preserved": false,
+      "asset_passes": false,
+      "control_superior": false,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 1.0,
+          "coverage": 1.0,
+          "groups": 1,
+          "lift": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "triggered_groups": 1
+        },
+        "contract_only": {
+          "base_rate": 1.0,
+          "coverage": 0.0,
+          "groups": 1,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 0
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 1.0,
+          "coverage": 1.0,
+          "groups": 1,
+          "lift": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "triggered_groups": 1
+        },
+        "underlying_only": {
+          "base_rate": 1.0,
+          "coverage": 0.0,
+          "groups": 1,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 0
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": false,
+      "discovery_scored_groups": 16,
+      "holdout_active_candidate": {
+        "base_rate": 1.0,
+        "coverage": 0.0,
+        "groups": 1,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_active_triggered_groups": 0,
+      "holdout_candidate": {
+        "base_rate": 1.0,
+        "coverage": 0.0,
+        "groups": 1,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_positive_groups": 1,
+      "holdout_scored_groups": 1,
+      "symbol": "LULU"
+    },
+    "PYPL": {
+      "active_direction_preserved": false,
+      "asset_passes": false,
+      "control_superior": false,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.18181818181818182,
+          "coverage": 1.0,
+          "groups": 11,
+          "lift": 1.0,
+          "precision": 0.18181818181818182,
+          "recall": 1.0,
+          "triggered_groups": 11
+        },
+        "contract_only": {
+          "base_rate": 0.18181818181818182,
+          "coverage": 0.2727272727272727,
+          "groups": 11,
+          "lift": 1.8333333333333333,
+          "precision": 0.3333333333333333,
+          "recall": 0.5,
+          "triggered_groups": 3
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.18181818181818182,
+          "coverage": 1.0,
+          "groups": 11,
+          "lift": 1.0,
+          "precision": 0.18181818181818182,
+          "recall": 1.0,
+          "triggered_groups": 11
+        },
+        "underlying_only": {
+          "base_rate": 0.18181818181818182,
+          "coverage": 0.18181818181818182,
+          "groups": 11,
+          "lift": 2.75,
+          "precision": 0.5,
+          "recall": 0.5,
+          "triggered_groups": 2
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": false,
+      "discovery_scored_groups": 22,
+      "holdout_active_candidate": {
+        "base_rate": 0.18181818181818182,
+        "coverage": 0.0,
+        "groups": 11,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_active_triggered_groups": 0,
+      "holdout_candidate": {
+        "base_rate": 0.18181818181818182,
+        "coverage": 0.0,
+        "groups": 11,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_positive_groups": 2,
+      "holdout_scored_groups": 11,
+      "symbol": "PYPL"
+    },
+    "RBLX": {
+      "active_direction_preserved": false,
+      "asset_passes": false,
+      "control_superior": false,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.3333333333333333,
+          "coverage": 1.0,
+          "groups": 6,
+          "lift": 1.0,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "triggered_groups": 6
+        },
+        "contract_only": {
+          "base_rate": 0.3333333333333333,
+          "coverage": 0.5,
+          "groups": 6,
+          "lift": 2.0,
+          "precision": 0.6666666666666666,
+          "recall": 1.0,
+          "triggered_groups": 3
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.3333333333333333,
+          "coverage": 1.0,
+          "groups": 6,
+          "lift": 1.0,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "triggered_groups": 6
+        },
+        "underlying_only": {
+          "base_rate": 0.3333333333333333,
+          "coverage": 0.16666666666666666,
+          "groups": 6,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 1
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": false,
+      "discovery_scored_groups": 12,
+      "holdout_active_candidate": {
+        "base_rate": 0.3333333333333333,
+        "coverage": 0.0,
+        "groups": 6,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_active_triggered_groups": 0,
+      "holdout_candidate": {
+        "base_rate": 0.3333333333333333,
+        "coverage": 0.0,
+        "groups": 6,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_positive_groups": 2,
+      "holdout_scored_groups": 6,
+      "symbol": "RBLX"
+    },
+    "SPY": {
+      "active_direction_preserved": false,
+      "asset_passes": false,
+      "control_superior": false,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.1,
+          "coverage": 1.0,
+          "groups": 10,
+          "lift": 1.0,
+          "precision": 0.1,
+          "recall": 1.0,
+          "triggered_groups": 10
+        },
+        "contract_only": {
+          "base_rate": 0.1,
+          "coverage": 0.4,
+          "groups": 10,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 4
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.1,
+          "coverage": 1.0,
+          "groups": 10,
+          "lift": 1.0,
+          "precision": 0.1,
+          "recall": 1.0,
+          "triggered_groups": 10
+        },
+        "underlying_only": {
+          "base_rate": 0.1,
+          "coverage": 0.1,
+          "groups": 10,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 1
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": false,
+      "discovery_scored_groups": 28,
+      "holdout_active_candidate": {
+        "base_rate": 0.1,
+        "coverage": 0.1,
+        "groups": 10,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 1
+      },
+      "holdout_active_triggered_groups": 1,
+      "holdout_candidate": {
+        "base_rate": 0.1,
+        "coverage": 0.1,
+        "groups": 10,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 1
+      },
+      "holdout_positive_groups": 1,
+      "holdout_scored_groups": 10,
+      "symbol": "SPY"
+    },
+    "TSLA": {
+      "active_direction_preserved": true,
+      "asset_passes": false,
+      "control_superior": true,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.15384615384615385,
+          "coverage": 1.0,
+          "groups": 13,
+          "lift": 1.0,
+          "precision": 0.15384615384615385,
+          "recall": 1.0,
+          "triggered_groups": 13
+        },
+        "contract_only": {
+          "base_rate": 0.14285714285714285,
+          "coverage": 0.35714285714285715,
+          "groups": 14,
+          "lift": 1.4000000000000001,
+          "precision": 0.2,
+          "recall": 0.5,
+          "triggered_groups": 5
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.14285714285714285,
+          "coverage": 1.0,
+          "groups": 14,
+          "lift": 1.0,
+          "precision": 0.14285714285714285,
+          "recall": 1.0,
+          "triggered_groups": 14
+        },
+        "underlying_only": {
+          "base_rate": 0.14285714285714285,
+          "coverage": 0.35714285714285715,
+          "groups": 14,
+          "lift": 2.8000000000000003,
+          "precision": 0.4,
+          "recall": 1.0,
+          "triggered_groups": 5
+        }
+      },
+      "counter_clear": true,
+      "direction_preserved": true,
+      "discovery_scored_groups": 32,
+      "holdout_active_candidate": {
+        "base_rate": 0.15384615384615385,
+        "coverage": 0.07692307692307693,
+        "groups": 13,
+        "lift": 6.5,
+        "precision": 1.0,
+        "recall": 0.5,
+        "triggered_groups": 1
+      },
+      "holdout_active_triggered_groups": 1,
+      "holdout_candidate": {
+        "base_rate": 0.14285714285714285,
+        "coverage": 0.07142857142857142,
+        "groups": 14,
+        "lift": 7.0,
+        "precision": 1.0,
+        "recall": 0.5,
+        "triggered_groups": 1
+      },
+      "holdout_positive_groups": 2,
+      "holdout_scored_groups": 14,
+      "symbol": "TSLA"
+    },
+    "U": {
+      "active_direction_preserved": false,
+      "asset_passes": false,
+      "control_superior": false,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.2,
+          "coverage": 1.0,
+          "groups": 5,
+          "lift": 1.0,
+          "precision": 0.2,
+          "recall": 1.0,
+          "triggered_groups": 5
+        },
+        "contract_only": {
+          "base_rate": 0.2,
+          "coverage": 0.0,
+          "groups": 5,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 0
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.2,
+          "coverage": 1.0,
+          "groups": 5,
+          "lift": 1.0,
+          "precision": 0.2,
+          "recall": 1.0,
+          "triggered_groups": 5
+        },
+        "underlying_only": {
+          "base_rate": 0.2,
+          "coverage": 0.6,
+          "groups": 5,
+          "lift": 1.6666666666666665,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "triggered_groups": 3
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": false,
+      "discovery_scored_groups": 18,
+      "holdout_active_candidate": {
+        "base_rate": 0.2,
+        "coverage": 0.0,
+        "groups": 5,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_active_triggered_groups": 0,
+      "holdout_candidate": {
+        "base_rate": 0.2,
+        "coverage": 0.0,
+        "groups": 5,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_positive_groups": 1,
+      "holdout_scored_groups": 5,
+      "symbol": "U"
+    },
+    "VALE": {
+      "active_direction_preserved": false,
+      "asset_passes": false,
+      "control_superior": false,
+      "controls": {
+        "active_print_only_base_rate": {
+          "base_rate": 0.0,
+          "coverage": 1.0,
+          "groups": 5,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 5
+        },
+        "contract_only": {
+          "base_rate": 0.0,
+          "coverage": 0.6,
+          "groups": 5,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 3
+        },
+        "unconditional_cell_base_rate": {
+          "base_rate": 0.0,
+          "coverage": 1.0,
+          "groups": 5,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 5
+        },
+        "underlying_only": {
+          "base_rate": 0.0,
+          "coverage": 0.2,
+          "groups": 5,
+          "lift": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "triggered_groups": 1
+        }
+      },
+      "counter_clear": false,
+      "direction_preserved": false,
+      "discovery_scored_groups": 7,
+      "holdout_active_candidate": {
+        "base_rate": 0.0,
+        "coverage": 0.0,
+        "groups": 5,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_active_triggered_groups": 0,
+      "holdout_candidate": {
+        "base_rate": 0.0,
+        "coverage": 0.0,
+        "groups": 5,
+        "lift": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "triggered_groups": 0
+      },
+      "holdout_positive_groups": 0,
+      "holdout_scored_groups": 5,
+      "symbol": "VALE"
+    }
+  },
+  "pooled": {
+    "base_rate": 0.26141774891774894,
+    "coverage": 0.0380952380952381,
+    "groups": 67,
+    "lift": 0.7172428068722831,
+    "precision": 0.1875,
+    "triggered_groups": 4
+  },
+  "pooled_active_print": {
+    "base_rate": 0.2639818514818515,
+    "coverage": 0.03997252747252747,
+    "groups": 65,
+    "lift": 0.7102761002223308,
+    "precision": 0.1875,
+    "triggered_groups": 4
+  },
+  "pooled_lift_ci": {
+    "high": 1.962616822429907,
+    "low": 0.13338722716248988,
+    "prob_above_one": 0.323
+  },
+  "pooled_pass": false,
+  "promotion_forbidden": true,
+  "replication_status": "EXTERNAL_REPLICATION_NOT_CONFIRMED",
+  "target": "CONFIRMATION_FAILURE"
+}

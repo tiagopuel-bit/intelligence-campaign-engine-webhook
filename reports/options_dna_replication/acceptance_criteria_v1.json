@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "status": "FROZEN_BEFORE_OUTCOMES",
+  "research_only": true,
+  "candidate": {
+    "target": "CONFIRMATION_FAILURE",
+    "scope": "OBSERVE_ENTRY",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "moneyness_policy": "nearest regular 100-share strike when ±7.5% ATM is unavailable",
+    "conditions": [
+      {"feature": "contract__close_location", "operator": "<=", "threshold": 0.33333333333333354},
+      {"feature": "underlying__campaign_health", "operator": "<=", "threshold": 31.600000000000005}
+    ],
+    "active_print_definition": "non-zero causal contract__option_return (epsilon 1e-9)",
+    "execution_clock": "exact next option-bar open; no shifted or synthetic fill"
+  },
+  "assets": ["SPY", "TSLA", "GME", "U", "RBLX", "PYPL", "LULU", "VALE"],
+  "amc_excluded_from_sample": true,
+  "chronology": {
+    "holdout_start": "2026-02-01",
+    "independent_unit": "one underlying anchor per asset",
+    "deduplicate_clustered_underlying_events": true
+  },
+  "controls": [
+    {"name": "unconditional_cell_base_rate", "conditions": []},
+    {"name": "active_print_only_base_rate", "conditions": []},
+    {"name": "underlying_only", "conditions": [
+      {"feature": "underlying__campaign_health", "operator": "<=", "threshold": 31.600000000000005}
+    ]},
+    {"name": "contract_only", "conditions": [
+      {"feature": "contract__close_location", "operator": "<=", "threshold": 0.33333333333333354}
+    ]}
+  ],
+  "per_asset_minimums": {
+    "min_scored_discovery_anchors": 20,
+    "min_scored_holdout_anchors": 10,
+    "min_active_print_triggered_holdout_anchors": 3,
+    "min_positive_holdout_anchors": 2
+  },
+  "direction_preservation": {
+    "full_holdout_lift_gt": 1.0,
+    "active_print_lift_gt": 1.0
+  },
+  "control_superiority": {
+    "combined_lift_gt_each_single_root_control": true,
+    "combined_precision_gt_each_single_root_control": true,
+    "combined_lift_gt_unconditional_base_rate": true
+  },
+  "countertarget": {
+    "against": "EARLY_PREMIUM_CONFIRMATION",
+    "require_counter_lift_le": 1.0,
+    "require_counter_precision_lt_candidate": true
+  },
+  "pooled": {
+    "estimator": "asset_balanced_weight",
+    "min_assets_with_direction": 5,
+    "max_single_asset_weight": 0.40,
+    "bootstrap": "asset_cluster_bootstrap",
+    "lift_ci_lower_gt": 1.0,
+    "no_promotion_if_majority_assets_fail": true
+  },
+  "liquidity_failure_status": "CONTRACT_DATA_UNRELIABLE",
+  "failure_semantics": {
+    "missing_signal_bar": "UNSCORED_SIGNAL_BAR_ABSENT",
+    "insufficient_matched_history": "CONTRACT_DATA_UNRELIABLE",
+    "sparse_option_activity": "CONTRACT_DATA_UNRELIABLE"
+  },
+  "promotion_gates": {
+    "max_discovery_rank": 3,
+    "min_supported_cells": 4,
+    "shadow_eligible_requires": ["per_asset_pass", "pooled_pass", "countertarget_clear"]
+  }
+}

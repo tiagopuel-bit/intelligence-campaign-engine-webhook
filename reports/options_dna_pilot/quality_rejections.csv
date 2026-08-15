@@ -1,0 +1,12 @@
+anchor_id,ticker,contract_type,dte_target,reason
+AMC15-001,O:AMC240906P00005000,PUT,14,signal option bar absent
+AMC15-001,O:AMC240920P00005000,PUT,30,signal option bar absent
+AMC15-003,O:AMC240913P00005000,PUT,14,signal option bar absent
+AMC15-003,O:AMC240927P00005000,PUT,30,signal option bar absent
+AMC15-009,O:AMC260306P00001500,PUT,30,signal option bar absent
+AMC15-010,O:AMC260306P00001500,PUT,30,signal option bar absent
+AMC15-014,O:AMC260904P00002500,PUT,30,signal option bar absent
+AMC15-015,O:AMC260828P00002500,PUT,14,signal option bar absent
+AMC15-015,O:AMC260911P00002500,PUT,30,signal option bar absent
+AMC15-016,O:AMC260911C00002500,CALL,30,signal option bar absent
+AMC15-016,O:AMC260911P00002500,PUT,30,signal option bar absent

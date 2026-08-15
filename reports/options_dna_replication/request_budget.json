@@ -1,0 +1,11 @@
+{
+  "estimated_minutes_upper_bound": 121.6,
+  "expected_option_bar_requests_upper_bound": 384,
+  "expected_reference_requests": 224,
+  "expected_total_requests_upper_bound": 608,
+  "history_note": "audited 15m replay covers 2024-08-12 -> 2026-08-11 for every asset",
+  "no_provider_request_during_r0": true,
+  "planned_anchors": 384,
+  "rate_limit": "5 requests/minute (shared Massive free-plan limiter)",
+  "unique_session_dates": 224
+}

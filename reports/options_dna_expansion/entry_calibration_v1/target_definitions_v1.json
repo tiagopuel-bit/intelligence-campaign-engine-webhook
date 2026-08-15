@@ -1,0 +1,727 @@
+{
+  "definitions": [
+    {
+      "cell_fields": [
+        "contract_type",
+        "dte_target",
+        "moneyness_target"
+      ],
+      "cells": [
+        {
+          "cell_values": [
+            "CALL",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 11.666666666666671
+            },
+            {
+              "field": "H1__mae_pct",
+              "operator": ">=",
+              "quantile": 0.35,
+              "threshold": -13.289855072463766
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": -15.192307692307693
+            }
+          ],
+          "discovery_groups": 90
+        },
+        {
+          "cell_values": [
+            "CALL",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 7.788461538461554
+            },
+            {
+              "field": "H1__mae_pct",
+              "operator": ">=",
+              "quantile": 0.35,
+              "threshold": -8.44696969696969
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": -8.391608391608397
+            }
+          ],
+          "discovery_groups": 72
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 12.5
+            },
+            {
+              "field": "H1__mae_pct",
+              "operator": ">=",
+              "quantile": 0.35,
+              "threshold": -7.916666666666668
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": -7.08333333333333
+            }
+          ],
+          "discovery_groups": 60
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 2.3174603174603092
+            },
+            {
+              "field": "H1__mae_pct",
+              "operator": ">=",
+              "quantile": 0.35,
+              "threshold": 0.0
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": 0.0
+            }
+          ],
+          "discovery_groups": 25
+        }
+      ],
+      "group_field": "anchor_id",
+      "name": "EARLY_PREMIUM_CONFIRMATION",
+      "source_partition": "DISCOVERY"
+    },
+    {
+      "cell_fields": [
+        "contract_type",
+        "dte_target",
+        "moneyness_target"
+      ],
+      "cells": [
+        {
+          "cell_values": [
+            "CALL",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": 3.256249999999999
+            },
+            {
+              "field": "D1__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -31.25
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -20.57692307692308
+            }
+          ],
+          "discovery_groups": 90
+        },
+        {
+          "cell_values": [
+            "CALL",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": 3.8461538461538547
+            },
+            {
+              "field": "D1__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -23.076923076923073
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -15.032608695652176
+            }
+          ],
+          "discovery_groups": 72
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": 0.0
+            },
+            {
+              "field": "D1__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -26.878787878787875
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -14.407665505226493
+            }
+          ],
+          "discovery_groups": 60
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "H1__mfe_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": 0.0
+            },
+            {
+              "field": "D1__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -14.23076923076923
+            },
+            {
+              "field": "D1__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -6.096866096866108
+            }
+          ],
+          "discovery_groups": 25
+        }
+      ],
+      "group_field": "anchor_id",
+      "name": "CONFIRMATION_FAILURE",
+      "source_partition": "DISCOVERY"
+    },
+    {
+      "cell_fields": [
+        "contract_type",
+        "dte_target",
+        "moneyness_target"
+      ],
+      "cells": [
+        {
+          "cell_values": [
+            "CALL",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 25.0
+            },
+            {
+              "field": "D3__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": -0.5
+            },
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": -33.333333333333336
+            }
+          ],
+          "discovery_groups": 77
+        },
+        {
+          "cell_values": [
+            "CALL",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 22.702020202020204
+            },
+            {
+              "field": "D3__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 0.0
+            },
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": -9.000000000000004
+            }
+          ],
+          "discovery_groups": 64
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 24.558823529411764
+            },
+            {
+              "field": "D3__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 0.22153846153846207
+            },
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": 0.0
+            }
+          ],
+          "discovery_groups": 59
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 16.538461538461547
+            },
+            {
+              "field": "D3__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 0.14999999999999977
+            },
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": ">=",
+              "quantile": 0.5,
+              "threshold": -6.25
+            }
+          ],
+          "discovery_groups": 27
+        }
+      ],
+      "group_field": "anchor_id",
+      "name": "RETAINED_EXPANSION",
+      "source_partition": "DISCOVERY"
+    },
+    {
+      "cell_fields": [
+        "contract_type",
+        "dte_target",
+        "moneyness_target"
+      ],
+      "cells": [
+        {
+          "cell_values": [
+            "CALL",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 21.37218045112781
+            },
+            {
+              "field": "D3__peak_to_terminal_giveback_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -57.09415584415585
+            }
+          ],
+          "discovery_groups": 90
+        },
+        {
+          "cell_values": [
+            "CALL",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 19.476190476190474
+            },
+            {
+              "field": "D3__peak_to_terminal_giveback_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -37.07908163265306
+            }
+          ],
+          "discovery_groups": 74
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 21.795665634674926
+            },
+            {
+              "field": "D3__peak_to_terminal_giveback_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -33.717948717948715
+            }
+          ],
+          "discovery_groups": 63
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D1__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 15.099715099715095
+            },
+            {
+              "field": "D3__peak_to_terminal_giveback_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -22.619047619047613
+            }
+          ],
+          "discovery_groups": 31
+        }
+      ],
+      "group_field": "anchor_id",
+      "name": "GIVEBACK_AFTER_EXPANSION",
+      "source_partition": "DISCOVERY"
+    },
+    {
+      "cell_fields": [
+        "contract_type",
+        "dte_target",
+        "moneyness_target"
+      ],
+      "cells": [
+        {
+          "cell_values": [
+            "CALL",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -47.399267399267394
+            },
+            {
+              "field": "D5__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -60.00000000000001
+            },
+            {
+              "field": "D5__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -73.16666666666667
+            }
+          ],
+          "discovery_groups": 90
+        },
+        {
+          "cell_values": [
+            "CALL",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -26.831550802139045
+            },
+            {
+              "field": "D5__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -30.985576923076923
+            },
+            {
+              "field": "D5__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -51.40460030165913
+            }
+          ],
+          "discovery_groups": 74
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -20.31578947368421
+            },
+            {
+              "field": "D5__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -40.98930481283422
+            },
+            {
+              "field": "D5__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -59.6969696969697
+            }
+          ],
+          "discovery_groups": 63
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -15.740740740740739
+            },
+            {
+              "field": "D5__terminal_return_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -22.514071294559102
+            },
+            {
+              "field": "D5__mae_pct",
+              "operator": "<=",
+              "quantile": 0.35,
+              "threshold": -45.37037037037038
+            }
+          ],
+          "discovery_groups": 31
+        }
+      ],
+      "group_field": "anchor_id",
+      "name": "PERSISTENT_PREMIUM_DAMAGE",
+      "source_partition": "DISCOVERY"
+    },
+    {
+      "cell_fields": [
+        "contract_type",
+        "dte_target",
+        "moneyness_target"
+      ],
+      "cells": [
+        {
+          "cell_values": [
+            "CALL",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 77.77777777777779
+            },
+            {
+              "field": "D5__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 129.62962962962962
+            },
+            {
+              "field": "D5__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": -0.49999999999999956
+            }
+          ],
+          "discovery_groups": 81
+        },
+        {
+          "cell_values": [
+            "CALL",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 63.99999999999999
+            },
+            {
+              "field": "D5__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 100.0
+            },
+            {
+              "field": "D5__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 0.0
+            }
+          ],
+          "discovery_groups": 66
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "14",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 62.830769230769235
+            },
+            {
+              "field": "D5__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 80.30075187969926
+            },
+            {
+              "field": "D5__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 0.0
+            }
+          ],
+          "discovery_groups": 60
+        },
+        {
+          "cell_values": [
+            "PUT",
+            "30",
+            "0.0"
+          ],
+          "cutoffs": [
+            {
+              "field": "D3__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 33.33333333333335
+            },
+            {
+              "field": "D5__mfe_pct",
+              "operator": ">=",
+              "quantile": 0.8,
+              "threshold": 39.86531986531987
+            },
+            {
+              "field": "D5__gain_retention",
+              "operator": ">=",
+              "quantile": 0.65,
+              "threshold": 0.1981818181818182
+            }
+          ],
+          "discovery_groups": 27
+        }
+      ],
+      "group_field": "anchor_id",
+      "name": "RUNAWAY_CONTINUATION",
+      "source_partition": "DISCOVERY"
+    }
+  ],
+  "scope": "OBSERVE_ENTRY",
+  "status": "FROZEN_DISCOVERY_TARGETS_RESEARCH_ONLY",
+  "version": 1
+}

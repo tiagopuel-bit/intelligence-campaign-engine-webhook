@@ -1,0 +1,86 @@
+[
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-04-29",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-03-18",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-03-25",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-04-09",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-04-15",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-08-07",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-08-11",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "anchor_id": "LULU-0013",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "LULU"
+  },
+  {
+    "anchor_id": "LULU-0038",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "LULU"
+  },
+  {
+    "anchor_id": "GME-0044",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "GME"
+  },
+  {
+    "anchor_id": "LULU-0042",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "LULU"
+  },
+  {
+    "anchor_id": "RBLX-0043",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "RBLX"
+  },
+  {
+    "anchor_id": "U-0044",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "U"
+  },
+  {
+    "anchor_id": "RBLX-0044",
+    "error": "no CALL/14 regular contract within DTE tolerance",
+    "stage": "selection",
+    "symbol": "RBLX"
+  }
+]

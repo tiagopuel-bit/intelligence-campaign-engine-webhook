@@ -1,0 +1,136 @@
+{
+  "complete_windows": {
+    "D1": 29,
+    "D10": 16,
+    "D3": 26,
+    "D5": 26,
+    "H1": 32
+  },
+  "contract_rows": 44,
+  "future_only": true,
+  "hypotheses": [
+    {
+      "conditions": [
+        {
+          "field": "H1__mfe_pct",
+          "operator": ">=",
+          "quantile": 0.65
+        },
+        {
+          "field": "H1__mae_pct",
+          "operator": ">=",
+          "quantile": 0.35
+        },
+        {
+          "field": "D1__terminal_return_pct",
+          "operator": ">=",
+          "quantile": 0.5
+        }
+      ],
+      "name": "EARLY_PREMIUM_CONFIRMATION",
+      "purpose": "Strong first-hour expression that remains constructive through D1."
+    },
+    {
+      "conditions": [
+        {
+          "field": "H1__mfe_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        },
+        {
+          "field": "D1__mae_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        },
+        {
+          "field": "D1__terminal_return_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        }
+      ],
+      "name": "CONFIRMATION_FAILURE",
+      "purpose": "Little early upside followed by adverse D1 premium path."
+    },
+    {
+      "conditions": [
+        {
+          "field": "D1__mfe_pct",
+          "operator": ">=",
+          "quantile": 0.65
+        },
+        {
+          "field": "D3__gain_retention",
+          "operator": ">=",
+          "quantile": 0.65
+        },
+        {
+          "field": "D3__terminal_return_pct",
+          "operator": ">=",
+          "quantile": 0.5
+        }
+      ],
+      "name": "RETAINED_EXPANSION",
+      "purpose": "A D1 impulse whose premium remains retained through D3."
+    },
+    {
+      "conditions": [
+        {
+          "field": "D1__mfe_pct",
+          "operator": ">=",
+          "quantile": 0.65
+        },
+        {
+          "field": "D3__peak_to_terminal_giveback_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        }
+      ],
+      "name": "GIVEBACK_AFTER_EXPANSION",
+      "purpose": "A strong D1 impulse followed by material peak-to-D3 giveback."
+    },
+    {
+      "conditions": [
+        {
+          "field": "D3__terminal_return_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        },
+        {
+          "field": "D5__terminal_return_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        },
+        {
+          "field": "D5__mae_pct",
+          "operator": "<=",
+          "quantile": 0.35
+        }
+      ],
+      "name": "PERSISTENT_PREMIUM_DAMAGE",
+      "purpose": "Weak terminal premium at both D3 and D5 rather than a brief cooldown."
+    },
+    {
+      "conditions": [
+        {
+          "field": "D3__mfe_pct",
+          "operator": ">=",
+          "quantile": 0.8
+        },
+        {
+          "field": "D5__mfe_pct",
+          "operator": ">=",
+          "quantile": 0.8
+        },
+        {
+          "field": "D5__gain_retention",
+          "operator": ">=",
+          "quantile": 0.65
+        }
+      ],
+      "name": "RUNAWAY_CONTINUATION",
+      "purpose": "Rare extended path used to test when a peak is continuation, not exit."
+    }
+  ],
+  "status": "HYPOTHESES_ONLY_NOT_CALIBRATED",
+  "version": 1
+}

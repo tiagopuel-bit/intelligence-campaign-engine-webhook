@@ -1,0 +1,135 @@
+{
+  "acceptance_targets": {
+    "cell_fields": [
+      "contract_type",
+      "dte_target"
+    ],
+    "discovery_independent_exact_signal_anchors_per_contract_cell": 20,
+    "event_family_balance_report_required": true,
+    "holdout_independent_exact_signal_anchors_per_contract_cell": 10,
+    "no_fill": true
+  },
+  "anchor_count": 162,
+  "anchor_family_counts": {
+    "DISCOVERY:CONTINUATION": 35,
+    "DISCOVERY:ENTRY_FORMING": 35,
+    "DISCOVERY:RISK_OR_EXHAUSTION": 15,
+    "DISCOVERY:THESIS_PRESSURE": 15,
+    "HOLDOUT:CONTINUATION": 23,
+    "HOLDOUT:ENTRY_FORMING": 23,
+    "HOLDOUT:RISK_OR_EXHAUSTION": 8,
+    "HOLDOUT:THESIS_PRESSURE": 8
+  },
+  "cache_hits": {
+    "option_bars": 120,
+    "reference": 85
+  },
+  "catalyst_design": {
+    "active_window_hours": 72,
+    "coverage_rule": "missing SEC coverage is unavailable, never inactive",
+    "operational_clock_rule": "genuine first_seen_at only; reconstruction forbidden",
+    "optional_modes": [
+      "OPERATIONAL_SEEN"
+    ],
+    "required": true,
+    "required_modes": [
+      "PUBLIC_ACCEPTANCE"
+    ]
+  },
+  "cohort_count": 546,
+  "contract_design": {
+    "bar_timeframe": "15m",
+    "dte_targets": [
+      14,
+      30
+    ],
+    "moneyness_target": 0.0,
+    "record_actual_fields": [
+      "moneyness_pct",
+      "moneyness_distance_pct",
+      "moneyness_band",
+      "selection_policy"
+    ],
+    "selection": "nearest regular 100-share strike when \u00b17.5% ATM is unavailable",
+    "types": [
+      "CALL",
+      "PUT"
+    ]
+  },
+  "failure_count": 18,
+  "holdout_start": "2026-02-01",
+  "position_replay_design": {
+    "cell_fields": [
+      "contract_type",
+      "dte_target"
+    ],
+    "cost_model": "none; no spread, fees, slippage, sizing, exercise or assignment",
+    "discovery_independent_episodes_per_cell": 20,
+    "entry_origins": [
+      "ENTRY_FORMING",
+      "CONTINUATION"
+    ],
+    "execution_model": "exact next option bar open",
+    "holdout_independent_episodes_per_cell": 10,
+    "max_calendar_days": 21,
+    "required": true,
+    "snapshot_rule": "same contract at exact later DNA signal bars; no fill"
+  },
+  "provider_execution_owner": "DeepSeek; shared Massive free-plan limiter",
+  "purpose": "calibration expansion; no thresholds selected",
+  "raw_replay": "/Users/tiago/Desktop/Campaing Inteligence Engine/_deepseek_expanded_rerun_stage/audited_output/replay/AMC_events_15m.csv.gz",
+  "raw_replay_sha256": "a0a26ce9f70a0da75436c0065bebe374d52af5220c8dfdecd43c02c3e1ac5edc",
+  "request_counts": {
+    "option_bars": 130,
+    "reference": 58
+  },
+  "shadow_acceptance_design": {
+    "criteria_file": "shadow_acceptance_criteria_v1.json",
+    "criteria_file_sha256": "af9f0c1d2848bdaf9d2aaad2ba6bdf6569c47499aaa51056690051d2f2d2cc30",
+    "criteria_hash": "ed5ad434b2ecfd2e684f977c2a7dbad8221415ea003815fcd1e966dd98e74693",
+    "frozen_before_expansion_results": true,
+    "required": true
+  },
+  "status": "FETCHED_WITH_FAILURES",
+  "supplemental_design": {
+    "added_anchors": 70,
+    "added_counts": {
+      "DISCOVERY:CONTINUATION": 20,
+      "DISCOVERY:ENTRY_FORMING": 20,
+      "HOLDOUT:CONTINUATION": 15,
+      "HOLDOUT:ENTRY_FORMING": 15
+    },
+    "base_anchor_file": "anchor_plan_base_v1.csv",
+    "base_anchor_sha256": "2ce5a755737c34fc52e7443bfd740d8e5030bef0d33804e5cd8e4b232a5a988c",
+    "base_anchors": 92,
+    "combined_anchor_sha256": "bf18964797dd1635aaaeebb6e0362d6af167700a14b6a997d3898a19636a9ffd",
+    "combined_anchors": 162,
+    "contract_design_unchanged": true,
+    "execution_model_unchanged": "exact next option bar open; no fill",
+    "frozen_before_supplement_fetch": true,
+    "selection_rule": "unused ENTRY_FORMING/CONTINUATION events, evenly spaced within the unchanged 2026-02-01 chronological partitions; no option availability or future outcome used for selection",
+    "status": "SUPPLEMENT_PLAN_ONLY",
+    "supplement_anchor_sha256": "6734ef530dc7b099411535be73879094448de2265e347aa1cacbbad9088da34d"
+  },
+  "symbol": "AMC",
+  "target_design": {
+    "future_only": true,
+    "required": true,
+    "right_censored_rule": "status retained; numeric calibration fields blank",
+    "status": "hypotheses frozen before expansion; numeric cutoffs not fitted",
+    "version": 1,
+    "windows": [
+      "H1",
+      "D1",
+      "D3",
+      "D5",
+      "D10"
+    ]
+  },
+  "timeframe": "15m",
+  "unique_session_dates": {
+    "DISCOVERY": 90,
+    "HOLDOUT": 53
+  },
+  "unique_ticker_count": 250
+}

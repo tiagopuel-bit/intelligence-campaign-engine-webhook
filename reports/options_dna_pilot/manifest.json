@@ -1,0 +1,40 @@
+{
+  "anchor_count": 16,
+  "anchor_family_counts": {
+    "DISCOVERY:CONTINUATION": 2,
+    "DISCOVERY:ENTRY_FORMING": 2,
+    "DISCOVERY:RISK_OR_EXHAUSTION": 2,
+    "DISCOVERY:THESIS_PRESSURE": 2,
+    "HOLDOUT:CONTINUATION": 2,
+    "HOLDOUT:ENTRY_FORMING": 2,
+    "HOLDOUT:RISK_OR_EXHAUSTION": 2,
+    "HOLDOUT:THESIS_PRESSURE": 2
+  },
+  "causal_note": "DNA event is available at decision_available_utc; outcomes start after it.",
+  "cohort_count": 44,
+  "contract_design": {
+    "bar_timeframe": "15m",
+    "dte_targets": [
+      14,
+      30,
+      60
+    ],
+    "history_days_before": 7,
+    "moneyness_targets": [
+      0.0
+    ],
+    "outcome_days_after": 21,
+    "types": [
+      "CALL",
+      "PUT"
+    ]
+  },
+  "failure_count": 0,
+  "holdout_start": "2026-02-01",
+  "provider": "Massive Options Basic aggregates/reference; no Greeks, IV, OI or quotes claimed.",
+  "raw_replay": "/Users/tiago/Desktop/Campaing Inteligence Engine/_deepseek_expanded_rerun_stage/audited_output/replay/AMC_events_15m.csv.gz",
+  "raw_replay_sha256": "a0a26ce9f70a0da75436c0065bebe374d52af5220c8dfdecd43c02c3e1ac5edc",
+  "status": "FETCHED",
+  "symbol": "AMC",
+  "timeframe": "15m"
+}

@@ -1,0 +1,1422 @@
+[
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-edb14df2e3d69f16",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-dd3217c84caf0b07",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-5cc8e938bca4ffb9",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-e3d234e7d53a8d6b",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-21c4996294c62f10",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-e2821260647aa3b0",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-e4dcb05594096587",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-8e4cc5f808798f26",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-87be9df5a6f1c639",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6e13d9dc36999151",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-9437500a897c0221",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d9c3a2617ae32b96",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-43a2284a469cb807",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6e52e4e1a9471c54",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-ad3923b3b96f613e",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-dc6157312de7c0a9",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-e19da57a8cbeb427",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-47209f941e613e5f",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-bc088d2566f910a3",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-13e448857348d88c",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d2338287480d95b8",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-9972d0ffd25072b5",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-1390a525b9a76389",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-e36e7181f13e9301",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-f006d7fd676d829a",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-71fb716a8d8dfb47",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d376d3d28d4db71c",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-4d9de1e94b561b95",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-2fd1b513693a9cf1",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-41ae3015737e5952",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-9b15a9bce57329af",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-813c79880a8946bd",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d508077809bc2f2c",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-2810a652db72d68e",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-324eac305e24ed0f",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-736516d64c1b266e",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-228c1636ae7618c3",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d5959b9041f8f51e",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-88743306b0f83deb",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-b7626b3e44b0cf11",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-ce3fddca4d67f67b",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-29ec3597eb2f028d",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-4ea642116a5a170d",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-9928a552207b5c31",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-c2f2df15f529e92a",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-67191c537664813d",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-fb1a8bde6fb278e3",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6d28b59ccb108ac4",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d63db9bec7e585fa",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-15b86d5dfa213f87",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-cbdeb29c3a736a1f",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-b2cc80b794974cc1",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-5e625cbfdc7ff779",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-91bf2a1f446fd60c",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-4f958c6e03d2483a",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6453b1587383c3ff",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-f4e8b6bbf5ff0635",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6ebc64fbe996ba3e",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6bc126cf3cd054d6",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-473b4943791a3dc3",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-ce4c2a6e03ea0472",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-3b3f313c868a4c9d",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-31d1aff09b6fd96d",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-79f1308962c696da",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-9928b558bfd1cd43",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-2eaab1b7756f35f9",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-95e7c49904c06d3b",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-9834a238d454d25b",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-9dacf5f9cd6a0fe3",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-d5d73e3acd645cea",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-80a64b79d2eb8a7a",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-b44eaa945f6c059f",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-aa3c86f380e7b435",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-9f0db13405a20548",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-152784c32e4e4d3b",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-83a0045c5ad460a5",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-2fceb4d41b29b181",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-a285ed21105c849b",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-357477a2a84c2edf",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-9714bb46ac7a5e1b",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mae_pct",
+      "D1__terminal_return_pct"
+    ],
+    "target": "EARLY_PREMIUM_CONFIRMATION"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-ae88991d19445fb9",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-ead243b7817e341d",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-52a22c41d88b4632",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-470277c1db2cf3de",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-7a3132a28abf33a1",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-4097de188f0b21e9",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d84c1298060079f9",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-b8095e7634bc569d",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-c16ba1f16583b3b8",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-5ea0ebbd065cd2df",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-7e53409fba32302b",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-5674c9b8e8112185",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-51b4f7ee1981048a",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d2b8bb01a64cb8b6",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6a598b1e3b7db3f1",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-12ddd7678bfcd1d4",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-599f598253f0a562",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-fcb836a46ae2fe8a",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d2ca119648d4aa8f",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-d329318400d2b145",
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-129d6f9841260411",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-5289effc26eab86e",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-a5fa13dc9cd88a96",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-c31287be20062220",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-33ba0ad583e81f75",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-ea73b154a375d4ec",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-7f69e07df78ea10c",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-309d20fb780b4af8",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-f9083e0debf4404f",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-0c0d49b060bceea2",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-b5f9f1ea30b51a5c",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-7a56c0109d947fa4",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-086c3f9c1651a510",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-79b14412bcf387cf",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-0d61bbb2d1e4fd6b",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-6460a3a87e8dc59e",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-1639af50fd6cf7cc",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-3d4259df96119840",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-8ca49e4c113eea6c",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "ACTIVE_PRINT_SUPPORTED",
+    "candidate_id": "CAND-007b24b5c85734f7",
+    "contract_type": "CALL",
+    "dte_target": "30",
+    "near_zero_fields": [],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-a192c440db397c93",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-fdfbc3fc88bc25d4",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-89e9e7fa004b3dc8",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-4a491a966b296d3e",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-94bd5c5d253a0aba",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-7ee796df5694af49",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-c54ba68b761d4828",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-a99c1cf3e8dda2b6",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-e4a1d7e3c84a586d",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-ddb110a71668e3fb",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-3b4e95962edd497b",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-28dcf37e9cdefc22",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-77bc743e004762f0",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-616b35613f9dc664",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-dc231c7986e914a8",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-e1f9089592fd0c03",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-39ed6884956977ba",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-22524397c196709f",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-ea7737aba70790b9",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-55df349375e98421",
+    "contract_type": "PUT",
+    "dte_target": "14",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-21e34d4196d5f693",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-fe118a250cfa9e65",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-c32bff2276db285f",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-5b36c3bcef0f86f9",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-5a54e74502680876",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-3c3e33275329ac60",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-6b42bd1d63d02cfb",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-e8d6b369f3c68fb8",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-5d988938ab208888",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-c4b0c079ed31e222",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-86e07460b4eb51ae",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-2ba5414d2e8e974b",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-868ef331728f798a",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-37a90f690bbda692",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-e870c673674e44ab",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-6e882dbb44f7aca8",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-e1e3fa2443e310ab",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-960af5115d26e2e5",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-4ea396e56d0ebc96",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  },
+  {
+    "audit_status": "LIQUIDITY_SENSITIVE",
+    "candidate_id": "CAND-d2c6ef984babaa8e",
+    "contract_type": "PUT",
+    "dte_target": "30",
+    "near_zero_fields": [
+      "H1__mfe_pct"
+    ],
+    "target": "CONFIRMATION_FAILURE"
+  }
+]

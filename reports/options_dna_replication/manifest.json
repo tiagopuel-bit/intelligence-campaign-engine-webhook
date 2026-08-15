@@ -1,0 +1,148 @@
+{
+  "acceptance_criteria_file": "acceptance_criteria_v1.json",
+  "acceptance_criteria_sha256": "f48c9ffc8b9ec42f07d874ff57cca4ee44e1d771ba3629b3044ede8ea85ce8c1",
+  "amc_provenance_only": true,
+  "anchor_count": 384,
+  "anchor_counts_by_asset": {
+    "GME": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "LULU": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "PYPL": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "RBLX": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "SPY": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "TSLA": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "U": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    },
+    "VALE": {
+      "DISCOVERY:CONTINUATION": 8,
+      "DISCOVERY:ENTRY_FORMING": 8,
+      "DISCOVERY:RISK_OR_EXHAUSTION": 8,
+      "DISCOVERY:THESIS_PRESSURE": 8,
+      "HOLDOUT:CONTINUATION": 4,
+      "HOLDOUT:ENTRY_FORMING": 4,
+      "HOLDOUT:RISK_OR_EXHAUSTION": 4,
+      "HOLDOUT:THESIS_PRESSURE": 4
+    }
+  },
+  "assets": [
+    "SPY",
+    "TSLA",
+    "GME",
+    "U",
+    "RBLX",
+    "PYPL",
+    "LULU",
+    "VALE"
+  ],
+  "cache_hits": {
+    "option_bars": 0,
+    "reference": 0
+  },
+  "candidate": {
+    "active_print_definition": "non-zero causal contract__option_return (epsilon 1e-9)",
+    "conditions": [
+      {
+        "feature": "contract__close_location",
+        "operator": "<=",
+        "threshold": 0.33333333333333354
+      },
+      {
+        "feature": "underlying__campaign_health",
+        "operator": "<=",
+        "threshold": 31.600000000000005
+      }
+    ],
+    "contract_type": "CALL",
+    "dte_target": "14",
+    "execution_clock": "exact next option-bar open; no shifted or synthetic fill",
+    "moneyness_policy": "nearest regular 100-share strike when \u00b17.5% ATM is unavailable",
+    "scope": "OBSERVE_ENTRY",
+    "target": "CONFIRMATION_FAILURE"
+  },
+  "candidate_sha256": "d2e6452a01b5aff663aa646c134a5245bbb64a59e7f65d6e0568817606f30f40",
+  "cell": {
+    "contract_type": "CALL",
+    "dte_target": "14"
+  },
+  "cohort_count": 370,
+  "failure_count": 14,
+  "holdout_start": "2026-02-01",
+  "purpose": "multi-asset external replication; no thresholds fit, no outcomes read",
+  "request_counts": {
+    "option_bars": 337,
+    "reference": 350
+  },
+  "source_replay_sha256": {
+    "GME": "4066d9805040e402773a83bf237d1254c10600ebab6bb9bef90679169b39c030",
+    "LULU": "bcf7f654718134b94ebbe55bcc239654f160216fe1ded822f874d9b5a545615d",
+    "PYPL": "0f14cadf3b65200efa3346c4539f2651ed5dd1a1800dc0d5884463411dd7b655",
+    "RBLX": "d2a657f96f7e81cc04b664e788d1d64a6960f4340200087c41bd85f2f24a0f80",
+    "SPY": "4ed3aaccdacbe6299413bde81e7df0f560fdb2f0d5d71172d2185bb01342b336",
+    "TSLA": "15c5d7de8b53349fa72d61919271519f07fff0d1922e14b384c46f4156953378",
+    "U": "178c5e369a8815321314e20137cbc1e1e6e554d0c04c9dd92b7669cb159da675",
+    "VALE": "8e0416c674691afb9989a0fe03e545a4f2f09f9ebccf146faaa7692282320fef"
+  },
+  "status": "FETCHED_WITH_FAILURES",
+  "unique_ticker_count": 337
+}

@@ -1,0 +1,25 @@
+{
+  "entry_ineligible_excluded": 185,
+  "entry_rows": 361,
+  "guidance_emitted": false,
+  "hypotheses": [
+    "EARLY_PREMIUM_CONFIRMATION",
+    "CONFIRMATION_FAILURE",
+    "RETAINED_EXPANSION",
+    "GIVEBACK_AFTER_EXPANSION",
+    "PERSISTENT_PREMIUM_DAMAGE",
+    "RUNAWAY_CONTINUATION"
+  ],
+  "input_sha256": {
+    "cohort": "d9c0142df5b5901f8d5d7147ad5344bfeb48514258fafddb878aebcaa1bbc119",
+    "component": "786e8ba8551c10c868844cfb10a0cd9138fc23e9e59b7b9b2b17f207488cf574",
+    "entry_catalyst": "f35104e99068a6d6d74ba577631ec0e028daef47735f0335e85805d2a87d44c3",
+    "entry_target": "2bae328b660aaa670e19be946a5c1b9526b61214f1adedd0a86d0aea598888fb",
+    "manifest": "c469bef809d9cd16d5edf3db2db09b8cba7e97820dea13079486be3eef1b0529"
+  },
+  "position_management_status": "BLOCKED_INSUFFICIENT_REPLAY_COVERAGE",
+  "research_only": true,
+  "rules_fitted": false,
+  "scope": "OBSERVE_ENTRY",
+  "stage": "ENTRY_TARGET_FREEZE_ONLY"
+}
