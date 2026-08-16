@@ -294,6 +294,14 @@
   .dna-slice-head strong{font-size:18px}.dna-portfolio-slice:first-child .dna-slice-head strong{font-size:28px;line-height:1;letter-spacing:-.035em}
   .dna-pill{display:inline-flex;padding:3px 8px;border-radius:999px;font-size:9px;font-weight:700;background:rgba(37,99,235,.10);color:#1d4ed8;white-space:nowrap}
   .dna-warmup{display:inline-flex;vertical-align:middle;margin-left:6px;padding:2px 8px;border-radius:999px;font-family:var(--font-display);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent);white-space:nowrap}
+  .dna-lifecycle{display:inline-flex;vertical-align:middle;margin-left:6px;padding:2px 8px;border-radius:999px;font-family:var(--font-display);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;border:1px solid var(--line)}
+  .dna-lifecycle-ignition{background:var(--accent-glow);color:var(--accent);border-color:var(--accent)}
+  .dna-lifecycle-establishment{background:var(--positive-glow);color:var(--positive);border-color:var(--positive)}
+  .dna-lifecycle-cascade_up{background:var(--positive-glow);color:var(--positive);border-color:var(--positive)}
+  .dna-lifecycle-stretch_cluster{background:var(--warning-glow);color:var(--warning);border-color:var(--warning)}
+  .dna-lifecycle-fail_cluster{background:var(--critical-glow);color:var(--critical);border-color:var(--critical)}
+  .dna-lifecycle-faded{background:var(--surface-2);color:var(--muted);border-color:var(--line)}
+
   .warmup-note-inline{margin-top:6px;padding:8px 10px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-glow);color:var(--text);font-size:10.5px;line-height:1.45}
   .dna-pill.green{background:rgba(28,154,87,.10);color:#0d7f4b}.dna-pill.red{background:var(--critical-glow);color:var(--critical)}
   .dna-slice-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
@@ -564,6 +572,105 @@
     if (!fresh.length) return null;
     fresh.sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); });
     return { row: fresh[0], ownerText: t.owner.text, ownerTf: t.owner.lead.timeframe };
+  }
+
+  // --- Campaign lifecycle: ignition -> establishment -> resolution ---------
+  // Discrete stage read from the current /state_all snapshot, closed
+  // vocabulary per reports/CAMPAIGN_LIFECYCLE_SPEC.md. Per-asset reliability
+  // mask is precomputed in tables/dna_campaign_lifecycle_reliability.csv.
+  var LIFECYCLE_RELIABILITY = {
+    "AMC": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1},
+    "GME": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1},
+    "PYPL": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1},
+    "RBLX": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1},
+    "SPY": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1},
+    "VALE": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1},
+    "U": {"5m":1,"15m":1,"30m":1,"1H":1,"2H":1,"3H":1,"4H":1}
+  };
+  var LIFECYCLE_ENTRY = ["EXPANSION","IGNITION","STRONG START","CAMPAIGN START","FIRE ADD","ADD","RELOAD","ACCUMULATE","ACCUMULATION"];
+  function lifeTfKey(tf) {
+    var c = canonTf(String(tf));
+    if (c === "D") return "1D";
+    if (c === "W") return "W";
+    if (c === "3") return null; // 3m is live-only, no backfill -> thin
+    var n = parseInt(c, 10);
+    if (isNaN(n)) return null;
+    return n >= 60 ? (n / 60) + "H" : n + "m";
+  }
+  function phaseFamily(p) {
+    var up = (p || "").toUpperCase();
+    if (BROKEN.indexOf(up) !== -1) return "fail";
+    if (STRESSED.indexOf(up) !== -1) return "fail_test";
+    if (STRETCH.indexOf(up) !== -1) return "stretch";
+    if (LIFECYCLE_ENTRY.indexOf(up) !== -1) return "entry";
+    if (up === "START TEST" || up === "IGNITION TEST") return "entry_test";
+    return "quiet";
+  }
+  function lifecycleStage(states, sym) {
+    var rel = LIFECYCLE_RELIABILITY[String(sym || "").toUpperCase()] || null;
+    function reliable(tf) {
+      if (rel === null) return true; // asset not in the mask -> no evidence to exclude
+      var k = lifeTfKey(tf);
+      if (k === "1D" || k === "W") return true; // backbone anchor, always trusted
+      if (k === null) return false; // thin timeframe (3m), excluded
+      return rel[k] === 1;
+    }
+    var rows = (states || []).filter(function (s) { return reliable(s.timeframe); });
+    function row(tf) {
+      for (var i = 0; i < rows.length; i++) if (String(rows[i].timeframe) === String(tf)) return rows[i];
+      return null;
+    }
+    function fam(tf) { var r = row(tf); return r ? phaseFamily(r.phase) : null; }
+    function mins(tf) { var r = row(tf); return r ? age(r.bar_time).mins : Infinity; }
+    function recFam(tf) { var r = row(tf); return r ? phaseFamily(r.recent_event) : null; }
+    var LOWER = ["3","5","15","30"], CONFIRM = ["60","120"], OWNER = ["180","240"], BACKBONE = ["D","W"];
+    var higher = CONFIRM.concat(OWNER).concat(BACKBONE);
+
+    // 1. cascade-up: a higher tier confirmed the run (currently building).
+    for (var i = 0; i < higher.length; i++) {
+      if (fam(higher[i]) === "entry" && mins(higher[i]) <= 8 * 60) {
+        return { stage: "cascade_up", label: "campaign confirmed", detail: tfLabel(higher[i]) + " confirmed the run" };
+      }
+    }
+    // 2. fail / stretch cluster among reliable lower tiers (<= 30 min).
+    var fails = [], stretches = [];
+    LOWER.forEach(function (tf) {
+      var f = fam(tf); if (mins(tf) > 30) return;
+      if (f === "fail" || f === "fail_test") fails.push(tf);
+      else if (f === "stretch") stretches.push(tf);
+    });
+    if (fails.length >= 2) {
+      return { stage: "fail_cluster", label: "breakdown cluster", detail: fails.map(tfLabel).join(" + ") + " failed together" };
+    }
+    if (stretches.length >= 2) {
+      return { stage: "stretch_cluster", label: "take-profit cluster", detail: stretches.map(tfLabel).join(" + ") + " stretched together" };
+    }
+    // 3. ignition: timing entry just fired + higher tiers still quiet.
+    var timingEntry = null;
+    ["15","30"].forEach(function (tf) { if (fam(tf) === "entry" && mins(tf) <= 30) timingEntry = timingEntry || tf; });
+    var higherQuiet = higher.every(function (tf) {
+      var f = fam(tf); return f !== "entry" && f !== "stretch" && f !== "fail" && f !== "fail_test";
+    });
+    if (timingEntry && higherQuiet) {
+      return { stage: "ignition", label: "ignition", detail: tfLabel(timingEntry) + " fired the first entry while higher tiers are quiet" };
+    }
+    // 4. establishment: the timing run is holding (recent, not a fresh flicker).
+    var timingRecent = null;
+    ["15","30"].forEach(function (tf) {
+      if (mins(tf) <= 8 * 60 && (fam(tf) === "entry" || recFam(tf) === "entry")) timingRecent = timingRecent || tf;
+    });
+    if (timingRecent && higherQuiet) {
+      return { stage: "establishment", label: "run established", detail: "the " + tfLabel(timingRecent) + " run is holding without a resolution" };
+    }
+    // 5. faded: an earlier lower-tier entry never confirmed and has gone quiet.
+    var fadedTf = null;
+    LOWER.forEach(function (tf) {
+      if (recFam(tf) === "entry" && mins(tf) > 8 * 60 && mins(tf) <= 24 * 60) fadedTf = fadedTf || tf;
+    });
+    if (fadedTf) {
+      return { stage: "faded", label: "attempt faded", detail: "an earlier " + tfLabel(fadedTf) + " entry never confirmed" };
+    }
+    return { stage: "idle", label: null, detail: null };
   }
 
   // --- Actions: only what's actionable now, never a running commentary --
@@ -1878,8 +1985,10 @@
 
     var warmupBadge = a.warmup ? ' <span class="dna-warmup" title="Campaign already constructive, confirmation has not caught up yet, fresh entry signal on ' + tfLabel(a.warmup.row.timeframe) + '">warming up</span>' : '';
     var warmupNote = a.warmup ? '<div class="copy warmup-note-inline">Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up — ' + tfLabel(a.warmup.row.timeframe) + ' just fired <b>' + a.warmup.row.signal_event + '</b>. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '';
+    var lifecycle = lifecycleStage(states, sym);
+    var lifecycleBadge = lifecycle.label ? ' <span class="dna-lifecycle dna-lifecycle-' + lifecycle.stage + '" title="' + lifecycle.detail + '">' + lifecycle.label + '</span>' : '';
     var decision = '<section class="dna-decision" aria-label="Current campaign decision">' +
-      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span>' + warmupBadge + '</h2><div class="copy">' + a.why + '</div>' + warmupNote + '</div>' +
+      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span>' + warmupBadge + lifecycleBadge + '</h2><div class="copy">' + a.why + '</div>' + warmupNote + '</div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Recommended action</div><div class="big">' + action + '</div><div class="copy">Rule-based DNA guidance</div></div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Next confirmation</div><div class="copy" style="color:#2563eb;font-weight:700">' + nextText + '</div><div class="copy">Timing before action</div></div>' +
       '<div class="dna-decision-cell risk"><div class="eyebrow">Main risk</div><div class="copy critical" style="font-weight:700">' + riskText + '</div><div class="copy">Slower structure remains the authority</div></div></section>';
