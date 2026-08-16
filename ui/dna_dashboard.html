@@ -1095,7 +1095,7 @@
   }
 
   // --- Your position: manual log, no broker ------------------------------
-  var posCache = {}, chainCache = {};
+  var posCache = {}, chainCache = {}, insightCache = {};
 
   function loadChain(sym) {
     var base = baseInput.value.trim().replace(/\/$/, "");
@@ -1104,6 +1104,15 @@
       .then(function (r) { return r.ok ? r.json() : { contracts: [], expirations: [] }; })
       .catch(function () { return { contracts: [], expirations: [] }; })
       .then(function (d) { chainCache[sym] = d; return d; });
+  }
+
+  function loadInsight(pid) {
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    if (insightCache[pid]) return Promise.resolve(insightCache[pid]);
+    return fetch(base + "/positions/" + encodeURIComponent(pid) + "/insight", { headers: authHeaders() })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; })
+      .then(function (d) { insightCache[pid] = d; return d; });
   }
 
   function loadPositions(sym) {
@@ -1783,7 +1792,7 @@
     var manager = '<aside class="dna-manager"><div class="label">Position manager</div><div class="dna-manager-title"><strong>' + managerTitle + '</strong><span class="dna-pill green">' + (pick ? 'OPEN' : 'EMPTY') + '</span></div>' +
       '<div class="dna-manager-highlight"><div><div class="dna-k">Current price</div><div class="dna-v">' + fmtMoney(current) + '</div></div><div><div class="dna-k">Market value</div><div class="dna-v">' + fmtMoney(pick ? pick.data.market_value : null) + '</div></div><div><div class="dna-k">Total P&amp;L</div><div class="dna-v return ' + (managerPnl == null || managerPnl >= 0 ? 'pos' : 'neg') + '">' + performanceText(managerPnl, managerPct) + '</div></div><div><div class="dna-k">Return</div><div class="dna-v return ' + (managerPct == null || managerPct >= 0 ? 'pos' : 'neg') + '">' + fmtPct(managerPct) + '</div></div></div>' + timelineHtml +
       '<div class="dna-manager-grid"><div><div class="dna-k">Holding</div><div class="dna-v">' + qtyText + '</div></div><div><div class="dna-k">Entry</div><div class="dna-v">' + entryText + '</div></div><div><div class="dna-k">Breakeven</div><div class="dna-v">' + breakEven + '</div></div><div><div class="dna-k">Held</div><div class="dna-v">' + (heldDays == null ? '—' : heldDays + ' days') + '</div></div><div><div class="dna-k">DTE</div><div class="dna-v">' + (dte == null ? '—' : dte + ' days') + '</div></div></div>' +
-      '<div class="dna-risk ' + (primary ? toneClass(primary.tone) : '') + '"><strong>' + holdingRead.title + '</strong><br>' + holdingRead.summary + guidanceBullets + '</div>' +
+      '<div class="dna-risk ' + (primary ? toneClass(primary.tone) : '') + '" data-insight-pid="' + (pick ? pick.data.position_id : '') + '" data-insight-key="' + (pick ? pick.key : '') + '"><strong>' + holdingRead.title + '</strong><br>' + holdingRead.summary + guidanceBullets + '</div>' +
       '<div class="dna-held"><div class="dna-held-title">Positions held</div><div class="dna-held-list">' + heldRows + '</div></div>' +
       '<div class="dna-manager-actions"><button class="open-pos-btn" data-sym="' + sym + '">+ Add position</button>' + closeButton + '<button class="pf-del" disabled>Manage</button></div>' +
       '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div></aside>';
@@ -2325,6 +2334,7 @@
     wirePosition();
     if (selected) drawChart(selected);
     populateChainSuggestions();
+    populatePositionInsights();
     loadNewsStream();
     loadFilings();
     loadPionex();
@@ -2345,6 +2355,29 @@
           filingsBySymbol[sym] = d;
           renderCatalystWatch(sym);
         });
+    });
+  }
+
+  function populatePositionInsights() {
+    Array.prototype.forEach.call(document.querySelectorAll(".dna-risk[data-insight-pid]"), function (el) {
+      var pid = el.getAttribute("data-insight-pid");
+      if (!pid) return;
+      var key = el.getAttribute("data-insight-key") || "";
+      loadInsight(pid).then(function (d) {
+        if (!d || !d.holdings) return;
+        var match = null;
+        for (var i = 0; i < d.holdings.length; i++) {
+          if ((d.holdings[i].leg_ids || []).join(",") === key) { match = d.holdings[i]; break; }
+        }
+        if (!match) return;
+        var ins = match.insight;
+        if (!ins || ins.confidence === "no-basis") return;
+        var evidence = (ins.evidence || []).join(" · ");
+        var html = '<strong>' + esc(ins.status_label || ins.navigation_intent || "") + '</strong><br>' + esc(ins.conclusion || "");
+        if (ins.decision_change) html += '<br><span class="copy">' + esc(ins.decision_change) + '</span>';
+        if (evidence) html += '<br><span class="copy">' + esc(evidence) + '</span>';
+        el.innerHTML = html;
+      });
     });
   }
 
@@ -2371,6 +2404,7 @@
     localStorage.setItem("dna_api_token", tokenInput.value.trim());
     statusEl.textContent = "loading…";
     cache = {};
+    insightCache = {};
     app.innerHTML = '<div class="msg">Loading…</div>';
 
     fetch(base + "/assets", { headers: authHeaders() })

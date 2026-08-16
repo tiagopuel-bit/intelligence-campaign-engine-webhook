@@ -14,7 +14,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import dna_insight_library as lib
 
@@ -160,7 +160,7 @@ class ComposeTests(unittest.TestCase):
 
 class VocabularyClosureTests(unittest.TestCase):
     def test_rule_engine_references_no_greeks(self):
-        with open(os.path.join(os.path.dirname(__file__), "dna_insight_library.py")) as fh:
+        with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "dna_insight_library.py")) as fh:
             src = fh.read()
         for bad in ("theta", "delta", "gamma", "vega", "rho", "implied_volatility",
                     "probability_of_profit"):

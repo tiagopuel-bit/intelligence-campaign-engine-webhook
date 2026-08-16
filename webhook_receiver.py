@@ -40,6 +40,7 @@ from pathlib import Path
 
 import requests
 
+import dna_insight_library
 import massive_ohlc
 import massive_options
 import pionex_bridge
@@ -1502,6 +1503,95 @@ def get_position_valuation(position_id):
         status = 503 if exc.status in (429, 503) else 502
         return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
     return jsonify({"position_id": position_id, "symbol": row["symbol"], **valuation})
+
+
+def _canonical_timeframe(tf):
+    tf = str(tf or "")
+    if tf in ("1D", "1d"):
+        return "D"
+    if tf in ("1W", "1w"):
+        return "W"
+    return tf
+
+
+def _insight_holding_for_stock(stock):
+    return {
+        "avg_cost": stock.get("avg_cost"),
+        "current_price": stock.get("current_price"),
+        "total_return_pct": stock.get("total_return_pct"),
+        "first_entry": stock.get("first_entry"),
+    }
+
+
+def _insight_holding_for_option(option):
+    contract = option.get("contract") or {}
+    return {
+        "avg_cost": option.get("avg_cost"),
+        "current_price": option.get("current_price"),
+        "total_return_pct": option.get("total_return_pct"),
+        "itm": option.get("itm"),
+        "expiration": contract.get("expiration"),
+        "first_entry": option.get("first_entry"),
+    }
+
+
+@app.route("/positions/<int:position_id>/insight", methods=["GET"])
+def get_position_insight(position_id):
+    """Deterministic position guidance from the DNA insight library.
+
+    Pulls the same open instruments and states as /positions/<id>/valuation and
+    /state_all/<symbol>, then runs dna_insight_library.compose() per holding.
+    The `insight` field is the library's output verbatim -- no reshaping, no
+    free text. Upstream (Massive) failures map to 502/503 like valuation.
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    conn = get_db()
+    row = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
+    if row is None:
+        conn.close()
+        return jsonify({"error": "position not found"}), 404
+    instruments = conn.execute(
+        "SELECT * FROM position_instruments WHERE position_id=? AND status='OPEN' ORDER BY id",
+        (position_id,),
+    ).fetchall()
+    states = _dna_context(conn, row["symbol"], row["opened_at"])["states"]
+    conn.close()
+    shaped = [positions.shape_instrument(r) for r in instruments]
+    for state in states:
+        state["timeframe"] = _canonical_timeframe(state.get("timeframe"))
+
+    try:
+        valuation = _compute_valuation(row["symbol"], shaped)
+    except massive_options.UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+    except massive_ohlc._UpstreamError as exc:
+        status = 503 if exc.status in (429, 503) else 502
+        return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
+
+    holdings = []
+    stock = valuation.get("stock")
+    if stock:
+        holdings.append({
+            "leg_ids": stock.get("leg_ids") or [],
+            "instrument": "shares",
+            "insight": dna_insight_library.compose(states, _insight_holding_for_stock(stock), "shares"),
+        })
+    for option in valuation.get("options") or []:
+        contract_type = (option.get("contract") or {}).get("type")
+        instrument = "long call" if contract_type == "CALL" else "long put"
+        holdings.append({
+            "leg_ids": option.get("leg_ids") or [],
+            "instrument": instrument,
+            "insight": dna_insight_library.compose(states, _insight_holding_for_option(option), instrument),
+        })
+    return jsonify({
+        "position_id": position_id,
+        "symbol": row["symbol"],
+        "direction": row["direction"],
+        "holdings": holdings,
+    })
 
 
 init_db()
