@@ -1570,17 +1570,22 @@ def get_position_insight(position_id):
         status = 503 if exc.status in (429, 503) else 502
         return jsonify({"error": "upstream", "detail": exc.detail, "upstream_status": exc.status}), status
 
+    is_short = (row["direction"] or "").upper() == "SHORT"
     holdings = []
     stock = valuation.get("stock")
     if stock:
+        instrument = "short shares" if is_short else "shares"
         holdings.append({
             "leg_ids": stock.get("leg_ids") or [],
-            "instrument": "shares",
-            "insight": dna_insight_library.compose(states, _insight_holding_for_stock(stock), "shares"),
+            "instrument": instrument,
+            "insight": dna_insight_library.compose(states, _insight_holding_for_stock(stock), instrument),
         })
     for option in valuation.get("options") or []:
         contract_type = (option.get("contract") or {}).get("type")
-        instrument = "long call" if contract_type == "CALL" else "long put"
+        if is_short:
+            instrument = "short call" if contract_type == "CALL" else "short put"
+        else:
+            instrument = "long call" if contract_type == "CALL" else "long put"
         holdings.append({
             "leg_ids": option.get("leg_ids") or [],
             "instrument": instrument,

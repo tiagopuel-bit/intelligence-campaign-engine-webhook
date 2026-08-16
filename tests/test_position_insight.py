@@ -101,10 +101,10 @@ class PositionInsightEndpointTests(unittest.TestCase):
         return self.client.post("/webhook", data=json.dumps(payload),
                                 headers={"Content-Type": "application/json"})
 
-    def _create_position(self, symbol):
+    def _create_position(self, symbol, direction="LONG"):
         body = {
             "symbol": symbol,
-            "direction": "LONG",
+            "direction": direction,
             "origin_timeframe": "15",
             "origin_event": "STRONG START",
             "instrument": {
@@ -176,6 +176,19 @@ class PositionInsightEndpointTests(unittest.TestCase):
             resp = self.client.get(f"/positions/{pid}/insight", headers=self._state_headers())
         self.assertEqual(resp.status_code, 503)
         self.assertEqual(resp.get_json()["error"], "upstream")
+
+    def test_short_direction_gets_short_vocabulary(self):
+        symbol = "CSHORT"
+        self._post_state(symbol, "240", "FAILED", "")
+        pid = self._create_position(symbol, direction="SHORT").get_json()["id"]
+        with mock.patch.object(webhook_receiver, "_compute_valuation",
+                               return_value=self._fixed_valuation()):
+            resp = self.client.get(f"/positions/{pid}/insight", headers=self._state_headers())
+        self.assertEqual(resp.status_code, 200)
+        holding = resp.get_json()["holdings"][0]
+        self.assertEqual(holding["instrument"], "short shares")
+        self.assertEqual(holding["insight"]["campaign_condition"], "broken")
+        self.assertEqual(holding["insight"]["navigation_intent"], "hold")
 
 
 if __name__ == "__main__":

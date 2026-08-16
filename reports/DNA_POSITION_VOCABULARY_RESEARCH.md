@@ -185,11 +185,34 @@ Deterministic, precedence-ordered. Holding state and TF relationship act as
 | **shares** | protect | protect | hold | add after confirmation | hold | wait |
 | **long call** | close / stand aside | reduce | hold | consider roll (ITM) / hold (OTM) | hold | monitor time decay |
 | **long put** | hold | hold | reduce | close / stand aside | reduce | monitor time decay |
+| **short shares** | hold | hold | reduce | protect | protect | wait |
+| **short call** | hold | hold | reduce | protect | protect | monitor time decay |
+| **short put** | protect | protect | hold | hold | hold | monitor time decay |
 | **multi-leg** | wait (future-ready) | wait | wait | wait | wait | wait |
 
 Note the deliberate asymmetry: **broken/weakening helps a long put and hurts a
 long call and shares.** The matrix never reuses a share read for an option or
 vice-versa.
+
+**Short positions mirror this asymmetry a second time.** A short profits when
+price falls or stays flat, so the risk/favorable conditions invert:
+
+- broken/weakening is *favorable* for **short shares** and **short call**
+  (hold — the short is winning) and a *risk* for **short put** (assignment
+  risk — protect).
+- expanding/constructive is *favorable* for **short put** (hold — decay and a
+  rising price both help) and a *risk* for **short shares** / **short call**
+  (protect).
+
+Two further inversions, documented explicitly rather than left implicit:
+
+- **ITM/OTM meaning flips.** For a short option, ITM is the *bad* state (real
+  assignment risk) and OTM is the *good* state (likely to expire worthless, the
+  short seller's win condition) — opposite of the long-side framing in §7.
+- **Profit/loss direction flips.** "Profitable" for short shares means price is
+  *below* entry, not above. `total_return_pct` remains long-convention
+  (positive = price above entry); `holding_state()` negates it for short
+  instruments.
 
 ---
 
@@ -207,6 +230,20 @@ Modifiers refine the default intent, never override the *evidence*:
   `add after confirmation` for longs.
 - **conflicting evidence** → slower tier is authoritative; if it is neutral,
   treat as `uncertain`.
+
+Short instruments mirror the modifiers with the risk/favorable conditions and
+profit direction inverted (see §6):
+
+- **winning short** (profitable) + expanding/constructive → bias `reduce`
+  (cover part to lock gains) instead of `protect`.
+- **losing short** + expanding on short shares → bias `protect` (cap downside).
+- **high DTE pressure** (≤10 days) on a short option → `monitor time decay`
+  becomes the dominant concern unless the condition is a risk condition
+  (expanding/constructive); near expiry the short is near max profit and is
+  monitored to decide when to cover.
+- **higher-TF intact** / **multi-TF confirmation** (bullish) → escalates
+  `hold` → `protect`/`reduce` for short shares / short call.
+- **weakness propagating** (bearish) → supports `hold` for a short in `wait`.
 
 ---
 

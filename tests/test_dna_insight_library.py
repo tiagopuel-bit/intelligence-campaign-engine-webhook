@@ -173,5 +173,54 @@ class VocabularyClosureTests(unittest.TestCase):
                              set(lib.CAMPAIGN_CONDITIONS))
 
 
+class ShortVocabularyTests(unittest.TestCase):
+    # Long-convention total_return_pct: negative = price below entry = a short
+    # is winning; positive = price above entry = a short is losing.
+    SHORT_PROFIT = {"avg_cost": 2.53, "current_price": 2.0, "total_return_pct": -20.9,
+                    "first_entry": "2026-04-20T07:17:00Z"}
+    SHORT_LOSS = {"avg_cost": 2.53, "current_price": 3.0, "total_return_pct": 18.6,
+                  "first_entry": "2026-04-20T07:17:00Z"}
+
+    def test_short_shares_mirror_shares_risk_condition(self):
+        # expanding is the short's risk condition, mirroring shares' broken.
+        expanding = CONDITION_FIXTURES["expanding"]
+        broken = CONDITION_FIXTURES["broken"]
+        short_intent = lib.compose(expanding, {}, "short shares")["navigation_intent"]
+        long_intent = lib.compose(broken, {}, "shares")["navigation_intent"]
+        self.assertEqual(short_intent, long_intent)
+        self.assertEqual(short_intent, "protect")
+
+    def test_short_shares_asymmetry_is_documented(self):
+        # The mirror of "add after confirmation" is NOT an add-intent for a
+        # winning short: the closed add-intent is long-only, so a winning short
+        # in a broken campaign maps to "hold" (let the winner run).
+        self.assertEqual(lib.compose(CONDITION_FIXTURES["broken"], {}, "short shares")["navigation_intent"],
+                         "hold")
+
+    def test_short_call_risk_condition_is_protect(self):
+        self.assertEqual(lib.compose(CONDITION_FIXTURES["expanding"], {}, "short call")["navigation_intent"],
+                         "protect")
+
+    def test_short_put_risk_condition_is_protect(self):
+        self.assertEqual(lib.compose(CONDITION_FIXTURES["broken"], {}, "short put")["navigation_intent"],
+                         "protect")
+
+    def test_short_pnl_semantics_invert(self):
+        self.assertTrue(lib.holding_state(self.SHORT_PROFIT, "short shares")["profitable"])
+        self.assertFalse(lib.holding_state(self.SHORT_LOSS, "short shares")["profitable"])
+        self.assertFalse(lib.holding_state(self.SHORT_PROFIT, "shares")["profitable"])
+
+    def test_short_moneyness_is_contract_fact(self):
+        itm = {"itm": True, "expiration": "2026-09-18"}
+        self.assertEqual(lib.holding_state(itm, "short call")["moneyness"], "ITM")
+        self.assertEqual(lib.holding_state(itm, "long call")["moneyness"], "ITM")
+
+    def test_short_composition_is_closed_vocabulary(self):
+        for instrument in ("short shares", "short call", "short put"):
+            for condition in lib.CAMPAIGN_CONDITIONS:
+                out = lib.compose(CONDITION_FIXTURES[condition], {}, instrument)
+                self.assertIn(out["navigation_intent"], lib.INTENTS)
+
+
 if __name__ == "__main__":
     unittest.main()

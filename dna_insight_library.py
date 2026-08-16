@@ -37,7 +37,10 @@ INTENTS = (
     "hold", "wait", "protect", "reduce", "close / stand aside",
     "add after confirmation", "consider roll", "monitor time decay",
 )
-INSTRUMENTS = ("shares", "long call", "long put", "multi-leg option")
+INSTRUMENTS = (
+    "shares", "long call", "long put",
+    "short shares", "short call", "short put", "multi-leg option",
+)
 
 
 def tone(phase) -> str:
@@ -141,13 +144,22 @@ def _dte(expiration):
 
 
 def holding_state(holding, instrument):
-    """Composite holding state from documented fields only."""
+    """Composite holding state from documented fields only.
+
+    `total_return_pct` is long-convention (positive = price above entry), as
+    produced by /positions/<id>/valuation. For short instruments the sign is
+    inverted: a negative long-convention return means the short is winning.
+    Moneyness (ITM/OTM) is a contract-level fact and is recorded unchanged;
+    the short-side interpretation (ITM = assignment risk) lives in the §7
+    modifiers.
+    """
     holding = holding or {}
+    is_short = instrument.startswith("short")
     hs = {"profitable": None, "moneyness": None, "dte_pressure": None, "age": None}
     pct = holding.get("total_return_pct")
     if pct is not None:
-        hs["profitable"] = pct >= 0
-    if instrument in ("long call", "long put"):
+        hs["profitable"] = (pct <= 0) if is_short else (pct >= 0)
+    if instrument in ("long call", "long put", "short call", "short put"):
         itm = holding.get("itm")
         if itm is True:
             hs["moneyness"] = "ITM"
@@ -176,6 +188,18 @@ _COMPOSITION = {
         "broken": "hold", "weakening": "hold", "repairing": "reduce",
         "expanding": "close / stand aside", "constructive": "reduce", "uncertain": "monitor time decay",
     },
+    "short shares": {
+        "broken": "hold", "weakening": "hold", "repairing": "reduce",
+        "expanding": "protect", "constructive": "protect", "uncertain": "wait",
+    },
+    "short call": {
+        "broken": "hold", "weakening": "hold", "repairing": "reduce",
+        "expanding": "protect", "constructive": "protect", "uncertain": "monitor time decay",
+    },
+    "short put": {
+        "broken": "protect", "weakening": "protect", "repairing": "hold",
+        "expanding": "hold", "constructive": "hold", "uncertain": "monitor time decay",
+    },
     "multi-leg option": {
         "broken": "wait", "weakening": "wait", "repairing": "wait",
         "expanding": "wait", "constructive": "wait", "uncertain": "wait",
@@ -184,11 +208,43 @@ _COMPOSITION = {
 
 
 def _apply_modifiers(intent, instrument, condition, hs, relationship):
-    """§7: holding-state and tf-relationship modifiers refine the default intent."""
-    # Option DTE pressure dominates unless the structure is broken.
-    if instrument in ("long call", "long put") and hs["dte_pressure"] == "high" \
-            and condition != "broken":
+    """§7: holding-state and tf-relationship modifiers refine the default intent.
+
+    Short instruments mirror the long-side modifiers a second time: the risk
+    conditions are expanding/constructive (price moving against the short), the
+    favorable conditions are broken/weakening, and "profitable" already means
+    the short is winning (see holding_state).
+    """
+    is_short = instrument.startswith("short")
+    is_option = instrument in ("long call", "long put", "short call", "short put")
+    risk_conditions = ("expanding", "constructive") if is_short else ("broken",)
+
+    # Option DTE pressure dominates unless the structure already demands a
+    # protective action. Near expiry a long option loses time value fastest,
+    # while a short option is near max profit and is monitored to decide when
+    # to cover.
+    if is_option and hs["dte_pressure"] == "high" and condition not in risk_conditions:
         return "monitor time decay"
+
+    if is_short:
+        # A winning short meeting a risk condition -> lock gains by covering part.
+        if hs["profitable"] is True and condition in ("expanding", "constructive") \
+                and intent == "protect":
+            return "reduce"
+        # A losing short meeting a risk condition on shares -> cap downside.
+        if hs["profitable"] is False and condition == "expanding" \
+                and instrument == "short shares":
+            return "protect"
+        # Bullish confirmation threatens shorts -> escalate hold to protect/reduce.
+        if relationship in ("higher-TF intact", "multi-TF confirmation") \
+                and intent == "hold" and instrument in ("short shares", "short call"):
+            return "protect" if instrument == "short shares" else "reduce"
+        # Bearish confirmation supports the short -> promote wait to hold.
+        if relationship == "weakness propagating" and intent == "wait" \
+                and instrument == "short shares":
+            return "hold"
+        return intent
+
     # profitable + broken/weakening -> lock gains (reduce) instead of protect.
     if hs["profitable"] is True and condition in ("broken", "weakening") \
             and instrument in ("shares", "long call") and intent == "protect":
