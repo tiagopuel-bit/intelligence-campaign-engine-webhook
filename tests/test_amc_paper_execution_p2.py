@@ -178,6 +178,62 @@ class PaperApiTests(unittest.TestCase):
         self.assertIn("policy_sha256", stored)
         self.assertIn("corrections_v12_sha256", stored)
 
+    def test_kill_switch_route_global(self):
+        r = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/kill-switch",
+            json={"scope": "GLOBAL", "enabled": False}, headers=self.h,
+        )
+        self.assertEqual(r.status_code, 200)
+        conn = db.connect(self._tmp.name)
+        row = conn.execute(
+            "SELECT auto_enabled FROM pe_auto_switches WHERE experiment_id=? AND scope='GLOBAL'",
+            (self.experiment_id,),
+        ).fetchone()
+        conn.close()
+        self.assertEqual(row["auto_enabled"], 0)
+
+    def test_kill_switch_route_position(self):
+        r = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/kill-switch",
+            json={"scope": "POSITION", "position_ref": "7", "enabled": False}, headers=self.h,
+        )
+        self.assertEqual(r.status_code, 200)
+        conn = db.connect(self._tmp.name)
+        row = conn.execute(
+            "SELECT auto_enabled FROM pe_auto_switches WHERE experiment_id=? AND scope='POSITION' AND position_ref='7'",
+            (self.experiment_id,),
+        ).fetchone()
+        conn.close()
+        self.assertEqual(row["auto_enabled"], 0)
+
+    def test_kill_switch_route_requires_auth(self):
+        r = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/kill-switch",
+            json={"scope": "GLOBAL", "enabled": False},
+        )
+        self.assertEqual(r.status_code, 401)
+
+    def test_kill_switch_route_position_requires_ref(self):
+        r = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/kill-switch",
+            json={"scope": "POSITION", "enabled": False}, headers=self.h,
+        )
+        self.assertEqual(r.status_code, 400)
+
+    def test_kill_switch_route_rejects_unknown_fields(self):
+        r = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/kill-switch",
+            json={"scope": "GLOBAL", "enabled": False, "bogus": 1}, headers=self.h,
+        )
+        self.assertEqual(r.status_code, 400)
+
+    def test_kill_switch_route_unknown_experiment(self):
+        r = self.client.post(
+            "/paper/experiments/9999/kill-switch",
+            json={"scope": "GLOBAL", "enabled": False}, headers=self.h,
+        )
+        self.assertEqual(r.status_code, 404)
+
 
 class RunnerTests(unittest.TestCase):
     def setUp(self):

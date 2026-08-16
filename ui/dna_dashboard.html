@@ -1604,6 +1604,10 @@
     var readiness = paperExecutionReady(), mounted = paperApiMounted();
     var readinessText = readiness ? "Execution ready" : mounted ? "Safety locked" : "P2A integration pending";
     var readinessClass = readiness ? " ready" : " locked";
+    var globalAutoOff = paperChallenge.health && paperChallenge.health.global_auto_disabled === true;
+    var killSwitchEnabled = mounted && paperExperimentId != null && isFinite(Number(paperExperimentId));
+    var killLabel = globalAutoOff ? "Re-enable auto" : "Cancel auto";
+    var killTitle = killSwitchEnabled ? (globalAutoOff ? "Re-enable automatic paper execution" : "Disable automatic paper execution") : "No active experiment to control";
     var proposals = paperChallenge.proposals.slice().sort(function (a, b) { return Number(b.id || 0) - Number(a.id || 0); }).slice(0, 5);
     var queue = proposals.length ? proposals.map(paperProposalHtml).join("") : '<div class="paper-empty">No paper proposals yet.<br>DNA decisions will appear here with evidence and a 10-minute approval window.</div>';
     var amc = cache.AMC, assessment = amc && amc.assess;
@@ -1619,7 +1623,7 @@
     var trackMarks = milestones.map(function (m) { return '<i class="paper-track-mark" style="left:' + Math.min(100, m.value / diamond * 100) + '%"></i>'; }).join("");
     var milestoneLabels = milestones.map(function (m) { return '<div class="paper-track-label' + (snap.current >= m.value ? ' reached' : '') + '">' + esc(m.name) + '<strong>' + fmtMoney(m.value) + '</strong></div>'; }).join("");
     var apiMessage = paperChallenge.loading ? "Loading isolated paper API…" : paperChallenge.error ? "Paper API not mounted: " + paperChallenge.error : !readiness ? "P2A is correcting approval, fill persistence, and the authoritative cloud provider. Controls remain locked." : "Fresh provider verified. Every approval is still revalidated server-side.";
-    return '<section class="dna-panel paper-command" data-role="paper-command"><div class="paper-command-head"><div class="paper-command-title"><span class="paper-badge">Paper only</span><div><h2>AMC Portfolio Challenge</h2><p>January 2027 North Star · user + DNA decision journal · no broker path</p></div></div><div class="paper-head-actions"><span class="paper-badge' + readinessClass + '">' + readinessText + '</span><button type="button" disabled title="Enabled only after the P2A kill-switch endpoint is accepted">Cancel auto</button></div></div>' +
+    return '<section class="dna-panel paper-command" data-role="paper-command"><div class="paper-command-head"><div class="paper-command-title"><span class="paper-badge">Paper only</span><div><h2>AMC Portfolio Challenge</h2><p>January 2027 North Star · user + DNA decision journal · no broker path</p></div></div><div class="paper-head-actions"><span class="paper-badge' + readinessClass + '">' + readinessText + '</span><button type="button" data-paper-kill-switch="GLOBAL"' + (killSwitchEnabled ? '' : ' disabled') + ' title="' + killTitle + '">' + killLabel + '</button></div></div>' +
       '<div class="paper-command-body"><div class="paper-progress"><div class="paper-kpis">' +
         '<div class="paper-kpi"><span>Total portfolio value</span><strong>' + fmtMoney(snap.current) + '</strong><small>' + esc(snap.source) + '</small></div>' +
         '<div class="paper-kpi"><span>Open-position P&amp;L</span><strong class="' + (snap.totals.pnl >= 0 ? 'pos' : 'neg') + '">' + fmtSigned(snap.totals.pnl) + '</strong><small>Realized ' + fmtSigned(realized) + '</small></div>' +
@@ -1670,10 +1674,26 @@
       .catch(function (err) { paperMessage("Paper decision blocked: " + err.message, true); });
   }
 
+  function paperKillSwitch(scope) {
+    var globalAutoOff = paperChallenge.health && paperChallenge.health.global_auto_disabled === true;
+    var enabled = globalAutoOff;
+    var body = { scope: scope, enabled: enabled };
+    var base = baseInput.value.trim().replace(/\/$/, "");
+    paperMessage("Updating kill switch…", false);
+    fetch(base + "/paper/experiments/" + paperExperimentId + "/kill-switch", {
+      method: "POST", headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+      body: JSON.stringify(body)
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) { if (!r.ok) throw new Error(d.detail || d.error || "HTTP " + r.status); return d; }); })
+      .then(function () { paperMessage("Kill switch updated. Refreshing…", false); loadPaperChallenge(true); })
+      .catch(function (err) { paperMessage("Kill switch blocked: " + err.message, true); });
+  }
+
   function wirePaperControls() {
     Array.prototype.forEach.call(document.querySelectorAll("[data-paper-decision]"), function (button) {
       button.addEventListener("click", function () { paperMutation(button.dataset.paperId, button.dataset.paperDecision, button.dataset.paperAction); });
     });
+    var killButton = document.querySelector("[data-paper-kill-switch]");
+    if (killButton) killButton.addEventListener("click", function () { paperKillSwitch(killButton.dataset.paperKillSwitch); });
     if (paperCountdownTimer) clearInterval(paperCountdownTimer);
     paperCountdownTimer = setInterval(updatePaperCountdowns, 1000);
     updatePaperCountdowns();

@@ -16,6 +16,7 @@ from paper_execution.store import (
     AUTO_MODE,
     TransitionConflict,
     InvalidTransition,
+    claim_approved_proposal,
     claim_due_proposal,
     create_experiment,
     create_proposal,
@@ -226,13 +227,14 @@ class StoreTests(unittest.TestCase):
             amc_target_floor_pct=30.0, confidence_status="INTACT", contract_sha256=frozen_goal_hash(),
         )
 
-    def _proposal(self, experiment_id, key="k1", expires=10, action="close", mode=AUTO_MODE, very_high=True):
+    def _proposal(self, experiment_id, key="k1", expires=10, action="close", mode=AUTO_MODE, very_high=True, position_ref=None):
         return create_proposal(
             self.conn, experiment_id=experiment_id, idempotency_key=key, action=action,
             mode=mode, symbol="AMC", policy_sha256=frozen_policy_hash(),
             time_sensitive_reason="confirmation", very_high=very_high, very_high_missing_roots=[],
             expires_at=_iso(expires), cancel_condition="stale_underlying",
             evidence_roots=[{"root": "underlying_dna", "present": True, "raw_fields": {}, "missing_evidence": [], "contradictions": [], "veto": False}],
+            position_ref=position_ref,
         )
 
     def test_frozen_hashes_preserved(self):
@@ -344,6 +346,28 @@ class StoreTests(unittest.TestCase):
         set_kill_switch(self.conn, eid, "GLOBAL", None, enabled=False)
         out = claim_due_proposal(self.conn, pid, _iso(0))
         self.assertEqual(out["reason"], "KILL_SWITCH_ACTIVE")
+
+    def test_position_kill_switch_blocks_only_that_position_due(self):
+        eid = self._experiment()
+        p1 = self._proposal(eid, key="pos1", expires=-1, position_ref="1")
+        p2 = self._proposal(eid, key="pos2", expires=-1, position_ref="2")
+        set_kill_switch(self.conn, eid, "POSITION", "1", enabled=False)
+        blocked = claim_due_proposal(self.conn, p1, _iso(0))
+        allowed = claim_due_proposal(self.conn, p2, _iso(0))
+        self.assertEqual(blocked["reason"], "KILL_SWITCH_ACTIVE")
+        self.assertTrue(allowed["claimed"])
+
+    def test_position_kill_switch_blocks_only_that_position_approved(self):
+        eid = self._experiment()
+        p1 = self._proposal(eid, key="apos1", expires=10, position_ref="1")
+        p2 = self._proposal(eid, key="apos2", expires=10, position_ref="2")
+        transition(self.conn, p1, "APPROVED", actor="user", expected_from="PENDING_APPROVAL")
+        transition(self.conn, p2, "APPROVED", actor="user", expected_from="PENDING_APPROVAL")
+        set_kill_switch(self.conn, eid, "POSITION", "1", enabled=False)
+        blocked = claim_approved_proposal(self.conn, p1)
+        allowed = claim_approved_proposal(self.conn, p2)
+        self.assertEqual(blocked["reason"], "KILL_SWITCH_ACTIVE")
+        self.assertTrue(allowed["claimed"])
 
 
 if __name__ == "__main__":

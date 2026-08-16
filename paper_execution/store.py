@@ -230,7 +230,7 @@ def claim_due_proposal(conn, proposal_id: int, now_iso: str, *, actor: str = "ru
     ).fetchone()
     if experiment is None or experiment["status"] != "ACTIVE":
         return {"claimed": False, "proposal_id": proposal_id, "reason": "EXPERIMENT_NOT_ACTIVE"}
-    if kill_switch_active(conn, row["experiment_id"]):
+    if kill_switch_active(conn, row["experiment_id"], position_ref=row["position_ref"]):
         return {"claimed": False, "proposal_id": proposal_id, "reason": "KILL_SWITCH_ACTIVE"}
     cur = conn.execute(
         "UPDATE pe_order_proposals SET current_status='REVALIDATING', status='REVALIDATING' "
@@ -278,7 +278,7 @@ def claim_approved_proposal(conn, proposal_id: int, *, actor: str = "runner") ->
     experiment = conn.execute("SELECT status FROM pe_experiments WHERE id=?", (row["experiment_id"],)).fetchone()
     if experiment is None or experiment["status"] != "ACTIVE":
         return {"claimed": False, "proposal_id": proposal_id, "reason": "EXPERIMENT_NOT_ACTIVE"}
-    if kill_switch_active(conn, row["experiment_id"]):
+    if kill_switch_active(conn, row["experiment_id"], position_ref=row["position_ref"]):
         return {"claimed": False, "proposal_id": proposal_id, "reason": "KILL_SWITCH_ACTIVE"}
     cur = conn.execute(
         "UPDATE pe_order_proposals SET current_status='REVALIDATING', status='REVALIDATING' "

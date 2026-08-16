@@ -207,6 +207,115 @@ _COMPOSITION = {
 }
 
 
+# --- copy (wording pass 2026-08: specific, not a fill-in-the-blank) ---------
+# Each structural clause names the instrument + condition so swapping two rows
+# stops making sense. Grounded only in §2 fields; no Greeks, no confidence.
+
+_ACTION_PHRASE = {
+    "hold": "hold",
+    "wait": "wait for the next classified event",
+    "protect": "protect the position",
+    "reduce": "scale down",
+    "close / stand aside": "exit the position",
+    "add after confirmation": "add only after the next event confirms",
+    "consider roll": "consider rolling",
+    "monitor time decay": "monitor time decay",
+}
+
+_STRUCTURE_WHY = {
+    "shares": {
+        "broken": "a broken campaign puts open shares at downside risk, not at an entry",
+        "weakening": "momentum is rolling over under open shares, so tightening the stop matters more than chasing",
+        "repairing": "a recovery is rebuilding the structure, so an early add is premature",
+        "expanding": "a building campaign supports shares",
+        "constructive": "lower tiers are supportive but the campaign tier is still unconfirmed",
+        "uncertain": "there is no dominant reading to act on",
+    },
+    "long call": {
+        "broken": "a broken campaign works against a long call — decay now compounds the loss",
+        "weakening": "a weakening structure and time decay both work against a long call",
+        "repairing": "a repair is underway, but decay still sets the clock on a long call",
+        "expanding": "an expanding campaign supports a long call",
+        "constructive": "the setup is constructive but unproven, leaving decay as the only pressure",
+        "uncertain": "with no structural edge, time decay is the only live factor on a long call",
+    },
+    "long put": {
+        "broken": "a broken campaign is doing its job as downside protection for a long put",
+        "weakening": "a weakening structure supports a long put",
+        "repairing": "a repair is underway against a long put, so the downside thesis is fading",
+        "expanding": "an expanding campaign invalidates the downside thesis behind a long put",
+        "constructive": "a constructive setup argues against a long put",
+        "uncertain": "with no structural edge, decay is the only live factor on a long put",
+    },
+    "short shares": {
+        "broken": "a broken campaign is working for the short",
+        "weakening": "a weakening structure is working for the short",
+        "repairing": "a recovery is moving against the short",
+        "expanding": "an expanding campaign is moving against the short",
+        "constructive": "a constructive setup is building against the short",
+        "uncertain": "there is no dominant reading on the short",
+    },
+    "short call": {
+        "broken": "decay and falling price both work for a short call",
+        "weakening": "decay and a rolling-over structure both work for a short call",
+        "repairing": "a recovery raises assignment risk on a short call",
+        "expanding": "rising price brings assignment risk on a short call",
+        "constructive": "a constructive setup raises assignment risk on a short call",
+        "uncertain": "with no structural edge, decay is the only live factor on a short call",
+    },
+    "short put": {
+        "broken": "falling price brings assignment risk on a short put",
+        "weakening": "a weakening structure raises assignment risk on a short put",
+        "repairing": "a recovery is working for a short put",
+        "expanding": "an expanding campaign is working for a short put",
+        "constructive": "a constructive setup supports a short put",
+        "uncertain": "with no structural edge, decay is the only live factor on a short put",
+    },
+    "multi-leg option": {
+        "broken": "multi-leg net exposure is not computable from the manual model",
+        "weakening": "multi-leg net exposure is not computable from the manual model",
+        "repairing": "multi-leg net exposure is not computable from the manual model",
+        "expanding": "multi-leg net exposure is not computable from the manual model",
+        "constructive": "multi-leg net exposure is not computable from the manual model",
+        "uncertain": "multi-leg net exposure is not computable from the manual model",
+    },
+}
+
+
+def _conclusion(instrument, condition, intent):
+    why = _STRUCTURE_WHY.get(instrument, _STRUCTURE_WHY["multi-leg option"])[condition]
+    action = _ACTION_PHRASE[intent]
+    return f"{why.capitalize()}; {action}."
+
+
+def _evidence_phrases(hs, instrument):
+    """Human phrases for the holding facts, no raw field names."""
+    is_short = instrument.startswith("short")
+    phrases = []
+    if hs.get("profitable") is True:
+        phrases.append("the short is winning" if is_short else "up on the position")
+    elif hs.get("profitable") is False:
+        phrases.append("the short is losing" if is_short else "down on the position")
+    moneyness = hs.get("moneyness")
+    if moneyness == "ITM":
+        phrases.append("in the money")
+    elif moneyness == "OTM":
+        phrases.append("out of the money")
+    dte = hs.get("dte_pressure")
+    if dte == "high":
+        phrases.append("near expiry")
+    elif dte == "medium":
+        phrases.append("moderate time left")
+    elif dte == "low":
+        phrases.append("comfortable time left")
+    age = hs.get("age")
+    if age == "mature":
+        phrases.append("held a while")
+    elif age == "new":
+        phrases.append("recently opened")
+    return phrases
+
+
 def _apply_modifiers(intent, instrument, condition, hs, relationship):
     """§7: holding-state and tf-relationship modifiers refine the default intent.
 
@@ -301,8 +410,8 @@ def compose(states, holding, instrument, required_fields=None):
         "tf_relationship": relationship,
         "holding_state": hs,
         "status_label": intent,
-        "conclusion": f"{instrument} in a {condition} campaign -> {intent}",
-        "evidence": [k for k, v in hs.items() if v is not None] or ["no holding facts"],
+        "conclusion": _conclusion(instrument, condition, intent),
+        "evidence": _evidence_phrases(hs, instrument) or ["no holding facts recorded"],
         "decision_change": "documented per rule row",
         "prohibited": [],
         "confidence": "structural" if has_structure else "mechanical",

@@ -29,6 +29,7 @@ from paper_execution.store import (
     frozen_policy_hash,
     modify_proposal_transactional,
     record_user_decision,
+    set_kill_switch,
     transition,
 )
 
@@ -272,6 +273,37 @@ def create_blueprint(db_path, state_token: str, state_provider):
         if not out["ok"]:
             return jsonify({"error": out["reason"]}), 409
         return jsonify({**out, "very_high": very_high, "mode": _determine_mode(action, very_high)}), 201
+
+    @bp.route("/paper/experiments/<int:experiment_id>/kill-switch", methods=["POST"])
+    def kill_switch(experiment_id):
+        err = require_auth()
+        if err:
+            return err
+        body = request.get_json(silent=True) or {}
+        unknown = _unknown_fields(body, {"scope", "position_ref", "enabled"})
+        if unknown:
+            return jsonify({"error": "unknown fields", "fields": unknown}), 400
+        scope = body.get("scope")
+        position_ref = body.get("position_ref")
+        enabled = body.get("enabled")
+        if scope not in ("GLOBAL", "POSITION"):
+            return jsonify({"error": "scope must be GLOBAL or POSITION"}), 400
+        if scope == "POSITION" and (position_ref is None or str(position_ref) == ""):
+            return jsonify({"error": "position_ref is required for POSITION scope"}), 400
+        if not isinstance(enabled, bool):
+            return jsonify({"error": "enabled must be a boolean"}), 400
+        conn = connect(db_path)
+        try:
+            experiment = conn.execute("SELECT id FROM pe_experiments WHERE id=?", (experiment_id,)).fetchone()
+            if experiment is None:
+                return jsonify({"error": "experiment not found"}), 404
+            set_kill_switch(conn, experiment_id, scope, position_ref, enabled)
+        finally:
+            conn.close()
+        return jsonify({
+            "experiment_id": experiment_id, "scope": scope,
+            "position_ref": position_ref, "enabled": enabled,
+        }), 200
 
     @bp.route("/paper/reports", methods=["GET"])
     def reports():
