@@ -32,7 +32,7 @@ class CampaignLifecycleUiTests(unittest.TestCase):
 
     def test_reliability_mask_embedded(self):
         self.assertIn("LIFECYCLE_RELIABILITY", self.html)
-        for symbol in ("AMC", "GME", "PYPL", "RBLX", "SPY", "VALE", "U"):
+        for symbol in ("AMC", "GME", "PYPL", "RBLX", "SPY", "VALE", "U", "MARA"):
             self.assertIn('"%s"' % symbol, self.html)
 
 
@@ -47,11 +47,11 @@ class CampaignLifecycleMaskTests(unittest.TestCase):
             {"symbol", "timeframe", "classified_bars", "agreement_rate", "reliable"},
         )
 
-    def test_mask_covers_seven_assets(self):
+    def test_mask_covers_eight_assets(self):
         with MASK.open(encoding="utf-8", newline="") as handle:
             rows = list(csv.DictReader(handle))
         symbols = {row["symbol"] for row in rows}
-        self.assertEqual(symbols, {"AMC", "GME", "PYPL", "RBLX", "SPY", "VALE", "U"})
+        self.assertEqual(symbols, {"AMC", "GME", "PYPL", "RBLX", "SPY", "VALE", "U", "MARA"})
 
     def test_reliable_flag_is_binary(self):
         with MASK.open(encoding="utf-8", newline="") as handle:
