@@ -31,9 +31,13 @@
 indicator("DNA MTF Webhook Relay v1 (research)", overlay=true)
 
 // --- tracked timeframes (anchored on 1m) -----------------------------------
-// All ten tracked timeframes. `relaySymbol` lets the same script be reused
-// per asset without hardcoding syminfo.tickerid.
-relaySymbol = input.string(syminfo.tickerid, "Relay symbol")
+// All ten tracked timeframes. `useChartSymbol` (default true) reuses the
+// chart's own ticker via syminfo.tickerid directly — a "simple string" that
+// input.string() can't take as a compile-time defval. `relaySymbol` is only
+// read when overriding to a different symbol than the chart is on.
+useChartSymbol = input.bool(true, "Use chart's symbol", group="Relay")
+relaySymbolOverride = input.string("", "Relay symbol (if not using chart symbol)", group="Relay")
+relaySymbol = useChartSymbol ? syminfo.tickerid : relaySymbolOverride
 trackTfs = input.string("3,5,15,30,60,120,180,240,D,W", "Tracked timeframes (comma)", group="Relay")
 
 // --- DNA event vocabulary (self-contained, price-action only) ---------------
