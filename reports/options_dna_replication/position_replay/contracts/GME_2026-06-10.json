@@ -1,0 +1,5848 @@
+{
+  "contracts": [
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260612C00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260612C00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260612C00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260612C00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260612C00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260612C00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260612C00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260612C00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260612C00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260612C00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260612C00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260612C00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260612C00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260612C00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260612C00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260612C00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260612C00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260612C00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260612C00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260612C00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260612C00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260612C00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260612C00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260612C00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260612C00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260612C00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28.5,
+      "ticker": "O:GME260612C00028500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260612C00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29.5,
+      "ticker": "O:GME260612C00029500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260612C00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30.5,
+      "ticker": "O:GME260612C00030500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260612C00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260612C00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME260612C00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME260612C00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260612C00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME260612C00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260612P00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260612P00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260612P00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260612P00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260612P00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260612P00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260612P00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260612P00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260612P00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260612P00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260612P00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260612P00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260612P00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260612P00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260612P00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260612P00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260612P00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260612P00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260612P00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260612P00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260612P00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260612P00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260612P00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260612P00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260612P00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260612P00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28.5,
+      "ticker": "O:GME260612P00028500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260612P00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29.5,
+      "ticker": "O:GME260612P00029500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260612P00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30.5,
+      "ticker": "O:GME260612P00030500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260612P00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260612P00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME260612P00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME260612P00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260612P00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-12",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME260612P00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:GME1260618C00003000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:GME1260618C00005000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 10,
+      "ticker": "O:GME1260618C00010000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME1260618C00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME1260618C00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME1260618C00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME1260618C00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME1260618C00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME1260618C00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME1260618C00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME1260618C00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME1260618C00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME1260618C00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME1260618C00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME1260618C00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME1260618C00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME1260618C00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME1260618C00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME1260618C00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME1260618C00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME1260618C00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME1260618C00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME1260618C00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME1260618C00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME1260618C00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME1260618C00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 37,
+      "ticker": "O:GME1260618C00037000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 38,
+      "ticker": "O:GME1260618C00038000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 39,
+      "ticker": "O:GME1260618C00039000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 40,
+      "ticker": "O:GME1260618C00040000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 41,
+      "ticker": "O:GME1260618C00041000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 42,
+      "ticker": "O:GME1260618C00042000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 43,
+      "ticker": "O:GME1260618C00043000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 44,
+      "ticker": "O:GME1260618C00044000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 45,
+      "ticker": "O:GME1260618C00045000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 46,
+      "ticker": "O:GME1260618C00046000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 47,
+      "ticker": "O:GME1260618C00047000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 48,
+      "ticker": "O:GME1260618C00048000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 49,
+      "ticker": "O:GME1260618C00049000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 50,
+      "ticker": "O:GME1260618C00050000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 55,
+      "ticker": "O:GME1260618C00055000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OCASPN",
+      "contract_type": "call",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 60,
+      "ticker": "O:GME1260618C00060000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:GME1260618P00003000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:GME1260618P00005000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 10,
+      "ticker": "O:GME1260618P00010000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME1260618P00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME1260618P00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME1260618P00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME1260618P00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME1260618P00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME1260618P00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME1260618P00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME1260618P00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME1260618P00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME1260618P00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME1260618P00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME1260618P00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME1260618P00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME1260618P00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME1260618P00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME1260618P00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME1260618P00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME1260618P00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME1260618P00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME1260618P00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME1260618P00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME1260618P00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME1260618P00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 37,
+      "ticker": "O:GME1260618P00037000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 38,
+      "ticker": "O:GME1260618P00038000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 39,
+      "ticker": "O:GME1260618P00039000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 40,
+      "ticker": "O:GME1260618P00040000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 41,
+      "ticker": "O:GME1260618P00041000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 42,
+      "ticker": "O:GME1260618P00042000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 43,
+      "ticker": "O:GME1260618P00043000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 44,
+      "ticker": "O:GME1260618P00044000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 45,
+      "ticker": "O:GME1260618P00045000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 46,
+      "ticker": "O:GME1260618P00046000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 47,
+      "ticker": "O:GME1260618P00047000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 48,
+      "ticker": "O:GME1260618P00048000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 49,
+      "ticker": "O:GME1260618P00049000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 50,
+      "ticker": "O:GME1260618P00050000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 55,
+      "ticker": "O:GME1260618P00055000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "additional_underlyings": [
+        {
+          "amount": 10,
+          "type": "equity",
+          "underlying": "GMEWS"
+        }
+      ],
+      "cfi": "OPASPN",
+      "contract_type": "put",
+      "correction": 1,
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 60,
+      "ticker": "O:GME1260618P00060000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:GME260618C00003000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:GME260618C00005000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 8,
+      "ticker": "O:GME260618C00008000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 10,
+      "ticker": "O:GME260618C00010000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 11,
+      "ticker": "O:GME260618C00011000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 12,
+      "ticker": "O:GME260618C00012000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260618C00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260618C00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260618C00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260618C00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260618C00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260618C00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260618C00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260618C00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260618C00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260618C00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260618C00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260618C00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260618C00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260618C00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260618C00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260618C00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260618C00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260618C00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260618C00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260618C00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260618C00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260618C00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260618C00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260618C00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260618C00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260618C00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260618C00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260618C00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260618C00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260618C00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME260618C00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME260618C00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260618C00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME260618C00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 37,
+      "ticker": "O:GME260618C00037000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 38,
+      "ticker": "O:GME260618C00038000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 39,
+      "ticker": "O:GME260618C00039000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 40,
+      "ticker": "O:GME260618C00040000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 41,
+      "ticker": "O:GME260618C00041000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 42,
+      "ticker": "O:GME260618C00042000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 43,
+      "ticker": "O:GME260618C00043000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 44,
+      "ticker": "O:GME260618C00044000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 45,
+      "ticker": "O:GME260618C00045000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 46,
+      "ticker": "O:GME260618C00046000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 47,
+      "ticker": "O:GME260618C00047000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 48,
+      "ticker": "O:GME260618C00048000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 49,
+      "ticker": "O:GME260618C00049000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 50,
+      "ticker": "O:GME260618C00050000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 3,
+      "ticker": "O:GME260618P00003000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 5,
+      "ticker": "O:GME260618P00005000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 8,
+      "ticker": "O:GME260618P00008000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 10,
+      "ticker": "O:GME260618P00010000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 11,
+      "ticker": "O:GME260618P00011000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 12,
+      "ticker": "O:GME260618P00012000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260618P00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260618P00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260618P00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260618P00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260618P00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260618P00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260618P00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260618P00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260618P00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260618P00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260618P00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260618P00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260618P00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260618P00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260618P00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260618P00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260618P00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260618P00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260618P00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260618P00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260618P00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260618P00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260618P00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260618P00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260618P00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260618P00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260618P00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260618P00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260618P00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260618P00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME260618P00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME260618P00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260618P00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME260618P00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 37,
+      "ticker": "O:GME260618P00037000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 38,
+      "ticker": "O:GME260618P00038000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 39,
+      "ticker": "O:GME260618P00039000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 40,
+      "ticker": "O:GME260618P00040000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 41,
+      "ticker": "O:GME260618P00041000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 42,
+      "ticker": "O:GME260618P00042000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 43,
+      "ticker": "O:GME260618P00043000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 44,
+      "ticker": "O:GME260618P00044000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 45,
+      "ticker": "O:GME260618P00045000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 46,
+      "ticker": "O:GME260618P00046000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 47,
+      "ticker": "O:GME260618P00047000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 48,
+      "ticker": "O:GME260618P00048000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 49,
+      "ticker": "O:GME260618P00049000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-18",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 50,
+      "ticker": "O:GME260618P00050000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260626C00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260626C00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260626C00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260626C00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260626C00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260626C00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260626C00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260626C00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260626C00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260626C00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260626C00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260626C00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260626C00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260626C00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260626C00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260626C00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260626C00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260626C00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260626C00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260626C00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260626C00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260626C00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260626C00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260626C00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260626C00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260626C00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28.5,
+      "ticker": "O:GME260626C00028500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260626C00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29.5,
+      "ticker": "O:GME260626C00029500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260626C00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30.5,
+      "ticker": "O:GME260626C00030500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260626C00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260626C00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME260626C00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME260626C00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260626C00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME260626C00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260626P00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260626P00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260626P00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260626P00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260626P00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260626P00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260626P00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260626P00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260626P00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260626P00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260626P00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260626P00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260626P00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260626P00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260626P00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260626P00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260626P00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260626P00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260626P00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260626P00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260626P00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260626P00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260626P00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260626P00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260626P00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260626P00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28.5,
+      "ticker": "O:GME260626P00028500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260626P00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29.5,
+      "ticker": "O:GME260626P00029500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260626P00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30.5,
+      "ticker": "O:GME260626P00030500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260626P00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260626P00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 33,
+      "ticker": "O:GME260626P00033000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 34,
+      "ticker": "O:GME260626P00034000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260626P00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-06-26",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 36,
+      "ticker": "O:GME260626P00036000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260702C00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260702C00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260702C00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260702C00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260702C00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17.5,
+      "ticker": "O:GME260702C00017500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260702C00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260702C00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260702C00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260702C00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260702C00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260702C00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260702C00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260702C00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260702C00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260702C00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260702C00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260702C00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260702C00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260702C00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260702C00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260702C00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260702C00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260702C00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260702C00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260702C00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260702C00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260702C00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260702C00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260702C00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260702C00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260702C00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260702P00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260702P00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260702P00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260702P00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260702P00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17.5,
+      "ticker": "O:GME260702P00017500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260702P00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260702P00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260702P00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260702P00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260702P00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260702P00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260702P00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260702P00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260702P00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260702P00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260702P00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260702P00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260702P00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260702P00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260702P00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260702P00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260702P00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260702P00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260702P00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260702P00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260702P00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260702P00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260702P00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260702P00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260702P00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-02",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260702P00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260710C00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260710C00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260710C00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260710C00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16.5,
+      "ticker": "O:GME260710C00016500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260710C00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17.5,
+      "ticker": "O:GME260710C00017500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260710C00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260710C00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260710C00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260710C00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260710C00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260710C00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260710C00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260710C00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260710C00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260710C00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260710C00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260710C00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260710C00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260710C00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260710C00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260710C00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260710C00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260710C00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260710C00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260710C00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260710C00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260710C00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260710C00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260710C00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260710C00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OCASPS",
+      "contract_type": "call",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260710C00035000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 13,
+      "ticker": "O:GME260710P00013000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 14,
+      "ticker": "O:GME260710P00014000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 15,
+      "ticker": "O:GME260710P00015000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16,
+      "ticker": "O:GME260710P00016000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 16.5,
+      "ticker": "O:GME260710P00016500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17,
+      "ticker": "O:GME260710P00017000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 17.5,
+      "ticker": "O:GME260710P00017500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18,
+      "ticker": "O:GME260710P00018000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 18.5,
+      "ticker": "O:GME260710P00018500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19,
+      "ticker": "O:GME260710P00019000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 19.5,
+      "ticker": "O:GME260710P00019500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20,
+      "ticker": "O:GME260710P00020000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 20.5,
+      "ticker": "O:GME260710P00020500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21,
+      "ticker": "O:GME260710P00021000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 21.5,
+      "ticker": "O:GME260710P00021500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22,
+      "ticker": "O:GME260710P00022000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 22.5,
+      "ticker": "O:GME260710P00022500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23,
+      "ticker": "O:GME260710P00023000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 23.5,
+      "ticker": "O:GME260710P00023500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24,
+      "ticker": "O:GME260710P00024000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 24.5,
+      "ticker": "O:GME260710P00024500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25,
+      "ticker": "O:GME260710P00025000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 25.5,
+      "ticker": "O:GME260710P00025500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26,
+      "ticker": "O:GME260710P00026000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 26.5,
+      "ticker": "O:GME260710P00026500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27,
+      "ticker": "O:GME260710P00027000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 27.5,
+      "ticker": "O:GME260710P00027500",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 28,
+      "ticker": "O:GME260710P00028000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 29,
+      "ticker": "O:GME260710P00029000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 30,
+      "ticker": "O:GME260710P00030000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 31,
+      "ticker": "O:GME260710P00031000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 32,
+      "ticker": "O:GME260710P00032000",
+      "underlying_ticker": "GME"
+    },
+    {
+      "cfi": "OPASPS",
+      "contract_type": "put",
+      "exercise_style": "american",
+      "expiration_date": "2026-07-10",
+      "primary_exchange": "BATO",
+      "shares_per_contract": 100,
+      "strike_price": 35,
+      "ticker": "O:GME260710P00035000",
+      "underlying_ticker": "GME"
+    }
+  ],
+  "session_date": "2026-06-10",
+  "symbol": "GME"
+}

@@ -1,0 +1,180 @@
+{
+  "cells": {
+    "GME:CALL/14": {
+      "discovery_episodes": 16,
+      "holdout_episodes": 10,
+      "pass": false
+    },
+    "GME:CALL/30": {
+      "discovery_episodes": 13,
+      "holdout_episodes": 5,
+      "pass": false
+    },
+    "GME:PUT/14": {
+      "discovery_episodes": 5,
+      "holdout_episodes": 5,
+      "pass": false
+    },
+    "GME:PUT/30": {
+      "discovery_episodes": 4,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "LULU:CALL/14": {
+      "discovery_episodes": 13,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "LULU:CALL/30": {
+      "discovery_episodes": 7,
+      "holdout_episodes": 4,
+      "pass": false
+    },
+    "LULU:PUT/14": {
+      "discovery_episodes": 2,
+      "holdout_episodes": 3,
+      "pass": false
+    },
+    "LULU:PUT/30": {
+      "discovery_episodes": 4,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "PYPL:CALL/14": {
+      "discovery_episodes": 20,
+      "holdout_episodes": 6,
+      "pass": false
+    },
+    "PYPL:CALL/30": {
+      "discovery_episodes": 14,
+      "holdout_episodes": 4,
+      "pass": false
+    },
+    "PYPL:PUT/14": {
+      "discovery_episodes": 10,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "PYPL:PUT/30": {
+      "discovery_episodes": 7,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "RBLX:CALL/14": {
+      "discovery_episodes": 8,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "RBLX:CALL/30": {
+      "discovery_episodes": 7,
+      "holdout_episodes": 3,
+      "pass": false
+    },
+    "RBLX:PUT/14": {
+      "discovery_episodes": 5,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "RBLX:PUT/30": {
+      "discovery_episodes": 1,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "SPY:CALL/14": {
+      "discovery_episodes": 16,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "SPY:CALL/30": {
+      "discovery_episodes": 19,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "SPY:PUT/14": {
+      "discovery_episodes": 17,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "SPY:PUT/30": {
+      "discovery_episodes": 20,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "TSLA:CALL/14": {
+      "discovery_episodes": 20,
+      "holdout_episodes": 8,
+      "pass": false
+    },
+    "TSLA:CALL/30": {
+      "discovery_episodes": 20,
+      "holdout_episodes": 11,
+      "pass": true
+    },
+    "TSLA:PUT/14": {
+      "discovery_episodes": 20,
+      "holdout_episodes": 8,
+      "pass": false
+    },
+    "TSLA:PUT/30": {
+      "discovery_episodes": 20,
+      "holdout_episodes": 11,
+      "pass": true
+    },
+    "U:CALL/14": {
+      "discovery_episodes": 9,
+      "holdout_episodes": 1,
+      "pass": false
+    },
+    "U:CALL/30": {
+      "discovery_episodes": 4,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "U:PUT/14": {
+      "discovery_episodes": 1,
+      "holdout_episodes": 0,
+      "pass": false
+    },
+    "U:PUT/30": {
+      "discovery_episodes": 0,
+      "holdout_episodes": 0,
+      "pass": false
+    },
+    "VALE:CALL/14": {
+      "discovery_episodes": 1,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "VALE:CALL/30": {
+      "discovery_episodes": 2,
+      "holdout_episodes": 2,
+      "pass": false
+    },
+    "VALE:PUT/14": {
+      "discovery_episodes": 1,
+      "holdout_episodes": 0,
+      "pass": false
+    },
+    "VALE:PUT/30": {
+      "discovery_episodes": 1,
+      "holdout_episodes": 1,
+      "pass": false
+    }
+  },
+  "episodes": 409,
+  "min_discovery_episodes": 20,
+  "min_holdout_episodes": 10,
+  "passing_cell_count": 2,
+  "passing_cells": [
+    "TSLA:CALL/30",
+    "TSLA:PUT/30"
+  ],
+  "rejection_reasons": {
+    "ENTRY_SIGNAL_BAR_ABSENT": 728,
+    "EXACT_NEXT_BAR_OPEN_ABSENT": 231,
+    "SNAPSHOT_SIGNAL_BAR_ABSENT": 1779
+  },
+  "rejections": 2738,
+  "research_only": true,
+  "total_cells": 32
+}

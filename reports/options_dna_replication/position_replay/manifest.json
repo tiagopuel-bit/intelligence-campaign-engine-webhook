@@ -1,0 +1,88 @@
+{
+  "anchor_count": 368,
+  "anchors_by_asset": {
+    "GME": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "LULU": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "PYPL": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "RBLX": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "SPY": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "TSLA": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "U": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    },
+    "VALE": {
+      "DISCOVERY:CONTINUATION": 15,
+      "DISCOVERY:ENTRY_FORMING": 15,
+      "HOLDOUT:CONTINUATION": 8,
+      "HOLDOUT:ENTRY_FORMING": 8
+    }
+  },
+  "assets": [
+    "SPY",
+    "TSLA",
+    "GME",
+    "U",
+    "RBLX",
+    "PYPL",
+    "LULU",
+    "VALE"
+  ],
+  "cache_hits": {
+    "option_bars": 160,
+    "reference": 2
+  },
+  "cells": [
+    "CALL/14",
+    "CALL/30",
+    "PUT/14",
+    "PUT/30"
+  ],
+  "cohort_count": 1368,
+  "discovery_per_family": 15,
+  "failure_count": 23,
+  "holdout_per_family": 8,
+  "holdout_start": "2026-02-01",
+  "no_provider_request_during_plan": true,
+  "purpose": "multi-asset position-replay coverage; entry-origin anchors only",
+  "request_counts": {
+    "option_bars": 1156,
+    "reference": 338
+  },
+  "status": "FETCHED_WITH_FAILURES",
+  "unique_session_dates": 245,
+  "unique_symbol_session_pairs": 363,
+  "unique_ticker_count": 1316
+}

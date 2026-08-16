@@ -1,0 +1,140 @@
+[
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-03-14",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-04-01",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-04-29",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-05-07",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-09-18",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-10-03",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2025-12-08",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-01-21",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-01-27",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-02-20",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-03-04",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-03-10",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-04-02",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-04-06",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-04-27",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-05-07",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-05-20",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-06-01",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-06-12",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-07-08",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-07-21",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-07-30",
+    "stage": "contracts",
+    "symbol": "SPY"
+  },
+  {
+    "error": "rate limited after retries",
+    "session_date": "2026-08-07",
+    "stage": "contracts",
+    "symbol": "SPY"
+  }
+]
