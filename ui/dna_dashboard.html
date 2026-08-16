@@ -312,6 +312,8 @@
   .dna-held{margin-top:12px;padding-top:11px;border-top:1px solid var(--line)}.dna-held-title{font-family:var(--font-display);font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:7px}.dna-held-list{display:grid;gap:6px}
   .dna-held-item{width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 8px;text-align:left;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)}.dna-held-item strong{font-size:10px}.dna-held-item span{font-size:9px;color:var(--muted)}.dna-held-item .dna-held-price{grid-row:1;grid-column:2;align-self:end;font-size:9px;font-style:normal;font-weight:600;color:var(--text)}.dna-held-item b{grid-row:2;grid-column:2;align-self:start;font-size:12px;font-weight:500;color:var(--positive)}.dna-held-item.selected{border-color:#2563eb;background:rgba(37,99,235,.08);box-shadow:inset 3px 0 0 #2563eb}
   .dna-manager-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:auto;padding-top:12px}.dna-manager-actions .open-pos-btn{grid-column:1/-1}.dna-manager-actions button{min-height:34px}.dna-manager-actions .pf-close{font-size:12px}
+  .pf-manage{background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:7px;font-size:12px;font-weight:650}.pf-manage:hover{border-color:#2563eb;color:#2563eb}
+  .position-dialog{width:min(430px,calc(100vw - 28px));border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--text);padding:0;box-shadow:0 24px 70px rgba(0,0,0,.35)}.position-dialog::backdrop{background:rgba(2,8,18,.66)}.position-dialog-inner{padding:18px}.position-dialog-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding-bottom:13px;border-bottom:1px solid var(--line)}.position-dialog-head h3{margin:2px 0 0;font-size:16px}.position-dialog-close{border:0;background:transparent;color:var(--muted);font-size:21px;line-height:1;cursor:pointer}.position-dialog-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:14px 0}.position-dialog-summary>div{padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}.position-dialog-form{display:grid;grid-template-columns:1fr 1fr;gap:10px}.position-dialog-form label{font-size:9px;color:var(--muted)}.position-dialog-form input{width:100%;margin-top:5px}.position-dialog-form .full{grid-column:1/-1}.position-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.position-dialog-actions button{min-height:35px;padding:0 14px}.position-dialog-error{display:none;margin-top:10px;color:var(--critical);font-size:10px}.position-dialog-note{font-size:9px;color:var(--faint);line-height:1.4;margin-top:9px}
   .dna-chart-column{min-width:0;display:grid;gap:12px}.dna-chart-card{overflow:hidden}.dna-chart-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 15px;border-bottom:1px solid var(--line)}.dna-chart-title{font-size:13px;font-weight:700}.dna-chart-sub{font-size:10px;color:var(--muted)}
   .dna-chart-card .chart-wrap{border:0;border-radius:0;margin:0;padding:10px 14px}.dna-chart-card .chart-container{height:300px}.dna-chart-card .chart-status{padding-bottom:4px}
   .dna-signals{padding:14px}.dna-signals table{min-width:580px}.dna-signals-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.dna-signals-head h3{font-size:12px;margin:0}.dna-signals-head span{font-size:10px;color:var(--faint)}
@@ -1009,6 +1011,85 @@
     });
   }
 
+  // Wires the .pf-manage button + its shared dialog (markup from
+  // renderManageDialog). Re-run every paint() since the dialog is
+  // rebuilt with the DOM each time; native <dialog> handles its own
+  // show/hide state so nothing needs to survive across repaints.
+  function wireManageDialog() {
+    var dialog = document.getElementById("position-manage-dialog");
+    var openBtn = document.querySelector(".pf-manage");
+    if (!dialog || !openBtn) return;
+
+    if (!openBtn.disabled) {
+      openBtn.addEventListener("click", function () {
+        var max = Number(openBtn.dataset.max || 0);
+        dialog.dataset.pid = openBtn.dataset.pid;
+        dialog.dataset.legs = openBtn.dataset.legs;
+        document.getElementById("manage-dialog-title").textContent = openBtn.dataset.label || "";
+        document.getElementById("manage-dialog-open").textContent = openBtn.dataset.qtyText || "";
+        document.getElementById("manage-dialog-avg").textContent = openBtn.dataset.avg || "";
+        document.getElementById("manage-dialog-current").textContent = openBtn.dataset.current || "";
+        var qtyInput = document.getElementById("manage-dialog-qty");
+        qtyInput.max = max; qtyInput.value = max;
+        document.getElementById("manage-dialog-price").value = "";
+        document.getElementById("manage-dialog-time").value = "";
+        document.getElementById("manage-dialog-notes").value = "";
+        var errEl = document.getElementById("manage-dialog-error");
+        errEl.textContent = ""; errEl.style.display = "none";
+        dialog.showModal();
+      });
+    }
+
+    Array.prototype.forEach.call(dialog.querySelectorAll("[data-manage-close],[data-manage-cancel]"), function (b) {
+      b.addEventListener("click", function () { dialog.close(); });
+    });
+
+    var submitBtn = dialog.querySelector("[data-manage-submit]");
+    submitBtn.addEventListener("click", function () {
+      var errEl = document.getElementById("manage-dialog-error");
+      var pid = dialog.dataset.pid;
+      var legs = JSON.parse(dialog.dataset.legs || "[]");
+      var qty = Number(document.getElementById("manage-dialog-qty").value);
+      var max = Number(document.getElementById("manage-dialog-qty").max);
+      if (!qty || qty <= 0) {
+        errEl.textContent = "Enter a quantity greater than 0."; errEl.style.display = "block"; return;
+      }
+      if (max && qty > max + 1e-9) {
+        errEl.textContent = "Quantity exceeds the open holding (" + max + ")."; errEl.style.display = "block"; return;
+      }
+      var priceRaw = document.getElementById("manage-dialog-price").value;
+      var timeRaw = document.getElementById("manage-dialog-time").value;
+      var notesRaw = document.getElementById("manage-dialog-notes").value;
+      var body = { instrument_ids: legs, quantity: qty };
+      if (priceRaw !== "") body.exit_price = Number(priceRaw);
+      if (timeRaw !== "") body.exit_time = new Date(timeRaw).toISOString();
+      if (notesRaw !== "") body.notes = notesRaw;
+
+      var base = baseInput.value.trim().replace(/\/$/, "");
+      submitBtn.disabled = true;
+      fetch(base + "/positions/" + pid + "/instruments/close", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+        body: JSON.stringify(body)
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) { return { ok: r.ok, d: d }; });
+      }).then(function (res) {
+        submitBtn.disabled = false;
+        if (!res.ok) {
+          errEl.textContent = (res.d && res.d.error) || "Could not close that quantity.";
+          errEl.style.display = "block";
+          return;
+        }
+        dialog.close();
+        return Promise.all([loadPortfolio(), loadClosedPositions()]).then(paint);
+      }).catch(function (ex) {
+        submitBtn.disabled = false;
+        errEl.textContent = "Error: " + ex.message;
+        errEl.style.display = "block";
+      });
+    });
+  }
+
   function wirePortfolio() {
     Array.prototype.forEach.call(document.querySelectorAll(".pf-row"), function (row) {
       // Selecting a holding is what drives the chart + Position Insight panel
@@ -1380,6 +1461,32 @@
   function holdingLabel(x) {
     if (x.kind === "share") return x.data.symbol + " shares";
     return x.data.symbol + " $" + x.data.contract.strike + " " + x.data.contract.type;
+  }
+
+  // Partial-close dialog: one shared <dialog>, populated from whichever
+  // .pf-manage button opened it (see wireManageDialog). Backs
+  // POST /positions/<id>/instruments/close, which supports closing less
+  // than the full open quantity -- close 1 of 5 contracts and the other 4
+  // stay open.
+  function renderManageDialog() {
+    return '<dialog class="position-dialog" id="position-manage-dialog">' +
+      '<form method="dialog" class="position-dialog-inner">' +
+        '<div class="position-dialog-head"><div><div class="dna-k">Manage holding</div><h3 id="manage-dialog-title"></h3></div>' +
+          '<button type="button" class="position-dialog-close" data-manage-close aria-label="Close">×</button></div>' +
+        '<div class="position-dialog-summary">' +
+          '<div><div class="dna-k">Open</div><div class="dna-v" id="manage-dialog-open"></div></div>' +
+          '<div><div class="dna-k">Avg cost</div><div class="dna-v" id="manage-dialog-avg"></div></div>' +
+          '<div><div class="dna-k">Current</div><div class="dna-v" id="manage-dialog-current"></div></div></div>' +
+        '<div class="position-dialog-form">' +
+          '<label>Quantity to close<input type="number" id="manage-dialog-qty" min="0" step="any" required></label>' +
+          '<label>Exit price<input type="number" id="manage-dialog-price" min="0" step="any" placeholder="optional"></label>' +
+          '<label>Exit time<input type="datetime-local" id="manage-dialog-time"></label>' +
+          '<label class="full">Notes<input type="text" id="manage-dialog-notes" placeholder="optional"></label></div>' +
+        '<div class="position-dialog-error" id="manage-dialog-error" role="alert"></div>' +
+        '<div class="position-dialog-note">Closes only the quantity entered above; any remainder stays open under the same holding.</div>' +
+        '<div class="position-dialog-actions"><button type="button" data-manage-cancel>Cancel</button>' +
+          '<button type="button" class="pf-close" data-manage-submit>Close quantity</button></div>' +
+      '</form></dialog>';
   }
 
   function timelineFor(pick) {
@@ -1807,6 +1914,13 @@
       return '<button type="button" class="dna-held-item pf-row' + (x.key === selectedHolding ? ' selected' : '') + '" data-holding="' + x.key + '"><strong>' + holdingLabel(x) + '</strong><span>' + meta + '</span>' + currentPrice + '<b>' + fmtPct(ret) + '</b></button>';
     }).join("") || '<div class="copy">No open positions on this asset.</div>';
     var closeButton = pick ? '<button class="pf-close" data-pid="' + pick.data.position_id + '" data-legs="' + JSON.stringify(pick.data.leg_ids) + '" data-label="' + holdingLabel(pick) + '">Close</button>' : '<button class="pf-close" disabled>Close</button>';
+    var manageQtyAvailable = pick ? (pick.kind === "share" ? pick.data.shares : pick.data.contracts) : 0;
+    var manageButton = pick
+      ? '<button type="button" class="pf-manage" data-pid="' + pick.data.position_id + '" data-legs="' + JSON.stringify(pick.data.leg_ids) + '"' +
+        ' data-label="' + holdingLabel(pick) + '" data-max="' + manageQtyAvailable + '"' +
+        ' data-avg="' + fmtMoney(pick.data.avg_cost) + '" data-current="' + fmtMoney(current) + '"' +
+        ' data-qty-text="' + qtyText + '">Manage</button>'
+      : '<button type="button" class="pf-manage" disabled>Manage</button>';
     var timelineHtml = timeline ? '<div class="dna-timeline"><div class="dna-timeline-head"><strong>Entry → expiration</strong><span>' + timeline.progress + '</span></div><div class="dna-timeline-track"><span class="dna-timeline-fill" style="width:' + timeline.width + '"></span><i class="dna-timeline-dot" style="left:' + timeline.width + '"></i></div><div class="dna-timeline-labels"><span>' + timeline.entry + '</span><span>' + timeline.today + '</span><span>' + timeline.expiry + '</span></div></div>' : '';
     var guidanceBullets = holdingRead.bullets.length ? '<ul class="dna-position-actions">' + holdingRead.bullets.map(function (line) { return '<li>' + line + '</li>'; }).join("") + '</ul>' : '';
     var manager = '<aside class="dna-manager"><div class="label">Position manager</div><div class="dna-manager-title"><strong>' + managerTitle + '</strong><span class="dna-pill green">' + (pick ? 'OPEN' : 'EMPTY') + '</span></div>' +
@@ -1814,8 +1928,9 @@
       '<div class="dna-manager-grid"><div><div class="dna-k">Holding</div><div class="dna-v">' + qtyText + '</div></div><div><div class="dna-k">Entry</div><div class="dna-v">' + entryText + '</div></div><div><div class="dna-k">Breakeven</div><div class="dna-v">' + breakEven + '</div></div><div><div class="dna-k">Held</div><div class="dna-v">' + (heldDays == null ? '—' : heldDays + ' days') + '</div></div><div><div class="dna-k">DTE</div><div class="dna-v">' + (dte == null ? '—' : dte + ' days') + '</div></div></div>' +
       '<div class="dna-risk ' + (primary ? toneClass(primary.tone) : '') + '" data-insight-pid="' + (pick ? pick.data.position_id : '') + '" data-insight-key="' + (pick ? pick.key : '') + '"><strong>' + holdingRead.title + '</strong><br>' + holdingRead.summary + guidanceBullets + '</div>' +
       '<div class="dna-held"><div class="dna-held-title">Positions held</div><div class="dna-held-list">' + heldRows + '</div></div>' +
-      '<div class="dna-manager-actions"><button class="open-pos-btn" data-sym="' + sym + '">+ Add position</button>' + closeButton + '<button class="pf-del" disabled>Manage</button></div>' +
-      '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div></aside>';
+      '<div class="dna-manager-actions"><button class="open-pos-btn" data-sym="' + sym + '">+ Add position</button>' + closeButton + manageButton + '</div>' +
+      '<div class="open-pos-form" style="display:none" data-sym="' + sym + '">' + renderPositionForm(sym) + '</div></aside>' +
+      renderManageDialog();
 
     var chart = '<div class="dna-chart-column"><section class="dna-chart-card"><div class="dna-chart-head"><div><div class="dna-chart-title">' + managerTitle + '</div><div class="dna-chart-sub">Live position chart · entry and DNA reference levels</div></div><span class="dna-pill">Lightweight Charts</span></div><div class="chart-wrap"><div class="chart-toprow"><span class="chart-mode" data-sym="' + sym + '"></span><span class="chart-feats" data-sym="' + sym + '"></span></div><div class="chart-toggles" data-sym="' + sym + '"></div><div class="chart-container" data-sym="' + sym + '"></div><div class="chart-legend" data-sym="' + sym + '">hover a bar for OHLCV</div><div class="chart-status" data-sym="' + sym + '">loading chart…</div></div></section>';
     var signalRows = states.map(function (r) { var tr = tierOf(r.timeframe), ag = age(r.bar_time); return '<tr class="' + (ag.stale ? 'st' : '') + '"><td>' + tfLabel(r.timeframe) + '</td><td>' + (tr ? tr.label : '—') + '</td><td><span class="phase-pill ' + phaseTone(r.phase) + '">' + (r.phase || '—') + '</span></td><td>' + (r.health != null ? r.health + '%' : '—') + '</td><td>' + (r.recent_event || '—') + '</td><td>' + ag.text + '</td></tr>'; }).join("");
@@ -2343,6 +2458,7 @@
   function paint() {
     app.innerHTML = selected ? renderApprovedAsset(selected) : renderAssetList();
     wirePortfolio();
+    wireManageDialog();
     Array.prototype.forEach.call(document.querySelectorAll(".dna-radar-item"), function (b) {
       b.addEventListener("click", function () {
         var sym = b.dataset.sym;
