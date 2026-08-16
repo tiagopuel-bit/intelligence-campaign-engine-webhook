@@ -251,6 +251,39 @@ def init_db():
         )
     """)
     _ensure_alert_columns(conn)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS alerts_relay (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            symbol TEXT NOT NULL,
+            timeframe TEXT NOT NULL,
+            phase TEXT,
+            health INTEGER,
+            score INTEGER,
+            confidence INTEGER,
+            momentum TEXT,
+            status TEXT,
+            action TEXT,
+            exhaustion_warning INTEGER,
+            reload_quality TEXT,
+            htf_phase TEXT,
+            campaign_alignment TEXT,
+            last_fail_type TEXT,
+            close REAL,
+            bar_event TEXT,
+            bar_time TEXT,
+            rsi REAL,
+            ema21_distance_atr REAL,
+            session TEXT,
+            active_trade INTEGER,
+            active_entry REAL,
+            active_stop REAL,
+            active_target REAL,
+            active_trade_source TEXT,
+            active_trade_open_pct REAL,
+            source TEXT NOT NULL DEFAULT 'relay',
+            received_at TEXT NOT NULL
+        )
+    """)
     sec_filings.ensure_schema(conn)
     conn.commit()
     conn.close()
@@ -494,6 +527,41 @@ def _paper_tick_safely() -> None:
 
 # -- Routes ------------------------------------------------------------------
 
+def _insert_alert(conn, table: str, symbol: str, timeframe: str, event: str,
+                  fields: dict, now: str) -> None:
+    """Insert one alert row into `table` (``alerts`` or ``alerts_relay``).
+
+    `fields` is the per-timeframe payload dict (the whole native payload, or
+    one item of a relay ``events`` batch). The four identity fields the rest of
+    the pipeline depends on — symbol, source timeframe, event identity and bar
+    timestamp — plus price and the DNA fields are stored verbatim.
+    """
+    conn.execute(
+        f"INSERT INTO {table} (symbol, timeframe, phase, health, score, confidence, "
+        "momentum, status, action, exhaustion_warning, reload_quality, "
+        "htf_phase, campaign_alignment, last_fail_type, close, bar_event, "
+        "bar_time, rsi, ema21_distance_atr, session, active_trade, "
+        "active_entry, active_stop, active_target, active_trade_source, "
+        "active_trade_open_pct, received_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        (symbol, timeframe, fields.get("phase"), fields.get("health"),
+         fields.get("score"), fields.get("confidence"), fields.get("momentum"),
+         fields.get("status"), fields.get("action"),
+         int(bool(fields.get("exhaustion_warning"))), fields.get("reload_quality"),
+         fields.get("htf_phase"), fields.get("campaign_alignment"),
+         fields.get("last_fail_type"), fields.get("close"), event,
+         fields.get("time"), fields.get("rsi"), fields.get("ema21_distance_atr"),
+         fields.get("session"),
+         _parse_int_flag(fields.get("active_trade")),
+         _parse_float_or_none(fields.get("active_entry")),
+         _parse_float_or_none(fields.get("active_stop")),
+         _parse_float_or_none(fields.get("active_target")),
+         _parse_str_or_none(fields.get("active_trade_source")),
+         _parse_float_or_none(fields.get("active_trade_open_pct")),
+         now),
+    )
+
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     req_id = str(uuid.uuid4())[:8]
@@ -508,9 +576,6 @@ def webhook():
     else:
         return jsonify({"error": "unauthorized"}), 401
 
-    symbol = payload.get("symbol", "UNKNOWN")
-    timeframe = payload.get("timeframe", "UNKNOWN")
-    event = infer_event_from_payload(payload)
     now = datetime.now(timezone.utc).isoformat()
 
     conn = get_db()
@@ -518,31 +583,33 @@ def webhook():
     if heartbeat_response is not None:
         conn.close()
         return heartbeat_response
-    conn.execute("""
-        INSERT INTO alerts (symbol, timeframe, phase, health, score, confidence,
-            momentum, status, action, exhaustion_warning, reload_quality,
-            htf_phase, campaign_alignment, last_fail_type, close, bar_event,
-            bar_time, rsi, ema21_distance_atr, session, active_trade,
-            active_entry, active_stop, active_target, active_trade_source,
-            active_trade_open_pct, received_at)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    """, (
-        symbol, timeframe, payload.get("phase"), payload.get("health"),
-        payload.get("score"), payload.get("confidence"), payload.get("momentum"),
-        payload.get("status"), payload.get("action"),
-        int(bool(payload.get("exhaustion_warning"))), payload.get("reload_quality"),
-        payload.get("htf_phase"), payload.get("campaign_alignment"),
-        payload.get("last_fail_type"), payload.get("close"), event,
-        payload.get("time"), payload.get("rsi"), payload.get("ema21_distance_atr"),
-        payload.get("session"),
-        _parse_int_flag(payload.get("active_trade")),
-        _parse_float_or_none(payload.get("active_entry")),
-        _parse_float_or_none(payload.get("active_stop")),
-        _parse_float_or_none(payload.get("active_target")),
-        _parse_str_or_none(payload.get("active_trade_source")),
-        _parse_float_or_none(payload.get("active_trade_open_pct")),
-        now,
-    ))
+
+    # MTF relay: one anchor-bar alert may carry several tracked timeframes'
+    # events in a single batch (multiple bars closed on the same anchor tick).
+    # Relay rows go to the separate alerts_relay table so they never feed the
+    # native DNA read — the relay runs *alongside* native for comparison.
+    relay_events = payload.get("events") if payload.get("relay") else None
+    if relay_events is not None:
+        if not isinstance(relay_events, list) or not relay_events:
+            conn.close()
+            return jsonify({"error": "relay events must be a non-empty list"}), 400
+        symbol = str(payload.get("symbol", "")).strip().upper() or "UNKNOWN"
+        stored = 0
+        for item in relay_events:
+            if not isinstance(item, dict):
+                continue
+            tf = item.get("timeframe", "UNKNOWN")
+            ev = infer_event_from_payload(item)
+            _insert_alert(conn, "alerts_relay", symbol, tf, ev, item, now)
+            stored += 1
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "recorded", "symbol": symbol, "relay": True, "events_stored": stored})
+
+    symbol = payload.get("symbol", "UNKNOWN")
+    timeframe = payload.get("timeframe", "UNKNOWN")
+    event = infer_event_from_payload(payload)
+    _insert_alert(conn, "alerts", symbol, timeframe, event, payload, now)
 
     row = conn.execute(
         "SELECT * FROM watch_state WHERE symbol=? AND timeframe=?", (symbol, timeframe)

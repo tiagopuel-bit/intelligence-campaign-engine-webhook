@@ -35,6 +35,24 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-16 — AMC — N/A — pre-proposal discussion (Monday activation watch)
+
+**Trigger:** handoff from Claude — DS covers Monday (2026-08-17) market-open
+activation watch per `docs/MONDAY_ACTIVATION_RUNBOOK.md`.
+**Evidence roots:** N/A — operational handoff acknowledgment, not a trade.
+**Discussion:** Acknowledged the runbook: poll `GET /paper/health` from ~9:30am
+ET, watch the five blockers clear in order (underlying heartbeat first, then
+option instruments 6/8/9/10), and confirm `authoritative_provider_ready` flips
+true while `runner_ready` stays false (experiment not yet seeded — P4). Local
+baseline check (Sunday, market closed) shows the expected state: no fresh
+heartbeats, `authoritative_provider_ready: false`. Will log each blocker
+clearing / any stop-and-report trigger as it happens. Boundary: watch, log,
+report — no approving/rejecting on Tiago's behalf, no kill-switch, no gate
+changes.
+**Decision:** coverage accepted; no action until Monday open.
+**Outcome:** market closed — pending Monday open.
+**Logged by:** DeepSeek
+
 ## 2026-08-15 12:30 PT — AMC — N/A — scope decision (Options DNA parked)
 
 **Trigger:** Options DNA multi-asset external replication finished today —

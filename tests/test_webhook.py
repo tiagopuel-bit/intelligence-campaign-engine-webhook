@@ -283,6 +283,54 @@ class WebhookReceiverTests(unittest.TestCase):
         payload["time"] += 60000
         self.assertEqual(self._post(payload).status_code, 409)
 
+    # --- MTF relay ingestion (comparison-only, separate table) ---------------
+    def _relay_payload(self, events, symbol="AMC"):
+        return {"relay": True, "symbol": symbol, "events": events,
+                "secret": TEST_SECRET}
+
+    def test_relay_batch_stored_in_alerts_relay_not_alerts(self):
+        payload = self._relay_payload([
+            {"timeframe": "5", "event": "ADD", "time": "1786764000000", "close": 2.5,
+             "phase": "EXPANSION", "health": 70},
+            {"timeframe": "15", "event": "RELOAD", "time": "1786764000001", "close": 2.6,
+             "phase": "EXPANSION", "health": 72},
+        ])
+        r = self._post(payload)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["events_stored"], 2)
+        conn = webhook_receiver.get_db()
+        relay_count = conn.execute("SELECT COUNT(*) n FROM alerts_relay WHERE symbol='AMC'").fetchone()["n"]
+        native_count = conn.execute("SELECT COUNT(*) n FROM alerts WHERE symbol='AMC'").fetchone()["n"]
+        conn.close()
+        self.assertEqual(relay_count, 2)
+        self.assertEqual(native_count, 0)
+
+    def test_relay_event_attributed_to_source_timeframe(self):
+        self._post(self._relay_payload([
+            {"timeframe": "15", "event": "MANAGE", "time": "1786764000002", "close": 3.0},
+        ], symbol="RELAYATTR"))
+        conn = webhook_receiver.get_db()
+        row = conn.execute(
+            "SELECT timeframe, bar_event, bar_time FROM alerts_relay WHERE symbol='RELAYATTR'"
+        ).fetchone()
+        conn.close()
+        self.assertEqual(row["timeframe"], "15")
+        self.assertEqual(row["bar_event"], "MANAGE")
+        self.assertEqual(row["bar_time"], "1786764000002")
+
+    def test_relay_requires_nonempty_events(self):
+        r = self._post(self._relay_payload([]))
+        self.assertEqual(r.status_code, 400)
+
+    def test_native_payload_unchanged_goes_to_alerts(self):
+        self._post(self._strong_start_payload(symbol="NATIVECHK"))
+        conn = webhook_receiver.get_db()
+        native = conn.execute("SELECT COUNT(*) n FROM alerts WHERE symbol='NATIVECHK'").fetchone()["n"]
+        relay = conn.execute("SELECT COUNT(*) n FROM alerts_relay WHERE symbol='NATIVECHK'").fetchone()["n"]
+        conn.close()
+        self.assertEqual(native, 1)
+        self.assertEqual(relay, 0)
+
     def test_unknown_state_returns_404(self):
         resp = self.client.get("/state/NOEXIST/240", headers=self._state_headers())
         self.assertEqual(resp.status_code, 404)
