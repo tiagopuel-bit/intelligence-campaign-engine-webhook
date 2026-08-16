@@ -53,7 +53,7 @@ def _tables(conn):
     return {row["name"] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
 
 
-def cloud_readiness(webhook_db_path: str) -> dict:
+def cloud_readiness(webhook_db_path: str, symbols: tuple[str, ...] = ("AMC",)) -> dict:
     conn = sqlite3.connect(webhook_db_path)
     conn.row_factory = sqlite3.Row
     try:
@@ -65,15 +65,22 @@ def cloud_readiness(webhook_db_path: str) -> dict:
             blockers.append("BLOCKED_NO_LIVE_CONTRACT_RELAY")
         now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
         if not blockers:
-            hb = conn.execute(
-                "SELECT bar_time FROM underlying_heartbeats WHERE symbol='AMC' ORDER BY bar_time DESC LIMIT 1"
-            ).fetchone()
-            if hb is None or now_ms - int(hb["bar_time"]) > 2 * 60 * 1000:
-                blockers.append("BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT")
+            for symbol in symbols:
+                hb = conn.execute(
+                    "SELECT bar_time FROM underlying_heartbeats WHERE symbol=? ORDER BY bar_time DESC LIMIT 1",
+                    (symbol,),
+                ).fetchone()
+                if hb is None or now_ms - int(hb["bar_time"]) > 2 * 60 * 1000:
+                    # Keep the single-symbol code unchanged for backward compat.
+                    label = f"BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT:{symbol}" if len(symbols) > 1 \
+                        else "BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT"
+                    blockers.append(label)
+            placeholders = ",".join("?" for _ in symbols)
             open_options = conn.execute(
-                "SELECT p.id position_ref,i.id instrument_ref FROM positions p JOIN position_instruments i "
-                "ON i.position_id=p.id WHERE p.symbol='AMC' AND p.status='OPEN' AND i.status='OPEN' "
-                "AND i.instrument_type IN ('CALL','PUT')"
+                f"SELECT p.id position_ref,i.id instrument_ref FROM positions p JOIN position_instruments i "
+                f"ON i.position_id=p.id WHERE p.symbol IN ({placeholders}) AND p.status='OPEN' AND i.status='OPEN' "
+                f"AND i.instrument_type IN ('CALL','PUT')",
+                list(symbols),
             ).fetchall()
             for item in open_options:
                 quote = conn.execute(
@@ -187,10 +194,10 @@ def reconstruct_cloud_state(webhook_db_path: str, symbol: str, *, position_ref=N
         conn.close()
 
 
-def cloud_state_provider(webhook_db_path: str):
+def cloud_state_provider(webhook_db_path: str, symbols: tuple[str, ...] = ("AMC",)):
     def provider(db_path, symbol, position_ref=None, instrument_ref=None):
         return reconstruct_cloud_state(
             webhook_db_path, symbol, position_ref=position_ref, instrument_ref=instrument_ref
         )
-    provider.readiness = lambda: cloud_readiness(webhook_db_path)
+    provider.readiness = lambda: cloud_readiness(webhook_db_path, symbols)
     return provider

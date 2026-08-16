@@ -177,8 +177,12 @@ def set_kill_switch(conn, experiment_id: int, scope: str, position_ref: str | No
 
 
 def kill_switch_active(conn, experiment_id: int, scope: str = "GLOBAL",
-                       position_ref: str | None = None) -> bool:
-    """A disabled switch wins over any pending timer."""
+                       position_ref: str | None = None, symbol: str | None = None) -> bool:
+    """A disabled switch wins over any pending timer.
+
+    Checks GLOBAL (full-stop), then per-position, then per-symbol (multi-asset
+    expansion). Per-symbol reuses the ``position_ref`` column for the symbol.
+    """
     global_off = conn.execute(
         "SELECT auto_enabled FROM pe_auto_switches WHERE experiment_id=? AND scope='GLOBAL'",
         (experiment_id,),
@@ -192,7 +196,27 @@ def kill_switch_active(conn, experiment_id: int, scope: str = "GLOBAL",
         ).fetchone()
         if pos is not None and not pos["auto_enabled"]:
             return True
+    if symbol is not None:
+        sym = conn.execute(
+            "SELECT auto_enabled FROM pe_auto_switches WHERE experiment_id=? AND scope='SYMBOL' AND position_ref=?",
+            (experiment_id, symbol),
+        ).fetchone()
+        if sym is not None and not sym["auto_enabled"]:
+            return True
     return False
+
+
+def tracked_symbols(conn, experiment_id: int) -> tuple[str, ...]:
+    """The experiment's tracked symbol set: anchor + pe_experiment_symbols."""
+    row = conn.execute("SELECT symbol FROM pe_experiments WHERE id=?", (experiment_id,)).fetchone()
+    if row is None:
+        return ()
+    symbols = [str(row["symbol"])]
+    for r in conn.execute(
+        "SELECT symbol FROM pe_experiment_symbols WHERE experiment_id=?", (experiment_id,)
+    ).fetchall():
+        symbols.append(str(r["symbol"]))
+    return tuple(sorted(set(symbols)))
 
 
 def due_proposals(conn, now_iso: str, *, auto_only: bool = True) -> list[dict]:
@@ -230,7 +254,7 @@ def claim_due_proposal(conn, proposal_id: int, now_iso: str, *, actor: str = "ru
     ).fetchone()
     if experiment is None or experiment["status"] != "ACTIVE":
         return {"claimed": False, "proposal_id": proposal_id, "reason": "EXPERIMENT_NOT_ACTIVE"}
-    if kill_switch_active(conn, row["experiment_id"], position_ref=row["position_ref"]):
+    if kill_switch_active(conn, row["experiment_id"], position_ref=row["position_ref"], symbol=row["symbol"]):
         return {"claimed": False, "proposal_id": proposal_id, "reason": "KILL_SWITCH_ACTIVE"}
     cur = conn.execute(
         "UPDATE pe_order_proposals SET current_status='REVALIDATING', status='REVALIDATING' "
@@ -278,7 +302,7 @@ def claim_approved_proposal(conn, proposal_id: int, *, actor: str = "runner") ->
     experiment = conn.execute("SELECT status FROM pe_experiments WHERE id=?", (row["experiment_id"],)).fetchone()
     if experiment is None or experiment["status"] != "ACTIVE":
         return {"claimed": False, "proposal_id": proposal_id, "reason": "EXPERIMENT_NOT_ACTIVE"}
-    if kill_switch_active(conn, row["experiment_id"], position_ref=row["position_ref"]):
+    if kill_switch_active(conn, row["experiment_id"], position_ref=row["position_ref"], symbol=row["symbol"]):
         return {"claimed": False, "proposal_id": proposal_id, "reason": "KILL_SWITCH_ACTIVE"}
     cur = conn.execute(
         "UPDATE pe_order_proposals SET current_status='REVALIDATING', status='REVALIDATING' "

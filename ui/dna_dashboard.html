@@ -301,6 +301,7 @@
   .dna-lifecycle-stretch_cluster{background:var(--warning-glow);color:var(--warning);border-color:var(--warning)}
   .dna-lifecycle-fail_cluster{background:var(--critical-glow);color:var(--critical);border-color:var(--critical)}
   .dna-lifecycle-faded{background:var(--surface-2);color:var(--muted);border-color:var(--line)}
+  .dna-quiet{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:999px;font-size:8px;font-weight:700;letter-spacing:.03em;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
 
   .warmup-note-inline{margin-top:6px;padding:8px 10px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-glow);color:var(--text);font-size:10.5px;line-height:1.45}
   .dna-pill.green{background:rgba(28,154,87,.10);color:#0d7f4b}.dna-pill.red{background:var(--critical-glow);color:var(--critical)}
@@ -672,6 +673,23 @@
       return { stage: "faded", label: "attempt faded", detail: "an earlier " + tfLabel(fadedTf) + " entry never confirmed" };
     }
     return { stage: "idle", label: null, detail: null };
+  }
+
+  // --- Per-timeframe silence baseline --------------------------------------
+  // Precomputed p90 inter-event gap (minutes) per (asset, timeframe) from the
+  // backfilled history (tables/dna_campaign_silence_baseline.csv). A tier whose
+  // current silence exceeds its own p90 is flagged "unusually quiet" — a
+  // discrete flag, not a score. Tiers with <25 events have no entry here
+  // (no-basis: too few gaps to compute a meaningful typical cadence).
+  var LIFECYCLE_SILENCE_BASELINE = {"AMC":{"15m":4575.0,"1H":29880.0,"2H":45438.0,"30m":6894.0,"3H":40176.0,"4H":40398.0,"5m":1370.0},"GME":{"15m":4125.0,"1H":13710.0,"2H":22020.0,"30m":6918.0,"3H":15156.0,"4H":28080.0,"5m":1214.0},"PYPL":{"15m":4245.0,"1H":9840.0,"2H":15480.0,"30m":5439.0,"3H":14076.0,"4H":22032.0,"5m":1333.0},"RBLX":{"15m":4087.5,"1H":7176.0,"2H":18840.0,"30m":5703.0,"3H":20388.0,"4H":58008.0,"5m":1180.0},"SPY":{"15m":4110.0,"1D":32304.0,"1H":7200.0,"2H":10080.0,"30m":5538.0,"3H":12132.0,"4H":21696.0,"5m":1220.0},"U":{"15m":4110.0,"1H":10860.0,"2H":21408.0,"30m":5475.0,"3H":20088.0,"4H":21600.0,"5m":1380.5},"VALE":{"15m":4065.0,"1H":20616.0,"2H":27216.0,"30m":5454.0,"3H":12780.0,"4H":18576.0,"5m":1167.5}};
+  function silenceFlag(sym, tf, mins) {
+    var baseline = LIFECYCLE_SILENCE_BASELINE[String(sym || "").toUpperCase()] || {};
+    var p90 = baseline[String(tf)];
+    if (p90 == null || !isFinite(mins) || mins === Infinity) return null;
+    if (mins > p90) {
+      return { over: true, p90: p90, mins: mins };
+    }
+    return null;
   }
 
   // --- Actions: only what's actionable now, never a running commentary --
@@ -1838,7 +1856,7 @@
     var trackMarks = milestones.map(function (m) { return '<i class="paper-track-mark" style="left:' + Math.min(100, m.value / diamond * 100) + '%"></i>'; }).join("");
     var milestoneLabels = milestones.map(function (m) { return '<div class="paper-track-label' + (snap.current >= m.value ? ' reached' : '') + '">' + esc(m.name) + '<strong>' + fmtMoney(m.value) + '</strong></div>'; }).join("");
     var apiMessage = paperChallenge.loading ? "Loading isolated paper API…" : paperChallenge.error ? "Paper API not mounted: " + paperChallenge.error : !readiness ? "P2A is correcting approval, fill persistence, and the authoritative cloud provider. Controls remain locked." : "Fresh provider verified. Every approval is still revalidated server-side.";
-    return '<section class="dna-panel paper-command" data-role="paper-command"><div class="paper-command-head"><div class="paper-command-title"><span class="paper-badge">Paper only</span><div><h2>AMC Portfolio Challenge</h2><p>Tradable Assets · AMC</p></div></div><div class="paper-head-actions"><span class="paper-badge' + readinessClass + '">' + readinessText + '</span><button type="button" data-paper-kill-switch="GLOBAL"' + (killSwitchEnabled ? '' : ' disabled') + ' title="' + killTitle + '">' + killLabel + '</button></div></div>' +
+    return '<section class="dna-panel paper-command" data-role="paper-command"><div class="paper-command-head"><div class="paper-command-title"><span class="paper-badge">Paper only</span><div><h2>AMC Portfolio Challenge</h2><p>Tracked Assets · AMC · GME · PYPL · RBLX · SPY · VALE · U</p></div></div><div class="paper-head-actions"><span class="paper-badge' + readinessClass + '">' + readinessText + '</span><button type="button" data-paper-kill-switch="GLOBAL"' + (killSwitchEnabled ? '' : ' disabled') + ' title="' + killTitle + '">' + killLabel + '</button></div></div>' +
       '<div class="paper-command-body"><div class="paper-progress"><div class="paper-kpis">' +
         '<div class="paper-kpi"><span>Total portfolio value</span><strong>' + fmtMoney(snap.current) + '</strong><small>' + esc(snap.source) + '</small></div>' +
         '<div class="paper-kpi"><span>Open-position P&amp;L</span><strong class="' + (snap.totals.pnl >= 0 ? 'pos' : 'neg') + '">' + fmtSigned(snap.totals.pnl) + '</strong><small>Realized ' + fmtSigned(realized) + '</small></div>' +
@@ -2043,7 +2061,7 @@
       renderManageDialog();
 
     var chart = '<div class="dna-chart-column"><section class="dna-chart-card"><div class="dna-chart-head"><div><div class="dna-chart-title">' + managerTitle + '</div><div class="dna-chart-sub">Live position chart · entry and DNA reference levels</div></div><span class="dna-pill">Lightweight Charts</span></div><div class="chart-wrap"><div class="chart-toprow"><span class="chart-mode" data-sym="' + sym + '"></span><span class="chart-feats" data-sym="' + sym + '"></span></div><div class="chart-toggles" data-sym="' + sym + '"></div><div class="chart-container" data-sym="' + sym + '"></div><div class="chart-legend" data-sym="' + sym + '">hover a bar for OHLCV</div><div class="chart-status" data-sym="' + sym + '">loading chart…</div></div></section>';
-    var signalRows = states.map(function (r) { var tr = tierOf(r.timeframe), ag = age(r.bar_time); return '<tr class="' + (ag.stale ? 'st' : '') + '"><td>' + tfLabel(r.timeframe) + '</td><td>' + (tr ? tr.label : '—') + '</td><td><span class="phase-pill ' + phaseTone(r.phase) + '">' + (r.phase || '—') + '</span></td><td>' + (r.health != null ? r.health + '%' : '—') + '</td><td>' + (r.recent_event || '—') + '</td><td>' + ag.text + '</td></tr>'; }).join("");
+    var signalRows = states.map(function (r) { var tr = tierOf(r.timeframe), ag = age(r.bar_time); var quiet = silenceFlag(sym, r.timeframe, ag.mins); return '<tr class="' + (ag.stale ? 'st' : '') + '"><td>' + tfLabel(r.timeframe) + '</td><td>' + (tr ? tr.label : '—') + '</td><td><span class="phase-pill ' + phaseTone(r.phase) + '">' + (r.phase || '—') + '</span></td><td>' + (r.health != null ? r.health + '%' : '—') + '</td><td>' + (r.recent_event || '—') + '</td><td>' + ag.text + (quiet ? ' <span class="dna-quiet" title="Silent ' + Math.round(quiet.mins / 60) + 'h vs this tier\'s 90th-percentile gap of ' + Math.round(quiet.p90 / 60) + 'h">unusually quiet</span>' : '') + '</td></tr>'; }).join("");
     chart += '<section class="dna-panel dna-signals"><div class="dna-signals-head"><div><h3>Timeframe signals</h3><span>Compact evidence under the active chart</span></div></div><details class="raw" open><summary>Show timeframe ladder</summary><div class="raw-body"><div class="scroll"><table><thead><tr><th>TF</th><th>Tier</th><th>Phase</th><th>Health</th><th>Last event</th><th>Updated</th></tr></thead><tbody>' + signalRows + '</tbody></table></div></div></details></section></div>';
 
     var acts = actionsFor(sym, a);

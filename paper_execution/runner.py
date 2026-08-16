@@ -14,6 +14,13 @@ from datetime import datetime, timezone
 from paper_execution.db import connect
 from paper_execution.engine import revalidate
 from paper_execution.fill import simulate_order
+from paper_execution.portfolio import (
+    ANCHOR_SYMBOL,
+    amc_floor_breached,
+    legs_notional,
+    non_anchor_weight_cap,
+    paper_portfolio_value,
+)
 from paper_execution.state import reconstruct_evidence, reconstruct_legs
 from paper_execution.store import (
     claim_approved_proposal,
@@ -22,6 +29,7 @@ from paper_execution.store import (
     list_approved_proposals,
     record_order_and_fills,
     apply_paper_fill_ledger,
+    tracked_symbols,
     transition,
 )
 
@@ -64,6 +72,27 @@ def _process(conn, db_path, proposal, state_provider, actor) -> dict:
                 "reason": verdict["reason"]}
 
     legs, instrument_type = reconstruct_legs(state, proposal["symbol"], proposal["action"])
+
+    # Multi-asset policy gates (spec §2 R1 floor, §6 allocation) — revalidated
+    # here because the reconstructed notional is only known at execution time.
+    if proposal["action"] in {"open", "add"} and proposal["symbol"] != ANCHOR_SYMBOL:
+        notional = legs_notional(legs)
+        valuation = paper_portfolio_value(conn, proposal["experiment_id"])
+        if amc_floor_breached(valuation["amc_value"], valuation["total_value"], notional):
+            reason = "AMC_FLOOR_WOULD_BREACH"
+            transition(conn, proposal["id"], "CANCELLED_REVALIDATION", actor=actor,
+                       reason=reason, expected_from="REVALIDATING")
+            return {"proposal_id": proposal["id"], "status": "CANCELLED_REVALIDATION", "reason": reason}
+        non_anchor = [s for s in tracked_symbols(conn, proposal["experiment_id"]) if s != ANCHOR_SYMBOL]
+        cap = non_anchor_weight_cap(len(non_anchor))
+        current_value = valuation["by_symbol"].get(proposal["symbol"], 0.0)
+        projected_weight = (current_value + notional) / (valuation["total_value"] + notional)
+        if notional > 0 and projected_weight > cap:
+            reason = "ALLOCATION_CAP_EXCEEDED"
+            transition(conn, proposal["id"], "CANCELLED_REVALIDATION", actor=actor,
+                       reason=reason, expected_from="REVALIDATING")
+            return {"proposal_id": proposal["id"], "status": "CANCELLED_REVALIDATION", "reason": reason}
+
     order_result = simulate_order(legs or [], instrument_type=instrument_type or "SHARE")
     price_source = evidence["execution_quality"].get("source")
     try:

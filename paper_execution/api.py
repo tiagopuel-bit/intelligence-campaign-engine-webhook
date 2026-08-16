@@ -20,6 +20,14 @@ from flask import Blueprint, jsonify, request
 
 from paper_execution.db import connect
 from paper_execution.engine import auto_mode_allowed, evaluate_very_high
+from paper_execution.portfolio import (
+    ANCHOR_SYMBOL,
+    amc_floor_breached,
+    asset_eligible,
+    load_reliability_mask,
+    non_anchor_weight_cap,
+    paper_portfolio_value,
+)
 from paper_execution.runner import health_summary
 from paper_execution.state import reconstruct_evidence
 from paper_execution.store import (
@@ -30,6 +38,7 @@ from paper_execution.store import (
     modify_proposal_transactional,
     record_user_decision,
     set_kill_switch,
+    tracked_symbols,
     transition,
 )
 
@@ -42,6 +51,20 @@ APPROVAL_WINDOW_SECONDS = 600
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+_reliability_mask_cache: dict | None = None
+
+
+def _eligibility_mask() -> dict:
+    """Lazily load the reliability mask once; empty on failure (fail-closed)."""
+    global _reliability_mask_cache
+    if _reliability_mask_cache is None:
+        try:
+            _reliability_mask_cache = load_reliability_mask()
+        except (OSError, ValueError):
+            _reliability_mask_cache = {}
+    return _reliability_mask_cache
 
 
 def create_blueprint(db_path, state_token: str, state_provider):
@@ -72,8 +95,8 @@ def create_blueprint(db_path, state_token: str, state_provider):
             return None, "EXPERIMENT_NOT_FOUND"
         if row["status"] != "ACTIVE":
             return None, "EXPERIMENT_NOT_ACTIVE"
-        if row["symbol"] != symbol:
-            return None, "SYMBOL_MISMATCH"
+        if symbol not in tracked_symbols(conn, experiment_id):
+            return None, "SYMBOL_NOT_TRACKED"
         if action not in {a.strip() for a in (row["allowed_actions"] or "").split(",")}:
             return None, "ACTION_NOT_ALLOWED"
         now = _now_iso()
@@ -152,9 +175,22 @@ def create_blueprint(db_path, state_token: str, state_provider):
 
         conn = connect(db_path)
         experiment, exp_err = _validate_experiment(conn, experiment_id, symbol, action)
-        conn.close()
         if exp_err:
+            conn.close()
             return jsonify({"error": exp_err}), 409
+
+        # §5 eligibility gate (non-anchor only; the anchor AMC is always eligible).
+        if symbol != ANCHOR_SYMBOL and not asset_eligible(_eligibility_mask(), symbol):
+            conn.close()
+            return jsonify({"error": "ASSET_NOT_ELIGIBLE"}), 409
+
+        # §2 R2 (drift): while AMC is already below the floor, block non-AMC adds.
+        if symbol != ANCHOR_SYMBOL and action in {"open", "add"}:
+            valuation = paper_portfolio_value(conn, experiment_id)
+            if amc_floor_breached(valuation["amc_value"], valuation["total_value"], 0.0):
+                conn.close()
+                return jsonify({"error": "AMC_FLOOR_WOULD_BREACH"}), 409
+        conn.close()
 
         position_ref = body.get("position_ref")
         instrument_ref = body.get("instrument_ref")

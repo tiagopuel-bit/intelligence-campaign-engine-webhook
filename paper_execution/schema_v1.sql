@@ -53,6 +53,14 @@ CREATE TABLE IF NOT EXISTS pe_starting_holdings (
     frozen_at TEXT NOT NULL
 );
 
+-- Tracked symbols for a multi-asset experiment (anchor symbol stays on
+-- pe_experiments.symbol for the existing single-symbol validation path).
+CREATE TABLE IF NOT EXISTS pe_experiment_symbols (
+    experiment_id INTEGER NOT NULL REFERENCES pe_experiments(id),
+    symbol TEXT NOT NULL,
+    PRIMARY KEY (experiment_id, symbol)
+);
+
 -- Order proposals. idempotency_key is unique per experiment.
 CREATE TABLE IF NOT EXISTS pe_order_proposals (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -169,7 +177,7 @@ CREATE TABLE IF NOT EXISTS pe_daily_reports (
 CREATE TABLE IF NOT EXISTS pe_auto_switches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     experiment_id INTEGER NOT NULL REFERENCES pe_experiments(id),
-    scope TEXT NOT NULL CHECK(scope IN ('GLOBAL','POSITION')),
+    scope TEXT NOT NULL CHECK(scope IN ('GLOBAL','POSITION','SYMBOL')),
     position_ref TEXT NOT NULL DEFAULT '',
     auto_enabled INTEGER NOT NULL DEFAULT 1,
     updated_at TEXT NOT NULL,
