@@ -198,6 +198,46 @@ def validate_instrument_update(payload) -> tuple[dict, str | None]:
     return clean, None
 
 
+def validate_close_instruments(payload) -> tuple[dict, str | None]:
+    """Validate a manual partial/full close request for one holding group."""
+    if not isinstance(payload, dict):
+        return None, "body must be a JSON object"
+    allowed = {"instrument_ids", "quantity", "exit_price", "exit_time", "notes"}
+    unknown = sorted(set(payload) - allowed)
+    if unknown:
+        return None, "unsupported fields: " + ", ".join(unknown)
+    ids = payload.get("instrument_ids")
+    if not isinstance(ids, list) or not ids:
+        return None, "instrument_ids must be a non-empty list"
+    try:
+        instrument_ids = [int(value) for value in ids]
+    except (TypeError, ValueError):
+        return None, "instrument_ids must contain integers"
+    if any(value <= 0 for value in instrument_ids) or len(set(instrument_ids)) != len(instrument_ids):
+        return None, "instrument_ids must contain unique positive integers"
+    quantity, err = _opt_float(payload.get("quantity"), "quantity", positive=True)
+    if err:
+        return None, err
+    exit_price = None
+    if payload.get("exit_price") not in (None, ""):
+        exit_price, err = _opt_float(payload.get("exit_price"), "exit_price", positive=True)
+        if err:
+            return None, err
+    exit_time, err = _opt_str(payload.get("exit_time"), "exit_time")
+    if err:
+        return None, err
+    notes, err = _opt_str(payload.get("notes"), "notes")
+    if err:
+        return None, err
+    return {
+        "instrument_ids": instrument_ids,
+        "quantity": quantity,
+        "exit_price": exit_price,
+        "exit_time": exit_time,
+        "notes": notes,
+    }, None
+
+
 def shape_instrument(row) -> dict:
     return {
         "id": row["id"],

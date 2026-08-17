@@ -570,6 +570,64 @@ class WebhookReceiverTests(unittest.TestCase):
         self.assertEqual(detail["instrument_count"], 2)
         self.assertEqual(detail["open_instrument_count"], 1)
 
+    def test_partial_option_close_preserves_open_remainder_and_trade_log(self):
+        created = self._create_position(
+            symbol="PARTIAL",
+            instrument={"type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+                        "quantity": 7, "entry_price": 0.30,
+                        "entry_time": "2026-08-13T14:30:00Z"},
+        ).get_json()
+        iid = created["instruments"][0]["id"]
+        response = self.client.post(
+            f"/positions/{created['id']}/instruments/close",
+            data=json.dumps({"instrument_ids": [iid], "quantity": 2,
+                             "exit_price": 0.55, "notes": "partial profit"}),
+            content_type="application/json", headers=self._state_headers(),
+        )
+        self.assertEqual(response.status_code, 200)
+        body = response.get_json()
+        self.assertEqual(body["closed_quantity"], 2)
+        self.assertEqual(body["remaining_quantity"], 5)
+        instruments = body["position"]["instruments"]
+        open_legs = [leg for leg in instruments if leg["status"] == "OPEN"]
+        closed_legs = [leg for leg in instruments if leg["status"] == "CLOSED"]
+        self.assertEqual([leg["quantity"] for leg in open_legs], [5])
+        self.assertEqual([leg["quantity"] for leg in closed_legs], [2])
+        self.assertEqual(closed_legs[0]["exit_price"], 0.55)
+        self.assertEqual(closed_legs[0]["entry_price"], 0.30)
+        self.assertEqual(body["position"]["status"], "OPEN")
+
+        final = self.client.post(
+            f"/positions/{created['id']}/instruments/close",
+            data=json.dumps({"instrument_ids": [open_legs[0]["id"]], "quantity": 5,
+                             "exit_price": 0.60}),
+            content_type="application/json", headers=self._state_headers(),
+        )
+        self.assertEqual(final.status_code, 200)
+        self.assertEqual(final.get_json()["position"]["status"], "CLOSED")
+        self.assertIsNotNone(final.get_json()["position"]["closed_at"])
+
+    def test_partial_close_rejects_invalid_quantity_and_mixed_holdings(self):
+        created = self._create_position(symbol="PARTIALBAD").get_json()
+        pid = created["id"]
+        share_id = created["instruments"][0]["id"]
+        call_id = self.client.post(
+            f"/positions/{pid}/instruments",
+            data=json.dumps({"type": "CALL", "strike": 2.5, "expiration": "2026-09-18",
+                             "quantity": 2, "entry_price": 0.30,
+                             "entry_time": "2026-08-13T14:30:00Z"}),
+            content_type="application/json", headers=self._state_headers(),
+        ).get_json()["id"]
+        base = f"/positions/{pid}/instruments/close"
+        for payload in (
+            {"instrument_ids": [call_id], "quantity": 3},
+            {"instrument_ids": [call_id], "quantity": 0.5},
+            {"instrument_ids": [share_id, call_id], "quantity": 1},
+        ):
+            response = self.client.post(base, data=json.dumps(payload),
+                                        content_type="application/json", headers=self._state_headers())
+            self.assertEqual(response.status_code, 400)
+
     def test_position_roll_linking(self):
         pid = self._create_position().get_json()["id"]
         first = self.client.get(f"/positions/{pid}", headers=self._state_headers()).get_json()["instruments"][0]
