@@ -136,6 +136,15 @@ class PaperApiTests(unittest.TestCase):
         self.assertEqual(self._create({"symbol": "TSLA"}).status_code, 409)
         self.assertEqual(self._create({"action": "not_an_action"}).status_code, 409)
 
+    def test_experiment_returns_live_cash(self):
+        conn = db.connect(self._tmp.name)
+        conn.execute("UPDATE pe_paper_cash SET cash=150.0 WHERE experiment_id=?", (self.experiment_id,))
+        conn.commit()
+        conn.close()
+        body = self.client.get(f"/paper/experiments/{self.experiment_id}", headers=self.h).get_json()
+        self.assertEqual(body["starting_cash"], 100.0)
+        self.assertEqual(body["live_cash"], 150.0)
+
     def test_duplicate_idempotency(self):
         first = self._create().get_json()
         second = self._create().get_json()
@@ -417,6 +426,7 @@ class RunnerTests(unittest.TestCase):
         Path(wh.name).unlink(missing_ok=True)
 
     def test_roll_reconstruction_requires_two_legs(self):
+
         state = valid_state()
         self.assertEqual(reconstruct_legs(state, "AMC", "roll")[0], None)
         state["roll_legs"] = [
@@ -434,8 +444,8 @@ class MigrationTests(unittest.TestCase):
         tmp.close()
         # Simulate a pre-P2A DB: old pe_order_proposals without parent/version.
         old = sqlite3.connect(tmp.name)
-        old.execute("CREATE TABLE pe_order_proposals (id INTEGER PRIMARY KEY AUTOINCREMENT, experiment_id INTEGER, idempotency_key TEXT, policy_version INTEGER, policy_sha256 TEXT, action TEXT, mode TEXT, symbol TEXT, time_sensitive_reason TEXT, very_high INTEGER, very_high_missing_roots TEXT, status TEXT, current_status TEXT, expires_at TEXT, cancel_condition TEXT, created_at TEXT)")
-        old.execute("INSERT INTO pe_order_proposals (experiment_id, idempotency_key, action, mode, symbol, very_high, status, current_status, expires_at, cancel_condition, created_at) VALUES (1,'k','close','APPROVAL_REQUIRED','AMC',0,'PENDING_APPROVAL','PENDING_APPROVAL','2027-01-01T00:00:00Z','x','2026-01-01T00:00:00Z')")
+        old.execute("CREATE TABLE pe_order_proposals (id INTEGER PRIMARY KEY AUTOINCREMENT, experiment_id INTEGER, idempotency_key TEXT, policy_version INTEGER NOT NULL, policy_sha256 TEXT NOT NULL, action TEXT, mode TEXT, symbol TEXT, time_sensitive_reason TEXT, very_high INTEGER, very_high_missing_roots TEXT, status TEXT, current_status TEXT, expires_at TEXT, cancel_condition TEXT, created_at TEXT)")
+        old.execute("INSERT INTO pe_order_proposals (experiment_id, idempotency_key, policy_version, policy_sha256, action, mode, symbol, very_high, status, current_status, expires_at, cancel_condition, created_at) VALUES (1,'k',1,'h','close','APPROVAL_REQUIRED','AMC',0,'PENDING_APPROVAL','PENDING_APPROVAL','2027-01-01T00:00:00Z','x','2026-01-01T00:00:00Z')")
         old.commit()
         old.close()
         # Re-init: new columns/tables added, existing row preserved.
@@ -451,6 +461,79 @@ class MigrationTests(unittest.TestCase):
         self.assertIn("pe_paper_positions", tables)
         self.assertEqual(rows, 1)
         Path(tmp.name).unlink(missing_ok=True)
+
+
+class SetBracketApiTests(unittest.TestCase):
+    """set_bracket proposals flow through approval before any bracket is set."""
+
+    def setUp(self):
+        self._tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self._tmp.close()
+        db.init_db(self._tmp.name)
+        conn = db.connect(self._tmp.name)
+        self.experiment_id = make_experiment(conn)
+        conn.execute(
+            "INSERT INTO pe_paper_positions (experiment_id, symbol, instrument_type, ticker, quantity, updated_at) "
+            "VALUES (?,?,?,?,?,?)", (self.experiment_id, "AMC", "SHARE", "AMC", 100.0, _iso(0))
+        )
+        conn.commit()
+        conn.close()
+        self._provider_state = valid_state()
+        self.app = Flask(__name__)
+        self.app.register_blueprint(create_blueprint(self._tmp.name, TOKEN, lambda db_path, symbol: self._provider_state))
+        self.client = self.app.test_client()
+        self.h = {"Authorization": f"Bearer {TOKEN}"}
+
+    def tearDown(self):
+        Path(self._tmp.name).unlink(missing_ok=True)
+
+    def _create_bracket(self, **overrides):
+        payload = {"action": "set_bracket", "symbol": "AMC", "experiment_id": self.experiment_id,
+                   "idempotency_key": "b1", "position_ref": "AMC", "stop_price": 5.0}
+        payload.update(overrides)
+        return self.client.post("/paper/proposals", json=payload, headers=self.h)
+
+    def _active_brackets(self):
+        return self.client.get("/paper/brackets", headers=self.h).get_json()
+
+    def test_proposal_does_not_set_bracket_until_approved(self):
+        r = self._create_bracket()
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(self._active_brackets(), [])
+
+    def test_approve_sets_bracket_with_exact_prices(self):
+        pid = self._create_bracket().get_json()["proposal_id"]
+        r = self.client.post(f"/paper/proposals/{pid}/approve", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("bracket_id", r.get_json())
+        brackets = self._active_brackets()
+        self.assertEqual(len(brackets), 1)
+        self.assertEqual(brackets[0]["stop_price"], 5.0)
+        self.assertEqual(brackets[0]["ticker"], "AMC")
+
+    def test_reject_never_sets_bracket(self):
+        pid = self._create_bracket().get_json()["proposal_id"]
+        self.client.post(f"/paper/proposals/{pid}/reject", headers=self.h)
+        self.assertEqual(self._active_brackets(), [])
+
+    def test_requires_position_ref(self):
+        r = self._create_bracket(position_ref=None)
+        self.assertEqual(r.status_code, 400)
+        self.assertIn("position_ref", r.get_json()["error"])
+
+    def test_requires_stop_or_target(self):
+        r = self._create_bracket(stop_price=None)
+        self.assertEqual(r.status_code, 400)
+
+    def test_expired_proposal_cannot_approve(self):
+        pid = self._create_bracket().get_json()["proposal_id"]
+        conn = db.connect(self._tmp.name)
+        conn.execute("UPDATE pe_order_proposals SET expires_at='2020-01-01T00:00:00Z' WHERE id=?", (pid,))
+        conn.commit()
+        conn.close()
+        r = self.client.post(f"/paper/proposals/{pid}/approve", headers=self.h)
+        self.assertEqual(r.status_code, 409)
+        self.assertEqual(self._active_brackets(), [])
 
 
 if __name__ == "__main__":

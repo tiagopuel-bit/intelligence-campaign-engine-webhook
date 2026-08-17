@@ -35,6 +35,51 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-17 16:08 PT — N/A — build: multi-asset plumbing + AMC auto-entry + bracket lifecycle
+
+**Trigger:** Claude handoff `DEEPSEEK_MULTI_ASSET_AND_FIXES_TASK.md` (4 build items), done in one pass.
+**Discussion:** (1) `/paper/experiments` now returns live `live_cash` from `pe_paper_cash`; dashboard reads it. (2) `open`/`add` are auto-eligible only for the AMC anchor (Option B), other symbols stay manual. (3) `join_symbol_if_ready()` adds a symbol to an already-ACTIVE experiment (eligibility gate + fresh heartbeat, no holdings required). (4) `set_bracket` proposals flow through the approval lifecycle before `upsert_bracket`; dashboard shows active brackets + renders set_bracket proposals. **Flagged gap:** allocation caps (single-contract 15%, single-expiry 25%, total-options 50%, daily-loss 5%, orders/day 3) are declared in the goal but not enforced anywhere — pre-existing, needs Tiago's call. Left `set_bracket` out of `VERY_HIGH_AUTO_ACTIONS` (default).
+**Decision:** handed back for review; no deploy/commit/push.
+**Outcome:** 484 tests pass, `git diff --check` clean.
+**Logged by:** DeepSeek
+
+## 2026-08-17 14:14 PT — AMC — N/A — production incident (502, fixed)
+
+**Trigger:** Tiago reported Railway showing "Deployment failed" with a
+Network → Healthcheck failure on deployment `737dea4a` (2026-08-17 13:01
+PDT). `/health` and `/paper/health` both returned 502
+`"Application failed to respond"` for the intervening ~70+ minutes.
+**Evidence roots:** N/A — infra incident, not a trade.
+**Discussion:** Deploy logs (pasted by Tiago) showed every gunicorn worker
+crashing on boot: `ImportError: cannot import name 'TRACKED_SYMBOLS' from
+'paper_execution.portfolio'`. Root cause traced to commit `54dafef`
+("Fix: remove close_instruments route accidentally committed in aa1e25f")
+— that commit correctly stripped the unreviewed `close_instruments` route
+but left one unrelated line behind: `from paper_execution.portfolio import
+TRACKED_SYMBOLS` and `activate_if_ready(PAPER_DB_PATH, DB_PATH,
+TRACKED_SYMBOLS)`. `TRACKED_SYMBOLS` only exists in local, not-yet-
+committed multi-asset expansion work — never pushed — so the import always
+failed on the deployed commit. Fix: built a clean git worktree from
+`origin/main` (isolated from all other local uncommitted WIP), reverted
+those two lines back to the known-good `activate_if_ready(PAPER_DB_PATH,
+DB_PATH, "AMC")` literal, verified the import resolves, ran the full suite
+(450 passing on that clean base) and `git diff --check` (clean), then
+Tiago pushed the single-commit fix (`f27850c`) from his own terminal (push
+itself is blocked for Claude by the sandbox's auto-mode classifier — commit
+prep only, human executes the actual push). Deliberately did **not** pull
+in the local `TRACKED_SYMBOLS` definition to close the gap the other way,
+to keep the unreviewed multi-asset expansion isolated, matching the intent
+of `54dafef` itself.
+**Decision:** hotfix pushed to `main` as `f27850c`.
+**Outcome:** confirmed fixed — `/health` returned `{"status":"ok"}` at
+14:14:11 PT (3rd poll after push), `/paper/health` returned `status: ok`
+with the expected five closed-market blockers (no fresh heartbeats yet —
+correct resting state, not an error). Today's TradingView alert reset
+(Tiago, earlier this afternoon) should now deliver cleanly against a
+working backend once the market opens. Claude covers the market-open watch
+tomorrow (2026-08-18) per `docs/DEEPSEEK_TUESDAY_HANDOFF_2026-08-18.md`.
+**Logged by:** Claude
+
 ## 2026-08-16 — AMC — N/A — pre-proposal discussion (Monday activation watch)
 
 **Trigger:** handoff from Claude — DS covers Monday (2026-08-17) market-open

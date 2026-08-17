@@ -90,7 +90,8 @@ def create_proposal(conn, *, experiment_id, idempotency_key, action, mode, symbo
                     policy_sha256, time_sensitive_reason, very_high,
                     very_high_missing_roots, expires_at, cancel_condition,
                     evidence_roots, parent_proposal_id=None, version=1,
-                    position_ref=None, instrument_ref=None) -> int:
+                    position_ref=None, instrument_ref=None, stop_price=None,
+                    target_price=None) -> int:
     """Create a proposal idempotently. Duplicate idempotency keys return the
     existing proposal id instead of triggering twice."""
     now = _now_iso()
@@ -98,12 +99,12 @@ def create_proposal(conn, *, experiment_id, idempotency_key, action, mode, symbo
         "INSERT OR IGNORE INTO pe_order_proposals "
         "(experiment_id, idempotency_key, parent_proposal_id, version, policy_version, policy_sha256, "
         " action, mode, symbol, position_ref, instrument_ref, time_sensitive_reason, very_high, very_high_missing_roots, "
-        " status, current_status, expires_at, cancel_condition, created_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " status, current_status, expires_at, cancel_condition, created_at, stop_price, target_price) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (experiment_id, idempotency_key, parent_proposal_id, version, 1, policy_sha256,
          action, mode, symbol, position_ref, instrument_ref, time_sensitive_reason, 1 if very_high else 0,
          json.dumps(very_high_missing_roots), "PENDING_APPROVAL", "PENDING_APPROVAL",
-         expires_at, cancel_condition, now),
+         expires_at, cancel_condition, now, stop_price, target_price),
     )
     if cur.rowcount == 1:
         proposal_id = cur.lastrowid
@@ -247,7 +248,7 @@ def claim_due_proposal(conn, proposal_id: int, now_iso: str, *, actor: str = "ru
         return {"claimed": False, "proposal_id": proposal_id, "reason": "NOT_AUTO_MODE"}
     if not row["very_high"]:
         return {"claimed": False, "proposal_id": proposal_id, "reason": "NOT_VERY_HIGH"}
-    if not auto_mode_allowed(row["action"]):
+    if not auto_mode_allowed(row["action"], row["symbol"]):
         return {"claimed": False, "proposal_id": proposal_id, "reason": "ACTION_NOT_AUTO_ALLOWED"}
     experiment = conn.execute(
         "SELECT status FROM pe_experiments WHERE id=?", (row["experiment_id"],)
@@ -403,7 +404,8 @@ def modify_proposal_transactional(conn, proposal_id: int, *, new_action: str,
                                   time_sensitive_reason: str | None, very_high: bool,
                                   missing_roots: list, expires_at: str,
                                   cancel_condition: str, position_ref=None,
-                                  instrument_ref=None) -> dict:
+                                  instrument_ref=None, stop_price=None,
+                                  target_price=None) -> dict:
     """One-transaction supersession: create one versioned child, record the user
     decision, then cancel the parent. Any failure rolls back the whole thing."""
     parent = conn.execute("SELECT * FROM pe_order_proposals WHERE id=?", (proposal_id,)).fetchone()
@@ -421,6 +423,8 @@ def modify_proposal_transactional(conn, proposal_id: int, *, new_action: str,
         cancel_condition=cancel_condition,
         position_ref=position_ref if position_ref is not None else parent["position_ref"],
         instrument_ref=instrument_ref if instrument_ref is not None else parent["instrument_ref"],
+        stop_price=stop_price if stop_price is not None else parent["stop_price"],
+        target_price=target_price if target_price is not None else parent["target_price"],
     )
     conn.execute(
         "INSERT INTO pe_proposal_events (proposal_id, from_status, to_status, at, actor, reason) "
@@ -529,18 +533,19 @@ def apply_bracket_trigger(conn, bracket: dict, *, side, trigger_price, fill_pric
 def _insert_proposal_row(conn, *, experiment_id, idempotency_key, parent_proposal_id, version,
                          action, mode, symbol, policy_sha256, time_sensitive_reason,
                          very_high, missing_roots, expires_at, cancel_condition,
-                         position_ref=None, instrument_ref=None) -> int:
+                         position_ref=None, instrument_ref=None, stop_price=None,
+                         target_price=None) -> int:
     now = _now_iso()
     cur = conn.execute(
         "INSERT OR IGNORE INTO pe_order_proposals "
         "(experiment_id, idempotency_key, parent_proposal_id, version, policy_version, policy_sha256, "
         " action, mode, symbol, position_ref, instrument_ref, time_sensitive_reason, very_high, very_high_missing_roots, "
-        " status, current_status, expires_at, cancel_condition, created_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " status, current_status, expires_at, cancel_condition, created_at, stop_price, target_price) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (experiment_id, idempotency_key, parent_proposal_id, version, 1, policy_sha256,
          action, mode, symbol, position_ref, instrument_ref, time_sensitive_reason, 1 if very_high else 0,
          json.dumps(missing_roots), "PENDING_APPROVAL", "PENDING_APPROVAL",
-         expires_at, cancel_condition, now),
+         expires_at, cancel_condition, now, stop_price, target_price),
     )
     if cur.rowcount == 0:
         row = conn.execute(

@@ -13,6 +13,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 ANCHOR_SYMBOL = "AMC"
+# §1/§7: the deep-backfilled tracked set (anchor first). Additional symbols join
+# via pe_experiment_symbols once they clear the eligibility gate AND carry a
+# starting position (PORTFOLIO_MULTI_ASSET_SPEC.md §7) — activation is atomic,
+# so every symbol here must have a fresh heartbeat and open positions to seed.
+TRACKED_SYMBOLS = ("AMC", "GME", "PYPL", "RBLX", "SPY", "VALE", "U")
 AMC_FLOOR_PCT = 0.30
 MIN_CLASSIFIED_BARS = 25
 OPTION_MULTIPLIER = 100

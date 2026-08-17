@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS pe_order_proposals (
     version INTEGER NOT NULL DEFAULT 1,
     policy_version INTEGER NOT NULL,
     policy_sha256 TEXT NOT NULL,
-    action TEXT NOT NULL CHECK(action IN ('hold','open','add','partial_reduce','close','roll')),
+    action TEXT NOT NULL CHECK(action IN ('hold','open','add','partial_reduce','close','roll','set_bracket')),
     mode TEXT NOT NULL CHECK(mode IN ('ADVISORY_ONLY','APPROVAL_REQUIRED','AUTO_IF_VERY_HIGH_PAPER','PROTECTION_ONLY_PAPER')),
     symbol TEXT NOT NULL,
     position_ref TEXT,
@@ -83,6 +83,8 @@ CREATE TABLE IF NOT EXISTS pe_order_proposals (
     expires_at TEXT NOT NULL,
     cancel_condition TEXT NOT NULL,
     created_at TEXT NOT NULL,
+    stop_price REAL,
+    target_price REAL,
     UNIQUE(experiment_id, idempotency_key)
 );
 

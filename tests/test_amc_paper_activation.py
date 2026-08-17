@@ -6,6 +6,7 @@ from pathlib import Path
 
 from paper_execution import db
 from paper_execution.activation import activate_if_ready
+from paper_execution.portfolio import ANCHOR_SYMBOL, TRACKED_SYMBOLS
 
 
 class PaperActivationTests(unittest.TestCase):
@@ -121,6 +122,80 @@ class PaperActivationTests(unittest.TestCase):
         self.assertEqual(result["status"], "ACTIVATED")
         paper = db.connect(self.paper_file.name)
         self.assertEqual(paper.execute("SELECT COUNT(*) n FROM pe_experiment_symbols").fetchone()["n"], 0)
+        paper.close()
+
+    # --- multi-symbol activation (tracked set) -----------------------------
+
+    def _seed_amc_call_heartbeat(self):
+        conn = sqlite3.connect(self.webhook_file.name)
+        conn.execute(
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'live_contract_bar','now')",
+            (self.now,),
+        )
+        conn.commit()
+        conn.close()
+
+    def _seed_share_symbol(self, symbol, pos_id, instr_id):
+        conn = sqlite3.connect(self.webhook_file.name)
+        conn.execute(
+            "INSERT INTO underlying_heartbeats VALUES (?,?,?,?,?,?)",
+            (symbol, "1", self.now, 30.0, "live_webhook", "now"),
+        )
+        conn.execute("INSERT INTO positions VALUES (?,?,'LONG','OPEN')", (pos_id, symbol))
+        conn.execute(
+            "INSERT INTO position_instruments VALUES (?,?,'SHARE',NULL,NULL,?,?,'OPEN')",
+            (instr_id, pos_id, 10, 28.0),
+        )
+        conn.commit()
+        conn.close()
+
+    def test_tracked_symbols_constant_is_well_formed(self):
+        self.assertEqual(TRACKED_SYMBOLS[0], ANCHOR_SYMBOL)
+        self.assertEqual(len(TRACKED_SYMBOLS), 7)
+        self.assertEqual(len(set(TRACKED_SYMBOLS)), 7)
+        self.assertEqual(
+            set(TRACKED_SYMBOLS), {"AMC", "GME", "PYPL", "RBLX", "SPY", "VALE", "U"}
+        )
+
+    def test_full_tracked_set_activates_when_all_have_positions(self):
+        self._seed_amc_call_heartbeat()
+        for symbol, pos_id, instr_id in [
+            ("GME", 8, 12), ("PYPL", 9, 13), ("RBLX", 10, 14),
+            ("SPY", 11, 15), ("VALE", 12, 16), ("U", 13, 17),
+        ]:
+            self._seed_share_symbol(symbol, pos_id, instr_id)
+        result = activate_if_ready(self.paper_file.name, self.webhook_file.name, TRACKED_SYMBOLS)
+        self.assertEqual(result["status"], "ACTIVATED")
+        self.assertEqual(result["holding_count"], 8)  # AMC share + call + 6 shares
+        paper = db.connect(self.paper_file.name)
+        exp = paper.execute("SELECT symbol FROM pe_experiments").fetchone()
+        tracked = [r["symbol"] for r in
+                   paper.execute("SELECT symbol FROM pe_experiment_symbols ORDER BY symbol").fetchall()]
+        paper.close()
+        self.assertEqual(exp["symbol"], "AMC")
+        self.assertEqual(tracked, ["GME", "PYPL", "RBLX", "SPY", "U", "VALE"])
+
+    def test_tracked_set_blocks_when_non_anchor_lacks_position(self):
+        self._seed_amc_call_heartbeat()
+        for symbol, pos_id, instr_id in [
+            ("GME", 8, 12), ("PYPL", 9, 13), ("RBLX", 10, 14),
+            ("SPY", 11, 15), ("VALE", 12, 16),
+        ]:
+            self._seed_share_symbol(symbol, pos_id, instr_id)
+        # U gets a fresh heartbeat but NO position -> atomic activation blocks.
+        conn = sqlite3.connect(self.webhook_file.name)
+        conn.execute(
+            "INSERT INTO underlying_heartbeats VALUES ('U','1',?,30.0,'live_webhook','now')",
+            (self.now,),
+        )
+        conn.commit()
+        conn.close()
+        result = activate_if_ready(self.paper_file.name, self.webhook_file.name, TRACKED_SYMBOLS)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["blocker"], "BLOCKED_NO_STARTING_HOLDINGS")
+        self.assertEqual(result["symbol"], "U")
+        paper = db.connect(self.paper_file.name)
+        self.assertEqual(paper.execute("SELECT COUNT(*) n FROM pe_experiments").fetchone()["n"], 0)
         paper.close()
 
 

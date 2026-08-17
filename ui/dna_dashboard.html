@@ -781,7 +781,7 @@
   var assets = [], cache = {}, selected = null;
   var portfolio = [], realized = 0, portfolioById = {};
   var newsBySymbol = {}, marketWatchBySymbol = {}, filingsBySymbol = {};
-  var paperChallenge = { health: null, experiment: null, proposals: [], reports: [], error: null, loading: false, seq: 0 };
+  var paperChallenge = { health: null, experiment: null, proposals: [], reports: [], brackets: [], error: null, loading: false, seq: 0 };
   var paperCountdownTimer = null;
   var paperExperimentId = Number(localStorage.getItem("dna_paper_experiment_id") || 1);
   // Which single holding (share line or option contract) the chart + insight
@@ -1815,7 +1815,7 @@
   function paperCurrentSnapshot() {
     var totals = livePortfolioTotals();
     var report = latestPaperReport();
-    var cash = paperChallenge.experiment && paperChallenge.experiment.starting_cash != null ? Number(paperChallenge.experiment.starting_cash) : 100;
+    var cash = paperChallenge.experiment && paperChallenge.experiment.live_cash != null ? Number(paperChallenge.experiment.live_cash) : (paperChallenge.experiment && paperChallenge.experiment.starting_cash != null ? Number(paperChallenge.experiment.starting_cash) : 100);
     var current = report && report.portfolio_value != null ? Number(report.portfolio_value) : totals.value + cash;
     var high = current;
     paperChallenge.reports.forEach(function (r) { if (r.portfolio_value != null) high = Math.max(high, Number(r.portfolio_value)); });
@@ -1835,6 +1835,9 @@
     var rejectEnabled = pending && api;
     var modifyEnabled = pending && ready;
     var reason = p.time_sensitive_reason || (Number(p.very_high) === 1 ? "All four evidence roots were present at proposal time." : "Evidence is incomplete; observation only until every required root is present.");
+    if (p.action === "set_bracket") {
+      reason = "Protective bracket: stop " + (p.stop_price != null ? "$" + Number(p.stop_price) : "—") + " · target " + (p.target_price != null ? "$" + Number(p.target_price) : "—") + (p.time_sensitive_reason ? " · " + p.time_sensitive_reason : "");
+    }
     return '<article class="paper-proposal"><div class="paper-proposal-top"><strong><span class="paper-badge">Paper</span> ' + esc(p.symbol || "AMC") + ' · ' + esc(String(p.action || "observe").replace(/_/g, " ")) + '</strong><span class="paper-status ' + paperStatusClass(status) + '">' + esc(status.replace(/_/g, " ")) + '</span></div>' +
       '<div class="paper-proposal-meta"><span>#' + esc(p.id) + ' · v' + esc(p.version || 1) + '</span><span>' + esc(p.mode || "APPROVAL_REQUIRED") + '</span><span class="paper-countdown" data-expires="' + esc(p.expires_at || "") + '">' + paperTimeLeft(p.expires_at) + '</span></div>' +
       '<div class="paper-proposal-reason">' + esc(reason) + '</div>' +
@@ -1856,6 +1859,8 @@
     var killTitle = killSwitchEnabled ? (globalAutoOff ? "Re-enable automatic paper execution" : "Disable automatic paper execution") : "No active experiment to control";
     var proposals = paperChallenge.proposals.slice().sort(function (a, b) { return Number(b.id || 0) - Number(a.id || 0); }).slice(0, 5);
     var queue = proposals.length ? proposals.map(paperProposalHtml).join("") : '<div class="paper-empty">No paper proposals yet.<br>DNA decisions will appear here with evidence and a 10-minute approval window.</div>';
+    var brackets = paperChallenge.brackets || [];
+    var bracketHtml = brackets.length ? brackets.map(function (b) { return esc(b.ticker) + " · " + esc(b.direction) + " · stop " + (b.stop_price != null ? "$" + Number(b.stop_price) : "—") + " · target " + (b.target_price != null ? "$" + Number(b.target_price) : "—"); }).join("; ") : "No protective brackets set.";
     var amc = cache.AMC, assessment = amc && amc.assess;
     var tiers = assessment && assessment.tiers;
     var confirm = tiers && (!tiers.confirm.empty ? tiers.confirm : tiers.timing);
@@ -1883,6 +1888,7 @@
         '<div class="paper-daily-item"><span>AMC campaign</span><strong>' + esc(assessment ? assessment.headline : "Awaiting DNA state") + '</strong><small>' + esc(assessment ? assessment.why : "No authoritative campaign read available.") + '</small></div>' +
         '<div class="paper-daily-item"><span>Decision window</span><strong>' + esc(confirm && !confirm.empty ? confirm.tier.label + " · " + confirm.text : "Waiting for confirmation") + '</strong><small>' + esc(confirm && !confirm.empty ? tfLabel(confirm.lead.timeframe) + " health " + (confirm.lead.health == null ? "—" : confirm.lead.health + "%") : "No current confirmation timeframe") + '</small></div>' +
         '<div class="paper-daily-item"><span>Position decisions</span><strong>' + amcHoldingCount + ' AMC holdings · ' + amcOptions.length + ' option lines</strong><small>' + esc(selected === "AMC" && selectedHolding ? "Position Manager is tracking the selected holding." : "Select a holding for contract-specific navigation.") + '</small></div>' +
+        '<div class="paper-daily-item"><span>Protective brackets</span><strong>' + brackets.length + ' active</strong><small>' + esc(bracketHtml) + '</small></div>' +
         '<div class="paper-daily-item"><span>Contract efficiency / catalyst</span><strong>' + snap.totals.optionPositions + ' option positions under observation</strong><small>' + esc(filing ? filing.form + " · " + secFilingLabel(filing) : "No new high-priority SEC filing in the loaded window.") + '</small></div>' +
         '<div class="paper-daily-item"><span>Paper actions / baseline</span><strong>' + esc(paperActivity) + '</strong><small>' + (snap.report && snap.report.progress_vs_baseline != null ? 'Frozen baseline delta ' + fmtPct(Number(snap.report.progress_vs_baseline)) : 'Awaiting the first frozen daily report for benchmark comparison.') + '</small></div>' +
       '</div></div></div></section>';
@@ -1971,13 +1977,15 @@
       return Promise.all([
         request("/paper/experiments/" + paperExperimentId, true).catch(function () { return null; }),
         request("/paper/proposals", true).catch(function () { return []; }),
-        request("/paper/reports", true).catch(function () { return []; })
+        request("/paper/reports", true).catch(function () { return []; }),
+        request("/paper/brackets", true).catch(function () { return []; })
       ]);
     }).then(function (rows) {
       if (seq !== paperChallenge.seq || rows == null) return;
       paperChallenge.experiment = rows[0];
       paperChallenge.proposals = Array.isArray(rows[1]) ? rows[1] : [];
       paperChallenge.reports = Array.isArray(rows[2]) ? rows[2] : [];
+      paperChallenge.brackets = Array.isArray(rows[3]) ? rows[3] : [];
       paperChallenge.error = null;
     }).catch(function (err) {
       if (seq !== paperChallenge.seq) return;

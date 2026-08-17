@@ -9,11 +9,17 @@ from __future__ import annotations
 import math
 from datetime import datetime, timezone
 
+from paper_execution.portfolio import ANCHOR_SYMBOL
+
 LIVE_FRESHNESS_MAX_MINUTES = 2
 MIN_MATCHED_HISTORY_BARS = 12
 MIN_ACTIVITY_RATIO = 0.50
 ACTIVE_PRINT_EPSILON = 1e-9
 VERY_HIGH_AUTO_ACTIONS = ("partial_reduce", "close")
+# Auto-entry (open/add) is AMC-only per PORTFOLIO_MULTI_ASSET_SPEC §11 Option B:
+# the anchor can deploy new exposure unattended when VERY_HIGH passes; every
+# other symbol stays manual-only. See auto_mode_allowed().
+AUTO_ENTRY_ACTIONS = ("open", "add")
 
 LIVE_SOURCES = frozenset({"live", "live_webhook", "live_contract_bar", "heartbeat"})
 DELAYED_SOURCES = frozenset({"delayed", "massive", "delayed_provider_bar"})
@@ -149,8 +155,14 @@ def _root_portfolio_risk(evidence: dict, action: str) -> bool:
     )
 
 
-def auto_mode_allowed(action: str) -> bool:
-    return action in VERY_HIGH_AUTO_ACTIONS
+def auto_mode_allowed(action: str, symbol: str | None = None) -> bool:
+    """Risk-reducing actions are always auto-eligible; entries (open/add) are
+    auto-eligible only for the AMC anchor. Other symbols stay manual-only."""
+    if action in VERY_HIGH_AUTO_ACTIONS:
+        return True
+    if action in AUTO_ENTRY_ACTIONS:
+        return (symbol or "").upper() == ANCHOR_SYMBOL
+    return False
 
 
 def evaluate_very_high(evidence: dict, action: str) -> dict:

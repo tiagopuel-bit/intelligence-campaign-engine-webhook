@@ -3,11 +3,13 @@ gate, per-symbol kill switch, and multi-symbol readiness."""
 import sqlite3
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 from flask import Flask
 
 from paper_execution import db
+from paper_execution.activation import join_symbol_if_ready
 from paper_execution.api import create_blueprint
 from paper_execution.cloud_state import cloud_readiness
 from paper_execution.portfolio import (
@@ -147,6 +149,77 @@ class PortfolioValuationTests(unittest.TestCase):
         self.assertEqual(v["total_value"], 100.0)
         self.assertEqual(v["amc_value"], 0.0)
         conn.close()
+
+
+class JoinSymbolTests(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self._tmp.close()
+        db.init_db(self._tmp.name)
+        conn = db.connect(self._tmp.name)
+        self.eid = create_experiment(
+            conn, version=1, symbol="AMC", start_at="2026-01-01T00:00:00Z",
+            end_at="2027-01-31T16:00:00-08:00", starting_cash=100.0,
+            starting_value_method="marked_market_value", target_value_jan2027=15000.0,
+            target_return_pct=None, max_drawdown_pct=25.0, max_amc_exposure=0.70,
+            max_exposure_per_option_expiry=0.25, deposit_policy="ALLOWED_TRACKED_SEPARATELY",
+            allowed_actions="hold,add,open,partial_reduce,close,roll", benchmark_symbol="AMC",
+            benchmark_success_criteria="x", min_observation_count=30, max_daily_paper_loss=0.05,
+            max_orders_per_day=3, max_consecutive_failed_proposals=3, milestones_json="[]",
+            amc_target_floor_pct=30.0, confidence_status="INTACT", contract_sha256=frozen_goal_hash(),
+        )
+        conn.close()
+        self._wh = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self._wh.close()
+        wconn = sqlite3.connect(self._wh.name)
+        wconn.execute("CREATE TABLE underlying_heartbeats (symbol TEXT, bar_time INTEGER, close REAL, source TEXT)")
+        wconn.commit()
+        wconn.close()
+
+    def tearDown(self):
+        Path(self._tmp.name).unlink(missing_ok=True)
+        Path(self._wh.name).unlink(missing_ok=True)
+
+    def _heartbeat(self, symbol, age_ms=0):
+        now = int(datetime.now(timezone.utc).timestamp() * 1000) - age_ms
+        conn = sqlite3.connect(self._wh.name)
+        conn.execute(
+            "INSERT INTO underlying_heartbeats (symbol, bar_time, close, source) VALUES (?,?,?,?)",
+            (symbol, now, 2.0, "live_webhook"),
+        )
+        conn.commit()
+        conn.close()
+
+    def test_eligible_symbol_with_fresh_heartbeat_joins(self):
+        self._heartbeat("GME")
+        out = join_symbol_if_ready(self._tmp.name, self._wh.name, self.eid, "GME")
+        self.assertEqual(out["status"], "JOINED")
+        conn = db.connect(self._tmp.name)
+        self.assertIn("GME", tracked_symbols(conn, self.eid))
+        conn.close()
+
+    def test_ineligible_symbol_rejected(self):
+        self._heartbeat("MARA")
+        out = join_symbol_if_ready(self._tmp.name, self._wh.name, self.eid, "MARA")
+        self.assertEqual(out["status"], "BLOCKED")
+        self.assertEqual(out["blocker"], "ASSET_NOT_ELIGIBLE")
+
+    def test_stale_heartbeat_rejected(self):
+        self._heartbeat("GME", age_ms=10 * 60 * 1000)
+        out = join_symbol_if_ready(self._tmp.name, self._wh.name, self.eid, "GME")
+        self.assertEqual(out["status"], "BLOCKED")
+        self.assertEqual(out["blocker"], "BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT")
+
+    def test_already_tracked_anchor_is_noop_with_clear_status(self):
+        self._heartbeat("AMC")
+        out = join_symbol_if_ready(self._tmp.name, self._wh.name, self.eid, "AMC")
+        self.assertEqual(out["status"], "ALREADY_TRACKED")
+
+    def test_experiment_not_active_rejected(self):
+        self._heartbeat("GME")
+        out = join_symbol_if_ready(self._tmp.name, self._wh.name, 9999, "GME")
+        self.assertEqual(out["status"], "BLOCKED")
+        self.assertEqual(out["blocker"], "EXPERIMENT_NOT_FOUND")
 
 
 class MultiSymbolReadinessTests(unittest.TestCase):

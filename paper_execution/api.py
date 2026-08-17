@@ -47,14 +47,63 @@ from paper_execution.store import (
 )
 
 CREATE_ALLOWED = {"action", "symbol", "experiment_id", "idempotency_key", "time_sensitive_reason",
-                  "position_ref", "instrument_ref"}
-MODIFY_ALLOWED = {"action", "idempotency_key", "time_sensitive_reason", "position_ref", "instrument_ref"}
+                  "position_ref", "instrument_ref", "stop_price", "target_price"}
+MODIFY_ALLOWED = {"action", "idempotency_key", "time_sensitive_reason", "position_ref", "instrument_ref",
+                  "stop_price", "target_price"}
 
 APPROVAL_WINDOW_SECONDS = 600
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _num_or_none(value):
+    if value in (None, ""):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _bracket_position(conn, proposal):
+    ticker = proposal["position_ref"]
+    if not ticker:
+        return None, "BRACKET_MISSING_TICKER"
+    pos = conn.execute(
+        "SELECT symbol, instrument_type, quantity FROM pe_paper_positions "
+        "WHERE experiment_id=? AND ticker=?",
+        (proposal["experiment_id"], ticker),
+    ).fetchone()
+    if pos is None or float(pos["quantity"] or 0.0) == 0.0:
+        return None, "PAPER_POSITION_NOT_FOUND"
+    return pos, None
+
+
+def _bracket_check(conn, proposal) -> dict:
+    pos, reason = _bracket_position(conn, proposal)
+    if reason:
+        return {"ok": False, "reason": reason}
+    direction = "LONG" if float(pos["quantity"]) > 0 else "SHORT"
+    if not validate_side(direction, proposal["stop_price"], proposal["target_price"]):
+        return {"ok": False, "reason": "BRACKET_SIDE_INVALID"}
+    return {"ok": True}
+
+
+def _apply_approved_bracket(conn, proposal) -> dict:
+    pos, reason = _bracket_position(conn, proposal)
+    if reason:
+        return {"ok": False, "reason": reason}
+    direction = "LONG" if float(pos["quantity"]) > 0 else "SHORT"
+    bracket_id = upsert_bracket(
+        conn, experiment_id=proposal["experiment_id"], symbol=pos["symbol"],
+        ticker=proposal["position_ref"],
+        instrument_type=str(pos["instrument_type"] or "SHARE").upper(),
+        direction=direction, stop_price=proposal["stop_price"],
+        target_price=proposal["target_price"], created_by="user",
+    )
+    return {"ok": True, "bracket_id": bracket_id}
 
 
 _reliability_mask_cache: dict | None = None
@@ -88,8 +137,8 @@ def create_blueprint(db_path, state_token: str, state_provider):
     def _unknown_fields(body: dict, allowed: set) -> list[str]:
         return sorted(set(body) - allowed)
 
-    def _determine_mode(action: str, very_high: bool) -> str:
-        if very_high and auto_mode_allowed(action):
+    def _determine_mode(action: str, very_high: bool, symbol: str | None = None) -> str:
+        if very_high and auto_mode_allowed(action, symbol):
             return "AUTO_IF_VERY_HIGH_PAPER"
         return "APPROVAL_REQUIRED"
 
@@ -101,7 +150,7 @@ def create_blueprint(db_path, state_token: str, state_provider):
             return None, "EXPERIMENT_NOT_ACTIVE"
         if symbol not in tracked_symbols(conn, experiment_id):
             return None, "SYMBOL_NOT_TRACKED"
-        if action not in {a.strip() for a in (row["allowed_actions"] or "").split(",")}:
+        if action not in {a.strip() for a in (row["allowed_actions"] or "").split(",")} and action != "set_bracket":
             return None, "ACTION_NOT_ALLOWED"
         now = _now_iso()
         if row["start_at"] and now < row["start_at"]:
@@ -152,10 +201,16 @@ def create_blueprint(db_path, state_token: str, state_provider):
             return err
         conn = connect(db_path)
         row = conn.execute("SELECT * FROM pe_experiments WHERE id=?", (experiment_id,)).fetchone()
-        conn.close()
         if row is None:
+            conn.close()
             return jsonify({"error": "not found"}), 404
-        return jsonify(dict(row))
+        cash = conn.execute(
+            "SELECT cash FROM pe_paper_cash WHERE experiment_id=?", (experiment_id,)
+        ).fetchone()
+        conn.close()
+        payload = dict(row)
+        payload["live_cash"] = float(cash["cash"]) if cash else None
+        return jsonify(payload)
 
     @bp.route("/paper/proposals", methods=["POST"])
     def create():
@@ -177,11 +232,50 @@ def create_blueprint(db_path, state_token: str, state_provider):
         ):
             return jsonify({"error": "position_ref and instrument_ref are required for this action"}), 400
 
+        stop_price = body.get("stop_price")
+        target_price = body.get("target_price")
+        if action == "set_bracket":
+            if body.get("position_ref") is None:
+                return jsonify({"error": "position_ref (ticker) is required for set_bracket"}), 400
+            if stop_price in (None, "") and target_price in (None, ""):
+                return jsonify({"error": "at least one of stop_price or target_price is required"}), 400
+            for name, value in (("stop_price", stop_price), ("target_price", target_price)):
+                if value in (None, ""):
+                    continue
+                try:
+                    if float(value) <= 0:
+                        raise ValueError
+                except (TypeError, ValueError):
+                    return jsonify({"error": f"{name} must be a positive number"}), 400
+
         conn = connect(db_path)
         experiment, exp_err = _validate_experiment(conn, experiment_id, symbol, action)
         if exp_err:
             conn.close()
             return jsonify({"error": exp_err}), 409
+
+        # set_bracket is a protective order, not a capital action: it bypasses
+        # the evidence-root reconstruction and the eligibility/floor gates, and
+        # is always APPROVAL_REQUIRED (never auto). The bracket is only set
+        # when the human approves (§ see _decision_endpoint).
+        if action == "set_bracket":
+            conn.close()
+            expires_at = (datetime.now(timezone.utc) + timedelta(seconds=APPROVAL_WINDOW_SECONDS)).isoformat()
+            conn = connect(db_path)
+            proposal_id = create_proposal(
+                conn, experiment_id=experiment_id, idempotency_key=idempotency_key,
+                action="set_bracket", mode="APPROVAL_REQUIRED", symbol=symbol,
+                policy_sha256=frozen_policy_hash(),
+                time_sensitive_reason=body.get("time_sensitive_reason") or "protective stop/target",
+                very_high=False, very_high_missing_roots=[],
+                expires_at=expires_at, cancel_condition="stale_underlying",
+                evidence_roots=[],
+                position_ref=body.get("position_ref"), instrument_ref=body.get("instrument_ref"),
+                stop_price=_num_or_none(stop_price), target_price=_num_or_none(target_price),
+            )
+            conn.close()
+            return jsonify({"proposal_id": proposal_id, "very_high": False,
+                            "mode": "APPROVAL_REQUIRED", "missing_roots": [], "vetoes": []}), 201
 
         # §5 eligibility gate (non-anchor only; the anchor AMC is always eligible).
         if symbol != ANCHOR_SYMBOL and not asset_eligible(_eligibility_mask(), symbol):
@@ -202,7 +296,7 @@ def create_blueprint(db_path, state_token: str, state_provider):
         if evidence is None:
             return jsonify({"error": "no authoritative state; proposal blocked"}), 409
         very_high = bool(result["very_high"])
-        mode = _determine_mode(action, very_high)
+        mode = _determine_mode(action, very_high, symbol)
         expires_at = (datetime.now(timezone.utc) + timedelta(seconds=APPROVAL_WINDOW_SECONDS)).isoformat()
 
         conn = connect(db_path)
@@ -255,6 +349,12 @@ def create_blueprint(db_path, state_token: str, state_provider):
         if to_status == "APPROVED" and row["expires_at"] and _now_iso() > row["expires_at"]:
             conn.close()
             return jsonify({"error": "approval window expired"}), 409
+        apply_bracket = to_status == "APPROVED" and row["action"] == "set_bracket"
+        if apply_bracket:
+            check = _bracket_check(conn, row)
+            if not check["ok"]:
+                conn.close()
+                return jsonify({"error": check["reason"]}), 409
         try:
             out = transition(conn, proposal_id, to_status, actor="user",
                              expected_from="PENDING_APPROVAL")
@@ -263,6 +363,9 @@ def create_blueprint(db_path, state_token: str, state_provider):
             conn.close()
             return jsonify({"error": type(exc).__name__, "detail": str(exc)}), 409
         record_user_decision(conn, proposal_id, decision)
+        if apply_bracket:
+            applied = _apply_approved_bracket(conn, row)
+            out["bracket_id"] = applied.get("bracket_id")
         conn.close()
         return jsonify(out)
 
@@ -308,11 +411,13 @@ def create_blueprint(db_path, state_token: str, state_provider):
             expires_at=(datetime.now(timezone.utc) + timedelta(seconds=APPROVAL_WINDOW_SECONDS)).isoformat(),
             cancel_condition="stale_underlying",
             position_ref=position_ref, instrument_ref=instrument_ref,
+            stop_price=_num_or_none(body.get("stop_price")),
+            target_price=_num_or_none(body.get("target_price")),
         )
         conn.close()
         if not out["ok"]:
             return jsonify({"error": out["reason"]}), 409
-        return jsonify({**out, "very_high": very_high, "mode": _determine_mode(action, very_high)}), 201
+        return jsonify({**out, "very_high": very_high, "mode": _determine_mode(action, very_high, original["symbol"])}), 201
 
     @bp.route("/paper/experiments/<int:experiment_id>/kill-switch", methods=["POST"])
     def kill_switch(experiment_id):

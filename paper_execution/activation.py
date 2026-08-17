@@ -13,7 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from paper_execution import db
-from paper_execution.store import frozen_goal_hash
+from paper_execution.portfolio import asset_eligible, load_reliability_mask
+from paper_execution.store import frozen_goal_hash, tracked_symbols
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_AGE_MS = 2 * 60 * 1000
@@ -142,6 +143,64 @@ def activate_if_ready(paper_db_path, webhook_db_path, symbols=("AMC",)) -> dict:
         paper.commit()
         return {"status": "ACTIVATED", "experiment_id": experiment_id,
                 "starting_portfolio_value": total_start, "holding_count": len(holdings)}
+    except Exception:
+        paper.rollback()
+        raise
+    finally:
+        paper.close()
+
+
+def join_symbol_if_ready(paper_db_path, webhook_db_path, experiment_id, symbol) -> dict:
+    """Add a symbol to an already-ACTIVE experiment's tracked set.
+
+    Unlike initial activation, a newly joined asset starts at zero position in
+    the shared cash pool; it is funded by a future ``open`` proposal under the
+    existing allocation/floor checks in ``runner.py``. No holdings required.
+
+    Fails closed with a clear reason:
+    - ``ASSET_NOT_ELIGIBLE`` — symbol fails the reliability-mask eligibility gate.
+    - ``BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT`` — no fresh underlying heartbeat.
+    - ``ALREADY_TRACKED`` — symbol already in the experiment (anchor or joined).
+    - ``EXPERIMENT_NOT_ACTIVE`` / ``EXPERIMENT_NOT_FOUND``.
+    """
+    symbol = (symbol or "").strip().upper()
+    if not symbol:
+        return {"status": "BLOCKED", "blocker": "INVALID_SYMBOL"}
+
+    if not asset_eligible(load_reliability_mask(), symbol):
+        return {"status": "BLOCKED", "blocker": "ASSET_NOT_ELIGIBLE", "symbol": symbol}
+
+    source = sqlite3.connect(str(webhook_db_path))
+    source.row_factory = sqlite3.Row
+    try:
+        hb = source.execute(
+            "SELECT bar_time FROM underlying_heartbeats WHERE symbol=? "
+            "ORDER BY bar_time DESC LIMIT 1", (symbol,),
+        ).fetchone()
+        if hb is None or _now_ms() - int(hb["bar_time"]) > MAX_AGE_MS:
+            return {"status": "BLOCKED", "blocker": "BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT",
+                    "symbol": symbol}
+    finally:
+        source.close()
+
+    paper = db.connect(paper_db_path)
+    try:
+        exp = paper.execute("SELECT status FROM pe_experiments WHERE id=?", (experiment_id,)).fetchone()
+        if exp is None:
+            return {"status": "BLOCKED", "blocker": "EXPERIMENT_NOT_FOUND",
+                    "experiment_id": experiment_id}
+        if exp["status"] != "ACTIVE":
+            return {"status": "BLOCKED", "blocker": "EXPERIMENT_NOT_ACTIVE",
+                    "experiment_id": experiment_id}
+        if symbol in tracked_symbols(paper, experiment_id):
+            return {"status": "ALREADY_TRACKED", "experiment_id": experiment_id, "symbol": symbol}
+        paper.execute("BEGIN IMMEDIATE")
+        paper.execute(
+            "INSERT INTO pe_experiment_symbols (experiment_id, symbol) VALUES (?,?)",
+            (experiment_id, symbol),
+        )
+        paper.commit()
+        return {"status": "JOINED", "experiment_id": experiment_id, "symbol": symbol}
     except Exception:
         paper.rollback()
         raise

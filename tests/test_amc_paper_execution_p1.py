@@ -158,9 +158,15 @@ class EngineTests(unittest.TestCase):
     def test_very_high_auto_actions_enforced(self):
         self.assertTrue(auto_mode_allowed("close"))
         self.assertTrue(auto_mode_allowed("partial_reduce"))
+        # entries (open/add) auto-eligible only for the AMC anchor
+        self.assertTrue(auto_mode_allowed("open", "AMC"))
+        self.assertTrue(auto_mode_allowed("add", "AMC"))
+        self.assertFalse(auto_mode_allowed("open", "GME"))
+        self.assertFalse(auto_mode_allowed("add", "GME"))
+        # no symbol (legacy) and other symbols stay manual-only
         self.assertFalse(auto_mode_allowed("open"))
         self.assertFalse(auto_mode_allowed("add"))
-        self.assertFalse(auto_mode_allowed("roll"))
+        self.assertFalse(auto_mode_allowed("roll", "AMC"))
 
 
 class FillTests(unittest.TestCase):
@@ -227,10 +233,10 @@ class StoreTests(unittest.TestCase):
             amc_target_floor_pct=30.0, confidence_status="INTACT", contract_sha256=frozen_goal_hash(),
         )
 
-    def _proposal(self, experiment_id, key="k1", expires=10, action="close", mode=AUTO_MODE, very_high=True, position_ref=None):
+    def _proposal(self, experiment_id, key="k1", expires=10, action="close", mode=AUTO_MODE, very_high=True, position_ref=None, symbol="AMC"):
         return create_proposal(
             self.conn, experiment_id=experiment_id, idempotency_key=key, action=action,
-            mode=mode, symbol="AMC", policy_sha256=frozen_policy_hash(),
+            mode=mode, symbol=symbol, policy_sha256=frozen_policy_hash(),
             time_sensitive_reason="confirmation", very_high=very_high, very_high_missing_roots=[],
             expires_at=_iso(expires), cancel_condition="stale_underlying",
             evidence_roots=[{"root": "underlying_dna", "present": True, "raw_fields": {}, "missing_evidence": [], "contradictions": [], "veto": False}],
@@ -328,8 +334,17 @@ class StoreTests(unittest.TestCase):
 
     def test_claim_rejects_not_allowed_action(self):
         eid = self._experiment()
-        pid = self._proposal(eid, key="a", expires=-1, action="open")
+        pid = self._proposal(eid, key="a", expires=-1, action="roll")
         out = claim_due_proposal(self.conn, pid, _iso(0))
+        self.assertEqual(out["reason"], "ACTION_NOT_AUTO_ALLOWED")
+
+    def test_claim_allows_amc_open_but_not_other_symbol(self):
+        eid = self._experiment()
+        amc_open = self._proposal(eid, key="amc-open", expires=-1, action="open", symbol="AMC")
+        self.assertTrue(claim_due_proposal(self.conn, amc_open, _iso(0))["claimed"])
+        gme_open = self._proposal(eid, key="gme-open", expires=-1, action="open", symbol="GME")
+        out = claim_due_proposal(self.conn, gme_open, _iso(0))
+        self.assertFalse(out["claimed"])
         self.assertEqual(out["reason"], "ACTION_NOT_AUTO_ALLOWED")
 
     def test_claim_rejects_inactive_experiment(self):
