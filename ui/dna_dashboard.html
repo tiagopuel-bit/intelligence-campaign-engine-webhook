@@ -302,6 +302,7 @@
   .dna-lifecycle-fail_cluster{background:var(--critical-glow);color:var(--critical);border-color:var(--critical)}
   .dna-lifecycle-faded{background:var(--surface-2);color:var(--muted);border-color:var(--line)}
   .dna-quiet{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:999px;font-size:8px;font-weight:700;letter-spacing:.03em;background:var(--surface-2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+  .dna-liquidity{display:inline-flex;vertical-align:middle;margin-left:6px;padding:2px 8px;border-radius:999px;font-family:var(--font-display);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--warning-glow);color:var(--warning);border:1px solid var(--warning);white-space:nowrap}
 
   .warmup-note-inline{margin-top:6px;padding:8px 10px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-glow);color:var(--text);font-size:10.5px;line-height:1.45}
   .dna-pill.green{background:rgba(28,154,87,.10);color:#0d7f4b}.dna-pill.red{background:var(--critical-glow);color:var(--critical)}
@@ -690,6 +691,18 @@
       return { over: true, p90: p90, mins: mins };
     }
     return null;
+  }
+
+  // --- ADV liquidity band (advisory, precomputed) ---------------------------
+  // Per-asset 20-day average-daily-volume band (median/p10/p90) from the frozen
+  // daily OHLC exports (tables/dna_liquidity_adv.csv). A discrete flag: THIN
+  // when the latest daily volume is below the asset's own ADV p10. Advisory
+  // only — it does not feed paper_execution's evidence roots.
+  var LIQUIDITY_ADV = {"AMC": {"median": 587412, "p10": 25962, "p90": 20932519, "latest": 16857776, "latest_date": "2026-08-07", "liquidity": "NORMAL"}, "GME": {"median": 12103360, "p10": 5472037, "p90": 23335000, "latest": 4766509, "latest_date": "2026-08-07", "liquidity": "THIN"}, "PYPL": {"median": 9832037, "p10": 6273129, "p90": 17501147, "latest": 9752277, "latest_date": "2026-08-11", "liquidity": "NORMAL"}, "RBLX": {"median": 9715622, "p10": 6402247, "p90": 22022822, "latest": 18477692, "latest_date": "2026-08-07", "liquidity": "NORMAL"}, "SPY": {"median": 88704036, "p10": 58943144, "p90": 174503331, "latest": 43586333, "latest_date": "2026-08-07", "liquidity": "THIN"}, "U": {"median": 9128349, "p10": 3198676, "p90": 15115863, "latest": 11393389, "latest_date": "2026-08-11", "liquidity": "NORMAL"}, "VALE": {"median": 23841158, "p10": 13421289, "p90": 36083291, "latest": 24283456, "latest_date": "2026-08-07", "liquidity": "NORMAL"}};
+  function liquidityFlag(sym) {
+    var r = LIQUIDITY_ADV[String(sym || "").toUpperCase()] || null;
+    if (!r || r.liquidity !== "THIN") return null;
+    return { latest: r.latest, p10: r.p10, median: r.median, latest_date: r.latest_date };
   }
 
   // --- Actions: only what's actionable now, never a running commentary --
@@ -2006,8 +2019,10 @@
     var warmupNote = a.warmup ? '<div class="copy warmup-note-inline">Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up — ' + tfLabel(a.warmup.row.timeframe) + ' just fired <b>' + a.warmup.row.signal_event + '</b>. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '';
     var lifecycle = lifecycleStage(states, sym);
     var lifecycleBadge = lifecycle.label ? ' <span class="dna-lifecycle dna-lifecycle-' + lifecycle.stage + '" title="' + lifecycle.detail + '">' + lifecycle.label + '</span>' : '';
+    var liq = liquidityFlag(sym);
+    var liquidityBadge = liq ? ' <span class="dna-liquidity" title="Thin liquidity: latest daily volume ' + Number(liq.latest).toLocaleString("en-US") + ' (' + liq.latest_date + ') is below this asset\'s 20-day ADV p10 of ' + Number(liq.p10).toLocaleString("en-US") + ' (median ' + Number(liq.median).toLocaleString("en-US") + ')">thin liquidity</span>' : '';
     var decision = '<section class="dna-decision" aria-label="Current campaign decision">' +
-      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span>' + warmupBadge + lifecycleBadge + '</h2><div class="copy">' + a.why + '</div>' + warmupNote + '</div>' +
+      '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span>' + warmupBadge + lifecycleBadge + liquidityBadge + '</h2><div class="copy">' + a.why + '</div>' + warmupNote + '</div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Recommended action</div><div class="big">' + action + '</div><div class="copy">Rule-based DNA guidance</div></div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Next confirmation</div><div class="copy" style="color:#2563eb;font-weight:700">' + nextText + '</div><div class="copy">Timing before action</div></div>' +
       '<div class="dna-decision-cell risk"><div class="eyebrow">Main risk</div><div class="copy critical" style="font-weight:700">' + riskText + '</div><div class="copy">Slower structure remains the authority</div></div></section>';
