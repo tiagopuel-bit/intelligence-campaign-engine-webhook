@@ -222,5 +222,59 @@ class ShortVocabularyTests(unittest.TestCase):
                 self.assertIn(out["navigation_intent"], lib.INTENTS)
 
 
+class ShortPressureTests(unittest.TestCase):
+    """FINRA short-activity (squeeze-risk) modifier on short positions."""
+
+    def test_high_short_activity_escalates_short_shares_hold(self):
+        # broken campaign -> short shares base intent is "hold" (let winner run);
+        # crowded short activity de-risks that to "protect".
+        out = lib.compose(CONDITION_FIXTURES["broken"], {}, "short shares",
+                          short_activity="HIGH")
+        self.assertEqual(out["navigation_intent"], "protect")
+
+    def test_elevated_short_activity_escalates_short_shares_wait(self):
+        out = lib.compose(CONDITION_FIXTURES["uncertain"], {}, "short shares",
+                          short_activity="ELEVATED")
+        self.assertEqual(out["navigation_intent"], "protect")
+
+    def test_high_short_activity_escalates_short_call_to_reduce(self):
+        out = lib.compose(CONDITION_FIXTURES["broken"], {}, "short call",
+                          short_activity="HIGH")
+        self.assertEqual(out["navigation_intent"], "reduce")
+
+    def test_high_short_activity_does_not_override_monitor(self):
+        # short put + uncertain maps to "monitor time decay"; squeeze risk must
+        # never override an existing monitor/reduce/close intent.
+        out = lib.compose(CONDITION_FIXTURES["uncertain"], {}, "short put",
+                          short_activity="HIGH")
+        self.assertEqual(out["navigation_intent"], "monitor time decay")
+
+    def test_normal_short_activity_is_a_noop(self):
+        base = lib.compose(CONDITION_FIXTURES["broken"], {}, "short shares")
+        self.assertEqual(
+            lib.compose(CONDITION_FIXTURES["broken"], {}, "short shares",
+                        short_activity="NORMAL")["navigation_intent"],
+            base["navigation_intent"],
+        )
+        self.assertEqual(
+            lib.compose(CONDITION_FIXTURES["broken"], {}, "short shares",
+                        short_activity="LOW")["navigation_intent"],
+            base["navigation_intent"],
+        )
+
+    def test_short_activity_does_not_affect_longs(self):
+        base = lib.compose(CONDITION_FIXTURES["broken"], {}, "shares")
+        self.assertEqual(
+            lib.compose(CONDITION_FIXTURES["broken"], {}, "shares",
+                        short_activity="HIGH")["navigation_intent"],
+            base["navigation_intent"],
+        )
+
+    def test_high_short_activity_adds_evidence_phrase(self):
+        out = lib.compose(CONDITION_FIXTURES["broken"], {}, "short shares",
+                          short_activity="HIGH")
+        self.assertTrue(any("squeeze risk" in e for e in out["evidence"]))
+
+
 if __name__ == "__main__":
     unittest.main()

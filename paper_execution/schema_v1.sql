@@ -206,3 +206,30 @@ CREATE TABLE IF NOT EXISTS pe_paper_positions (
     updated_at TEXT NOT NULL,
     UNIQUE(experiment_id, ticker, instrument_type)
 );
+
+-- Per-position protective bracket (stop-loss + take-profit). Pre-registered
+-- standing orders: the runner fires them on a price crossing WITHOUT the
+-- 600-second approval window. At most one ACTIVE bracket per paper position;
+-- upsert supersedes the active bracket, historical rows are preserved.
+CREATE TABLE IF NOT EXISTS pe_position_brackets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    experiment_id INTEGER NOT NULL REFERENCES pe_experiments(id),
+    symbol TEXT NOT NULL,
+    ticker TEXT NOT NULL,
+    instrument_type TEXT NOT NULL DEFAULT 'SHARE',
+    direction TEXT NOT NULL CHECK(direction IN ('LONG','SHORT')),
+    stop_price REAL,
+    target_price REAL,
+    status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(status IN ('ACTIVE','TRIGGERED','CANCELLED')),
+    created_by TEXT NOT NULL DEFAULT 'user',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    triggered_at TEXT,
+    triggered_side TEXT CHECK(triggered_side IN ('STOP','TARGET')),
+    trigger_price REAL,
+    fill_price REAL,
+    fill_note TEXT
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_brackets_one_active
+    ON pe_position_brackets(experiment_id, ticker) WHERE status='ACTIVE';

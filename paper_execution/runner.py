@@ -22,10 +22,14 @@ from paper_execution.portfolio import (
     paper_portfolio_value,
 )
 from paper_execution.state import reconstruct_evidence, reconstruct_legs
+from paper_execution.brackets import bracket_decision
 from paper_execution.store import (
+    apply_bracket_trigger,
     claim_approved_proposal,
     claim_due_proposal,
     due_proposals,
+    kill_switch_active,
+    list_active_brackets,
     list_approved_proposals,
     record_order_and_fills,
     apply_paper_fill_ledger,
@@ -113,6 +117,41 @@ def _process(conn, db_path, proposal, state_provider, actor) -> dict:
     return {"proposal_id": proposal["id"], "status": outcome}
 
 
+def _process_brackets(conn, db_path, state_provider, actor) -> list[dict]:
+    """Evaluate active protective brackets and fire crossed levels.
+
+    Pre-registered standing orders: a crossing fires a protective close WITHOUT
+    the approval window, gated only by the kill switch and a fresh price
+    reference. No price -> skip (fail-closed)."""
+    latest = getattr(state_provider, "latest_close", None)
+    if latest is None:
+        return []
+    results = []
+    for bracket in list_active_brackets(conn):
+        if kill_switch_active(conn, bracket["experiment_id"], symbol=bracket["symbol"]):
+            results.append({"bracket_id": bracket["id"], "status": "SKIPPED",
+                            "reason": "KILL_SWITCH_ACTIVE"})
+            continue
+        price_info = latest(bracket["symbol"], bracket["ticker"])
+        close_price = (price_info or {}).get("close")
+        if close_price is None:
+            results.append({"bracket_id": bracket["id"], "status": "SKIPPED",
+                            "reason": "NO_PRICE"})
+            continue
+        side = bracket_decision(bracket, close_price)
+        if side is None:
+            continue
+        apply_bracket_trigger(
+            conn, bracket, side=side, trigger_price=close_price,
+            fill_price=close_price, bar_time=(price_info or {}).get("bar_time"),
+            price_source=(price_info or {}).get("source"),
+            note="close-based protective bracket fill (no intrabar fill)",
+        )
+        results.append({"bracket_id": bracket["id"], "status": "TRIGGERED",
+                        "side": side, "fill_price": close_price})
+    return results
+
+
 def run_once(db_path, state_provider, *, now_iso: str | None = None, actor: str = "runner") -> list[dict]:
     now_iso = now_iso or _now_iso()
     conn = connect(db_path)
@@ -134,6 +173,8 @@ def run_once(db_path, state_provider, *, now_iso: str | None = None, actor: str 
                                 "reason": claim["reason"]})
                 continue
             results.append(_process(conn, db_path, proposal, state_provider, actor))
+        # 3. protective brackets (pre-registered stops/targets).
+        results.extend(_process_brackets(conn, db_path, state_provider, actor))
         return results
     finally:
         conn.close()

@@ -42,6 +42,10 @@ INSTRUMENTS = (
     "short shares", "short call", "short put", "multi-leg option",
 )
 
+# Closed vocabulary from finra_short.short_activity. Elevated/high short-volume
+# ratio marks a crowded short side — squeeze risk for an open short position.
+SHORT_PRESSURE_RISK = {"ELEVATED", "HIGH"}
+
 
 def tone(phase) -> str:
     p = (phase or "").upper()
@@ -316,13 +320,14 @@ def _evidence_phrases(hs, instrument):
     return phrases
 
 
-def _apply_modifiers(intent, instrument, condition, hs, relationship):
+def _apply_modifiers(intent, instrument, condition, hs, relationship, short_activity=None):
     """§7: holding-state and tf-relationship modifiers refine the default intent.
 
     Short instruments mirror the long-side modifiers a second time: the risk
     conditions are expanding/constructive (price moving against the short), the
     favorable conditions are broken/weakening, and "profitable" already means
-    the short is winning (see holding_state).
+    the short is winning (see holding_state). An optional ``short_activity``
+    (FINRA short-volume ratio verdict) adds squeeze-risk de-risking for shorts.
     """
     is_short = instrument.startswith("short")
     is_option = instrument in ("long call", "long put", "short call", "short put")
@@ -352,6 +357,15 @@ def _apply_modifiers(intent, instrument, condition, hs, relationship):
         if relationship == "weakness propagating" and intent == "wait" \
                 and instrument == "short shares":
             return "hold"
+        # Crowded short activity (FINRA short-volume ratio) is squeeze risk for
+        # any open short: the short side is getting crowded, so de-risk one step
+        # regardless of the campaign read. Never overrides an existing reduce/
+        # close/monitor intent.
+        if (short_activity or "").upper() in SHORT_PRESSURE_RISK:
+            if intent in ("hold", "wait"):
+                return "protect" if instrument == "short shares" else "reduce"
+            if intent == "protect":
+                return "reduce"
         return intent
 
     # profitable + broken/weakening -> lock gains (reduce) instead of protect.
@@ -373,12 +387,16 @@ def _apply_modifiers(intent, instrument, condition, hs, relationship):
     return intent
 
 
-def compose(states, holding, instrument, required_fields=None):
+def compose(states, holding, instrument, required_fields=None, short_activity=None):
     """Full deterministic pipeline -> output record (research doc §9).
 
     `required_fields` (optional) declares the exact field names the caller
     supplied; used by tests to prove fact-only selection. The function itself
     reads only the documented keys.
+
+    `short_activity` (optional) is the FINRA short-volume-ratio verdict
+    (LOW/NORMAL/ELEVATED/HIGH/NO_DATA); for short instruments an ELEVATED/HIGH
+    read de-risks the position (squeeze risk). Absent, the modifier is skipped.
     """
     states = states or []
     condition = campaign_condition(states)
@@ -403,7 +421,12 @@ def compose(states, holding, instrument, required_fields=None):
         }
 
     base = _COMPOSITION[instrument][condition]
-    intent = _apply_modifiers(base, instrument, condition, hs, relationship)
+    intent = _apply_modifiers(base, instrument, condition, hs, relationship,
+                              short_activity=short_activity)
+    evidence = _evidence_phrases(hs, instrument) or ["no holding facts recorded"]
+    squeeze = (short_activity or "").upper() in SHORT_PRESSURE_RISK
+    if squeeze and instrument.startswith("short"):
+        evidence.append("crowded short activity (FINRA short-volume ratio) adds squeeze risk")
     return {
         "navigation_intent": intent,
         "campaign_condition": condition,
@@ -411,7 +434,7 @@ def compose(states, holding, instrument, required_fields=None):
         "holding_state": hs,
         "status_label": intent,
         "conclusion": _conclusion(instrument, condition, intent),
-        "evidence": _evidence_phrases(hs, instrument) or ["no holding facts recorded"],
+        "evidence": evidence,
         "decision_change": "documented per rule row",
         "prohibited": [],
         "confidence": "structural" if has_structure else "mechanical",

@@ -446,6 +446,86 @@ def modify_proposal_transactional(conn, proposal_id: int, *, new_action: str,
             "version": parent["version"] + 1}
 
 
+def upsert_bracket(conn, *, experiment_id, symbol, ticker, instrument_type,
+                   direction, stop_price, target_price, created_by="user") -> int:
+    """Replace the ACTIVE bracket for a paper position with a new one.
+
+    Supersedes (cancels) any existing ACTIVE bracket for the ticker, then
+    inserts the new ACTIVE row. Historical TRIGGERED/CANCELLED rows are kept.
+    """
+    now = _now_iso()
+    conn.execute(
+        "UPDATE pe_position_brackets SET status='CANCELLED', updated_at=? "
+        "WHERE experiment_id=? AND ticker=? AND status='ACTIVE'",
+        (now, experiment_id, ticker),
+    )
+    cur = conn.execute(
+        "INSERT INTO pe_position_brackets (experiment_id, symbol, ticker, "
+        " instrument_type, direction, stop_price, target_price, status, "
+        " created_by, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        (experiment_id, symbol, ticker, instrument_type, direction,
+         stop_price, target_price, "ACTIVE", created_by, now, now),
+    )
+    conn.commit()
+    return cur.lastrowid
+
+
+def list_active_brackets(conn, experiment_id=None) -> list[dict]:
+    """Active brackets (the operational view the runner evaluates)."""
+    query = "SELECT * FROM pe_position_brackets WHERE status='ACTIVE'"
+    params: list = []
+    if experiment_id is not None:
+        query += " AND experiment_id=?"
+        params.append(experiment_id)
+    return [dict(row) for row in conn.execute(query, params).fetchall()]
+
+
+def cancel_bracket(conn, bracket_id: int) -> bool:
+    """Cancel an ACTIVE bracket; returns True when one row was cancelled."""
+    cur = conn.execute(
+        "UPDATE pe_position_brackets SET status='CANCELLED', updated_at=? "
+        "WHERE id=? AND status='ACTIVE'",
+        (_now_iso(), bracket_id),
+    )
+    conn.commit()
+    return cur.rowcount == 1
+
+
+def apply_bracket_trigger(conn, bracket: dict, *, side, trigger_price, fill_price,
+                          bar_time, price_source, note) -> None:
+    """Mark a bracket TRIGGERED and apply a protective close to the paper ledger.
+
+    Bar-close fill at the trigger price; no intrabar, no bid/ask. Closing a LONG
+    sells (cash in); closing a SHORT buys (cash out)."""
+    instrument_type = str(bracket["instrument_type"] or "SHARE").upper()
+    multiplier = 100 if instrument_type in ("CALL", "PUT") else 1
+    pos = conn.execute(
+        "SELECT quantity FROM pe_paper_positions WHERE experiment_id=? AND ticker=? AND instrument_type=?",
+        (bracket["experiment_id"], bracket["ticker"], instrument_type),
+    ).fetchone()
+    if pos is not None:
+        qty = float(pos["quantity"] or 0.0)
+        if abs(qty) > 0:
+            closing_sell = bracket["direction"] == "LONG"
+            cash_delta = (abs(qty) * fill_price * multiplier) if closing_sell else (-abs(qty) * fill_price * multiplier)
+            conn.execute(
+                "UPDATE pe_paper_cash SET cash=cash+?, updated_at=? WHERE experiment_id=?",
+                (cash_delta, _now_iso(), bracket["experiment_id"]),
+            )
+            conn.execute(
+                "UPDATE pe_paper_positions SET quantity=0, updated_at=? "
+                "WHERE experiment_id=? AND ticker=? AND instrument_type=?",
+                (_now_iso(), bracket["experiment_id"], bracket["ticker"], instrument_type),
+            )
+    conn.execute(
+        "UPDATE pe_position_brackets SET status='TRIGGERED', triggered_at=?, "
+        " triggered_side=?, trigger_price=?, fill_price=?, fill_note=?, updated_at=? "
+        "WHERE id=? AND status='ACTIVE'",
+        (_now_iso(), side, trigger_price, fill_price, note, _now_iso(), bracket["id"]),
+    )
+    conn.commit()
+
+
 def _insert_proposal_row(conn, *, experiment_id, idempotency_key, parent_proposal_id, version,
                          action, mode, symbol, policy_sha256, time_sensitive_reason,
                          very_high, missing_roots, expires_at, cancel_condition,

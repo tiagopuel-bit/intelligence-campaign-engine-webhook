@@ -43,6 +43,7 @@ import requests
 import dna_insight_library
 import massive_ohlc
 import massive_options
+import finra_short
 import pionex_bridge
 import positions
 import sec_filings
@@ -881,6 +882,31 @@ def get_filings(symbol):
     return jsonify(sec_filings.get_filings_state(DB_PATH, clean, window_hours))
 
 
+@app.route("/short/<symbol>", methods=["GET"])
+def get_short_context(symbol):
+    """Read-only FINRA daily short-sale-volume context for one symbol.
+
+    Aggregates the rolling short-volume ratio into a closed-vocabulary
+    short-activity read (LOW/NORMAL/ELEVATED/HIGH/NO_DATA). FINRA publishes
+    daily short volume T+1, so freshness is DELAYED, never live. This is short
+    activity, not cost-to-borrow (FINRA publishes no CTB/locate here).
+    """
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    clean = positions.clean_symbol(symbol)
+    if not clean:
+        return jsonify({"error": "invalid symbol"}), 400
+    days = request.args.get("days", type=int)
+    if days is None:
+        days = finra_short.DEFAULT_DAYS
+    if not (1 <= days <= finra_short.MAX_DAYS):
+        return jsonify({"error": f"days must be between 1 and {finra_short.MAX_DAYS}"}), 400
+    try:
+        return jsonify(finra_short.short_context(clean, days=days))
+    except finra_short.UpstreamError as exc:
+        return jsonify({"error": "upstream", "detail": str(exc)}), 502
+
+
 # Symbols excluded from the asset list: internal pipeline smoke-test rows,
 # not real market data. Same allowlist as scripts/cleanup_test_symbols.py.
 _TEST_SYMBOLS = {"PUBTEST", "TEST", "TEST2", "TEST_PING"}
@@ -1505,6 +1531,111 @@ def update_instrument(position_id, iid):
     updated = conn.execute("SELECT * FROM position_instruments WHERE id=?", (iid,)).fetchone()
     conn.close()
     return jsonify(positions.shape_instrument(updated))
+
+
+@app.route("/positions/<int:position_id>/instruments/close", methods=["POST"])
+def close_instruments(position_id):
+    """Close some or all of a displayed holding while preserving its trade log."""
+    if not state_is_authorized():
+        return jsonify({"error": "unauthorized"}), 401
+    clean, err = positions.validate_close_instruments(request.get_json(silent=True))
+    if err:
+        return jsonify({"error": err}), 400
+
+    now = datetime.now(timezone.utc).isoformat()
+    exit_time = clean["exit_time"] or now
+    ids = clean["instrument_ids"]
+    placeholders = ",".join("?" for _ in ids)
+    conn = get_db()
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        pos = conn.execute("SELECT * FROM positions WHERE id=?", (position_id,)).fetchone()
+        if pos is None:
+            conn.rollback()
+            return jsonify({"error": "position not found"}), 404
+        rows = conn.execute(
+            f"SELECT * FROM position_instruments WHERE position_id=? AND id IN ({placeholders}) ORDER BY id",
+            [position_id, *ids],
+        ).fetchall()
+        if len(rows) != len(ids):
+            conn.rollback()
+            return jsonify({"error": "one or more instruments were not found"}), 404
+        if any(row["status"] != "OPEN" for row in rows):
+            conn.rollback()
+            return jsonify({"error": "all instruments must still be open"}), 409
+        contract_keys = {(row["instrument_type"], row["strike"], row["expiration"]) for row in rows}
+        if len(contract_keys) != 1:
+            conn.rollback()
+            return jsonify({"error": "instrument_ids must identify one holding"}), 400
+
+        instrument_type = rows[0]["instrument_type"]
+        quantity = float(clean["quantity"])
+        if instrument_type in ("CALL", "PUT") and not quantity.is_integer():
+            conn.rollback()
+            return jsonify({"error": "option quantity must be a whole number"}), 400
+        total_open = sum(float(row["quantity"]) for row in rows)
+        if quantity > total_open + 1e-9:
+            conn.rollback()
+            return jsonify({"error": "quantity exceeds the open holding", "available_quantity": total_open}), 400
+
+        remaining_to_close = quantity
+        closed_ids = []
+        for row in rows:
+            if remaining_to_close <= 1e-9:
+                break
+            row_quantity = float(row["quantity"])
+            closing = min(row_quantity, remaining_to_close)
+            if abs(closing - row_quantity) <= 1e-9:
+                conn.execute(
+                    "UPDATE position_instruments SET status='CLOSED', exit_price=?, exit_time=?, notes=COALESCE(?,notes), updated_at=? WHERE id=?",
+                    (clean["exit_price"], exit_time, clean["notes"], now, row["id"]),
+                )
+                closed_ids.append(row["id"])
+            else:
+                conn.execute(
+                    "UPDATE position_instruments SET quantity=?, updated_at=? WHERE id=?",
+                    (row_quantity - closing, now, row["id"]),
+                )
+                cur = conn.execute("""
+                    INSERT INTO position_instruments (position_id, instrument_type, strike, expiration,
+                        quantity, entry_price, entry_time, exit_price, exit_time, status,
+                        rolled_from_id, rolled_to_id, notes, created_at, updated_at)
+                    VALUES (?,?,?,?,?,?,?,?,?,'CLOSED',?,?,?,?,?)
+                """, (
+                    position_id, row["instrument_type"], row["strike"], row["expiration"],
+                    closing, row["entry_price"], row["entry_time"], clean["exit_price"], exit_time,
+                    row["rolled_from_id"], row["rolled_to_id"], clean["notes"] or row["notes"], now, now,
+                ))
+                closed_ids.append(cur.lastrowid)
+            remaining_to_close -= closing
+
+        open_count = conn.execute(
+            "SELECT COUNT(*) AS n FROM position_instruments WHERE position_id=? AND status='OPEN'",
+            (position_id,),
+        ).fetchone()["n"]
+        if open_count == 0:
+            conn.execute(
+                "UPDATE positions SET status='CLOSED', closed_at=?, updated_at=? WHERE id=?",
+                (exit_time, now, position_id),
+            )
+        else:
+            conn.execute(
+                "UPDATE positions SET status='OPEN', closed_at=NULL, updated_at=? WHERE id=?",
+                (now, position_id),
+            )
+        conn.commit()
+        detail = _position_detail(conn, position_id)
+        return jsonify({
+            "closed_quantity": quantity,
+            "remaining_quantity": max(0.0, total_open - quantity),
+            "closed_instrument_ids": closed_ids,
+            "position": detail,
+        })
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 @app.route("/positions/<int:position_id>", methods=["DELETE"])

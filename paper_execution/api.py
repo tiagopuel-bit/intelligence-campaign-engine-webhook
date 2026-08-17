@@ -19,6 +19,7 @@ from pathlib import Path
 from flask import Blueprint, jsonify, request
 
 from paper_execution.db import connect
+from paper_execution.brackets import validate_bracket_payload, validate_side
 from paper_execution.engine import auto_mode_allowed, evaluate_very_high
 from paper_execution.portfolio import (
     ANCHOR_SYMBOL,
@@ -31,15 +32,18 @@ from paper_execution.portfolio import (
 from paper_execution.runner import health_summary
 from paper_execution.state import reconstruct_evidence
 from paper_execution.store import (
+    cancel_bracket,
     create_proposal,
     frozen_corrections_hash,
     frozen_corrections_v12_hash,
     frozen_policy_hash,
+    list_active_brackets,
     modify_proposal_transactional,
     record_user_decision,
     set_kill_switch,
     tracked_symbols,
     transition,
+    upsert_bracket,
 )
 
 CREATE_ALLOWED = {"action", "symbol", "experiment_id", "idempotency_key", "time_sensitive_reason",
@@ -340,6 +344,69 @@ def create_blueprint(db_path, state_token: str, state_provider):
             "experiment_id": experiment_id, "scope": scope,
             "position_ref": position_ref, "enabled": enabled,
         }), 200
+
+    @bp.route("/paper/brackets", methods=["POST"])
+    def create_bracket():
+        err = require_auth()
+        if err:
+            return err
+        clean, val_err = validate_bracket_payload(request.get_json(silent=True) or {})
+        if val_err:
+            return jsonify({"error": val_err}), 400
+        conn = connect(db_path)
+        experiment = conn.execute(
+            "SELECT status FROM pe_experiments WHERE id=?", (clean["experiment_id"],)
+        ).fetchone()
+        if experiment is None:
+            conn.close()
+            return jsonify({"error": "EXPERIMENT_NOT_FOUND"}), 404
+        if experiment["status"] != "ACTIVE":
+            conn.close()
+            return jsonify({"error": "EXPERIMENT_NOT_ACTIVE"}), 409
+        pos = conn.execute(
+            "SELECT symbol, instrument_type, quantity FROM pe_paper_positions "
+            "WHERE experiment_id=? AND ticker=?",
+            (clean["experiment_id"], clean["ticker"]),
+        ).fetchone()
+        if pos is None or float(pos["quantity"] or 0.0) == 0.0:
+            conn.close()
+            return jsonify({"error": "PAPER_POSITION_NOT_FOUND"}), 409
+        direction = "LONG" if float(pos["quantity"]) > 0 else "SHORT"
+        if not validate_side(direction, clean["stop_price"], clean["target_price"]):
+            conn.close()
+            return jsonify({"error": "BRACKET_SIDE_INVALID"}), 400
+        bracket_id = upsert_bracket(
+            conn, experiment_id=clean["experiment_id"], symbol=pos["symbol"],
+            ticker=clean["ticker"], instrument_type=str(pos["instrument_type"] or "SHARE").upper(),
+            direction=direction, stop_price=clean["stop_price"],
+            target_price=clean["target_price"], created_by=clean["created_by"],
+        )
+        conn.close()
+        return jsonify({"bracket_id": bracket_id, "ticker": clean["ticker"],
+                        "direction": direction}), 201
+
+    @bp.route("/paper/brackets", methods=["GET"])
+    def list_brackets():
+        err = require_auth()
+        if err:
+            return err
+        experiment_id = request.args.get("experiment_id", type=int)
+        conn = connect(db_path)
+        rows = list_active_brackets(conn, experiment_id=experiment_id)
+        conn.close()
+        return jsonify(rows)
+
+    @bp.route("/paper/brackets/<int:bracket_id>", methods=["DELETE"])
+    def delete_bracket(bracket_id):
+        err = require_auth()
+        if err:
+            return err
+        conn = connect(db_path)
+        ok = cancel_bracket(conn, bracket_id)
+        conn.close()
+        if not ok:
+            return jsonify({"error": "bracket not found or not active"}), 404
+        return jsonify({"bracket_id": bracket_id, "status": "CANCELLED"}), 200
 
     @bp.route("/paper/reports", methods=["GET"])
     def reports():

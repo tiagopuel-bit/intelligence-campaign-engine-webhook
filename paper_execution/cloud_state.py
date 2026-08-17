@@ -200,4 +200,41 @@ def cloud_state_provider(webhook_db_path: str, symbols: tuple[str, ...] = ("AMC"
             webhook_db_path, symbol, position_ref=position_ref, instrument_ref=instrument_ref
         )
     provider.readiness = lambda: cloud_readiness(webhook_db_path, symbols)
+    provider.latest_close = lambda symbol, ticker: latest_close(webhook_db_path, symbol, ticker)
     return provider
+
+
+def latest_close(webhook_db_path: str, symbol: str, ticker: str) -> dict | None:
+    """Latest bar close for a paper position's price reference (brackets).
+
+    Shares (ticker == symbol) read the underlying heartbeat; options read the
+    option heartbeat by ticker. Returns {close, bar_time, source} or None when
+    no heartbeat exists — fail-closed, never a synthetic price.
+    """
+    conn = sqlite3.connect(webhook_db_path)
+    conn.row_factory = sqlite3.Row
+    try:
+        tables = _tables(conn)
+        if ticker == symbol:
+            if "underlying_heartbeats" not in tables:
+                return None
+            row = conn.execute(
+                "SELECT bar_time, close, source FROM underlying_heartbeats "
+                "WHERE symbol=? AND close IS NOT NULL "
+                "ORDER BY CAST(bar_time AS INTEGER) DESC LIMIT 1",
+                (symbol,),
+            ).fetchone()
+        else:
+            if "option_heartbeats" not in tables:
+                return None
+            row = conn.execute(
+                "SELECT bar_time, close, source FROM option_heartbeats "
+                "WHERE ticker=? AND close IS NOT NULL "
+                "ORDER BY CAST(bar_time AS INTEGER) DESC LIMIT 1",
+                (ticker,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {"close": row["close"], "bar_time": _bar_time(row["bar_time"]), "source": row["source"]}
+    finally:
+        conn.close()
