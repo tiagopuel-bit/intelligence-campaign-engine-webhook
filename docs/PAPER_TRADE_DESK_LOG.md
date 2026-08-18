@@ -35,6 +35,22 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-17 — N/A — blocked: Massive Indices entitlement not yet propagated
+
+**Trigger:** `docs/DEEPSEEK_MASSIVE_INDICES_CHECK_TASK.md` — live check
+against the deployed `MASSIVE_API_KEY` on Railway.
+**Discussion:** `I:VIX` returned `403 NOT_AUTHORIZED` ("You are not
+entitled to this data... upgrade your plan"); `AMC` control returned a
+clean `200` with real OHLC bars. Key itself is valid — this is
+specifically the Indices Basic entitlement (enabled in Tiago's Massive
+dashboard) not yet propagated to the deployed key. Not a code issue,
+nothing to fix here.
+**Decision:** VIX vol-regime spec stays parked, no other work blocked by
+it. Retest later; if still 403 after a reasonable wait, contact Massive
+support directly.
+**Outcome:** blocked, pending Massive-side propagation.
+**Logged by:** Claude
+
 ## 2026-08-17 — N/A — review: four-item batch committed, join_symbol_if_ready confirmed final
 
 **Trigger:** Claude's verify-then-commit pass on DS's four-item batch
