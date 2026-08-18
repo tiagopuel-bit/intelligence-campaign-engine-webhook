@@ -35,6 +35,29 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-17 — N/A — review: four-item batch committed, join_symbol_if_ready confirmed final
+
+**Trigger:** Claude's verify-then-commit pass on DS's four-item batch
+(cash balance, AMC-only auto-entry, multi-asset join, set_bracket
+lifecycle), plus ADV liquidity bands reviewed separately.
+**Discussion:** Both reviewed line-by-line and shipped as separate
+commits: `b03e788` (ADV bands) and `745c8d8` (the four-item batch).
+Migrations verified data-preserving (explicit column lists checked
+against pre-migration schema, not a blind `SELECT *`). Tiago
+explicitly confirmed `join_symbol_if_ready()`'s design as final — a
+newly joined symbol starts at zero position, funded by a future
+`open` proposal under the existing floor/eligibility checks; this was
+flagged by DS as a judgment call and is no longer open. Also flagged:
+`join_symbol_if_ready()` is not yet wired to any API route (exists
+and is tested, but unreachable in production) — a follow-up, not a
+blocker. Massive Indices Basic confirmed free ($0/mo, EOD data, 5
+req/min) — unblocks the VIX vol-regime spec at zero cost pending
+Tiago enabling the product on his account and a live access check.
+**Decision:** both commits ship as-is; `join_symbol_if_ready` design
+confirmed, no rework needed.
+**Outcome:** live health confirmed good post-commit (`/health` ok).
+**Logged by:** Claude
+
 ## 2026-08-17 16:08 PT — N/A — build: multi-asset plumbing + AMC auto-entry + bracket lifecycle
 
 **Trigger:** Claude handoff `DEEPSEEK_MULTI_ASSET_AND_FIXES_TASK.md` (4 build items), done in one pass.
