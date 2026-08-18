@@ -1830,18 +1830,28 @@
   function paperProposalHtml(p) {
     var status = p.current_status || p.status || "UNKNOWN";
     var pending = status === "PENDING_APPROVAL";
+    var onHold = status === "ON_HOLD";
     var api = paperApiMounted(), ready = paperExecutionReady();
-    var approveEnabled = pending && Number(p.very_high) === 1 && ready;
-    var rejectEnabled = pending && api;
+    var approveEnabled = (pending || onHold) && Number(p.very_high) === 1 && ready;
+    var rejectEnabled = (pending || onHold) && api;
     var modifyEnabled = pending && ready;
+    var holdEnabled = pending && api;
+    var resumeEnabled = onHold && api;
     var reason = p.time_sensitive_reason || (Number(p.very_high) === 1 ? "All four evidence roots were present at proposal time." : "Evidence is incomplete; observation only until every required root is present.");
     if (p.action === "set_bracket") {
       reason = "Protective bracket: stop " + (p.stop_price != null ? "$" + Number(p.stop_price) : "—") + " · target " + (p.target_price != null ? "$" + Number(p.target_price) : "—") + (p.time_sensitive_reason ? " · " + p.time_sensitive_reason : "");
     }
+    var countdown = onHold ? "frozen — no deadline" : paperTimeLeft(p.expires_at);
+    var actions = "";
+    if (pending) {
+      actions = '<div class="paper-proposal-actions"><button data-paper-decision="approve" data-paper-id="' + esc(p.id) + '"' + (approveEnabled ? '' : ' disabled title="Requires P2A provider readiness and VERY_HIGH evidence"') + '>Approve</button><button data-paper-decision="modify" data-paper-id="' + esc(p.id) + '" data-paper-action="' + esc(p.action) + '"' + (modifyEnabled ? '' : ' disabled') + '>Modify</button><button data-paper-decision="hold" data-paper-id="' + esc(p.id) + '"' + (holdEnabled ? '' : ' disabled') + ' title="Pause the approval clock — no auto-execution while frozen">Freeze</button><button class="danger" data-paper-decision="reject" data-paper-id="' + esc(p.id) + '"' + (rejectEnabled ? '' : ' disabled') + '>Reject</button></div>';
+    } else if (onHold) {
+      actions = '<div class="paper-proposal-actions"><button data-paper-decision="approve" data-paper-id="' + esc(p.id) + '"' + (approveEnabled ? '' : ' disabled title="Requires P2A provider readiness and VERY_HIGH evidence"') + '>Approve</button><button data-paper-decision="resume" data-paper-id="' + esc(p.id) + '"' + (resumeEnabled ? '' : ' disabled') + ' title="Re-arm a fresh 10-minute window">Resume</button><button class="danger" data-paper-decision="reject" data-paper-id="' + esc(p.id) + '"' + (rejectEnabled ? '' : ' disabled') + '>Reject</button></div>';
+    }
     return '<article class="paper-proposal"><div class="paper-proposal-top"><strong><span class="paper-badge">Paper</span> ' + esc(p.symbol || "AMC") + ' · ' + esc(String(p.action || "observe").replace(/_/g, " ")) + '</strong><span class="paper-status ' + paperStatusClass(status) + '">' + esc(status.replace(/_/g, " ")) + '</span></div>' +
-      '<div class="paper-proposal-meta"><span>#' + esc(p.id) + ' · v' + esc(p.version || 1) + '</span><span>' + esc(p.mode || "APPROVAL_REQUIRED") + '</span><span class="paper-countdown" data-expires="' + esc(p.expires_at || "") + '">' + paperTimeLeft(p.expires_at) + '</span></div>' +
+      '<div class="paper-proposal-meta"><span>#' + esc(p.id) + ' · v' + esc(p.version || 1) + '</span><span>' + esc(p.mode || "APPROVAL_REQUIRED") + '</span><span class="paper-countdown" data-expires="' + esc(onHold ? "" : (p.expires_at || "")) + '">' + esc(countdown) + '</span></div>' +
       '<div class="paper-proposal-reason">' + esc(reason) + '</div>' +
-      (pending ? '<div class="paper-proposal-actions"><button data-paper-decision="approve" data-paper-id="' + esc(p.id) + '"' + (approveEnabled ? '' : ' disabled title="Requires P2A provider readiness and VERY_HIGH evidence"') + '>Approve</button><button data-paper-decision="modify" data-paper-id="' + esc(p.id) + '" data-paper-action="' + esc(p.action) + '"' + (modifyEnabled ? '' : ' disabled') + '>Modify</button><button class="danger" data-paper-decision="reject" data-paper-id="' + esc(p.id) + '"' + (rejectEnabled ? '' : ' disabled') + '>Reject</button></div>' : '') + '</article>';
+      actions + '</article>';
   }
 
   function renderPaperChallenge(sym) {

@@ -35,6 +35,43 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-17 21:xx PT — AMC — N/A — Freeze/Resume added to the proposal lifecycle
+
+**Trigger:** `docs/DEEPSEEK_PROPOSAL_FREEZE_TASK.md` — Tiago asked Claude to
+execute this one directly. Wanted "if I don't show up, green light to
+execute" to stay the default, but with a way to pause the clock when he
+wants to actually look at something (especially once Entry Discovery starts
+surfacing new AMC positions to consider).
+**Evidence roots:** N/A — lifecycle/API addition, not a trade.
+**Discussion:** New `ON_HOLD` status added to `paper_execution/policy.py`'s
+`ALLOWED_TRANSITIONS` (`PENDING_APPROVAL <-> ON_HOLD`, plus
+`ON_HOLD -> APPROVED/REJECTED/CANCELLED`). Two new routes in
+`paper_execution/api.py`: `POST /paper/proposals/<id>/hold` and
+`.../resume`. `_decision_endpoint` (approve/reject/cancel) generalized to
+read the proposal's actual current status instead of hardcoding
+`PENDING_APPROVAL`, so those three also work directly from `ON_HOLD`.
+Real finding mid-build: `expires_at` is `NOT NULL` in `schema_v1.sql`, so a
+literal `NULL` for "no deadline" isn't possible without a migration —
+used a far-future sentinel (`9999-12-31T23:59:59+00:00`) internally
+instead (guarantees `due_proposals()`'s `expires_at <= now` filter never
+claims it) while the hold/resume API responses still return an actual
+`null` to callers. Dashboard: Freeze button on pending proposals, swaps to
+Resume while frozen, countdown replaced with "frozen — no deadline" text.
+10 new tests (`test_amc_paper_execution_p2.py`): API-level hold/resume/
+approve-reject-cancel-from-hold/error cases, plus the one that actually
+proves the safety property — an `ON_HOLD` proposal is never claimed by
+`run_once()` even manufactured well past its original deadline. Full
+suite: 501 passing (up from 491). `git diff --check` clean. Note: while
+overwriting `docs/DEEPSEEK_ENTRY_DISCOVERY_BUILD_TASK.md` with my own
+draft of the same file, found DS had already independently written and
+committed an equivalent task packet in `745c8d8` — restored DS's version
+via `git checkout`, no functional conflict (no Entry Discovery code exists
+yet either way).
+**Decision:** ready for Tiago to commit/push (Claude's sandbox blocks
+`git push`, same pattern as tonight's other hotfix/route work).
+**Outcome:** awaiting push.
+**Logged by:** Claude
+
 ## 2026-08-17 21:xx PT — AMC — N/A — join_symbol_if_ready wired to a route
 
 **Trigger:** `docs/DEEPSEEK_JOIN_SYMBOL_ROUTE_TASK.md` — Tiago asked Claude

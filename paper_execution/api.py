@@ -53,6 +53,10 @@ MODIFY_ALLOWED = {"action", "idempotency_key", "time_sensitive_reason", "positio
                   "stop_price", "target_price"}
 
 APPROVAL_WINDOW_SECONDS = 600
+# expires_at is NOT NULL in schema_v1.sql; ON_HOLD stores this far-future
+# sentinel instead so due_proposals() can never claim it (never <= now), while
+# the API/dashboard sees an actual null (no clock to show).
+NO_DEADLINE_SENTINEL = "9999-12-31T23:59:59+00:00"
 
 
 def _now_iso() -> str:
@@ -358,7 +362,7 @@ def create_blueprint(db_path, state_token: str, state_provider, webhook_db_path=
                 return jsonify({"error": check["reason"]}), 409
         try:
             out = transition(conn, proposal_id, to_status, actor="user",
-                             expected_from="PENDING_APPROVAL")
+                             expected_from=row["current_status"])
         except Exception as exc:  # noqa: BLE001
             conn.rollback()
             conn.close()
@@ -381,6 +385,57 @@ def create_blueprint(db_path, state_token: str, state_provider, webhook_db_path=
     @bp.route("/paper/proposals/<int:proposal_id>/cancel", methods=["POST"])
     def cancel(proposal_id):
         return _decision_endpoint(proposal_id, "CANCELLED", "CANCEL_AUTO")
+
+    @bp.route("/paper/proposals/<int:proposal_id>/hold", methods=["POST"])
+    def hold(proposal_id):
+        """Pause the approval clock: no auto-execution while ON_HOLD, no deadline."""
+        err = require_auth()
+        if err:
+            return err
+        conn = connect(db_path)
+        row = conn.execute("SELECT * FROM pe_order_proposals WHERE id=?", (proposal_id,)).fetchone()
+        if row is None:
+            conn.close()
+            return jsonify({"error": "not found"}), 404
+        try:
+            out = transition(conn, proposal_id, "ON_HOLD", actor="user", reason="freeze",
+                             expected_from=row["current_status"], commit=False)
+            conn.execute("UPDATE pe_order_proposals SET expires_at=? WHERE id=?",
+                        (NO_DEADLINE_SENTINEL, proposal_id))
+            conn.commit()
+        except Exception as exc:  # noqa: BLE001
+            conn.rollback()
+            conn.close()
+            return jsonify({"error": type(exc).__name__, "detail": str(exc)}), 409
+        conn.close()
+        out["expires_at"] = None
+        return jsonify(out)
+
+    @bp.route("/paper/proposals/<int:proposal_id>/resume", methods=["POST"])
+    def resume(proposal_id):
+        """Re-arm a fresh approval window on an ON_HOLD proposal; holding banks no time."""
+        err = require_auth()
+        if err:
+            return err
+        conn = connect(db_path)
+        row = conn.execute("SELECT * FROM pe_order_proposals WHERE id=?", (proposal_id,)).fetchone()
+        if row is None:
+            conn.close()
+            return jsonify({"error": "not found"}), 404
+        new_expires = (datetime.now(timezone.utc) + timedelta(seconds=APPROVAL_WINDOW_SECONDS)).isoformat()
+        try:
+            out = transition(conn, proposal_id, "PENDING_APPROVAL", actor="user", reason="resume",
+                             expected_from=row["current_status"], commit=False)
+            conn.execute("UPDATE pe_order_proposals SET expires_at=? WHERE id=?",
+                        (new_expires, proposal_id))
+            conn.commit()
+        except Exception as exc:  # noqa: BLE001
+            conn.rollback()
+            conn.close()
+            return jsonify({"error": type(exc).__name__, "detail": str(exc)}), 409
+        conn.close()
+        out["expires_at"] = new_expires
+        return jsonify(out)
 
     @bp.route("/paper/proposals/<int:proposal_id>/modify", methods=["POST"])
     def modify(proposal_id):

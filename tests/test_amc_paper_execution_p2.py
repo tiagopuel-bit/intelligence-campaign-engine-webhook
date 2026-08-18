@@ -243,6 +243,76 @@ class PaperApiTests(unittest.TestCase):
         )
         self.assertEqual(r.status_code, 404)
 
+    def test_hold_requires_auth(self):
+        pid = self._create().get_json()["proposal_id"]
+        r = self.client.post(f"/paper/proposals/{pid}/hold")
+        self.assertEqual(r.status_code, 401)
+
+    def test_hold_pauses_the_clock(self):
+        pid = self._create().get_json()["proposal_id"]
+        r = self.client.post(f"/paper/proposals/{pid}/hold", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["to"], "ON_HOLD")
+        self.assertIsNone(r.get_json()["expires_at"])
+        conn = db.connect(self._tmp.name)
+        row = conn.execute("SELECT current_status, expires_at FROM pe_order_proposals WHERE id=?",
+                           (pid,)).fetchone()
+        conn.close()
+        self.assertEqual(row["current_status"], "ON_HOLD")
+        # Stored as a far-future sentinel (schema is expires_at NOT NULL), not
+        # a literal NULL -- the API contract still returns None (see above).
+        self.assertEqual(row["expires_at"], "9999-12-31T23:59:59+00:00")
+
+    def test_resume_rearms_a_fresh_window(self):
+        pid = self._create().get_json()["proposal_id"]
+        self.client.post(f"/paper/proposals/{pid}/hold", headers=self.h)
+        r = self.client.post(f"/paper/proposals/{pid}/resume", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["to"], "PENDING_APPROVAL")
+        conn = db.connect(self._tmp.name)
+        row = conn.execute("SELECT current_status, expires_at FROM pe_order_proposals WHERE id=?",
+                           (pid,)).fetchone()
+        conn.close()
+        self.assertEqual(row["current_status"], "PENDING_APPROVAL")
+        self.assertIsNotNone(row["expires_at"])
+        self.assertGreater(row["expires_at"], datetime.now(timezone.utc).isoformat())
+
+    def test_approve_directly_from_hold(self):
+        pid = self._create().get_json()["proposal_id"]
+        self.client.post(f"/paper/proposals/{pid}/hold", headers=self.h)
+        r = self.client.post(f"/paper/proposals/{pid}/approve", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["to"], "APPROVED")
+
+    def test_reject_directly_from_hold(self):
+        pid = self._create().get_json()["proposal_id"]
+        self.client.post(f"/paper/proposals/{pid}/hold", headers=self.h)
+        r = self.client.post(f"/paper/proposals/{pid}/reject", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["to"], "REJECTED")
+
+    def test_cancel_directly_from_hold(self):
+        pid = self._create().get_json()["proposal_id"]
+        self.client.post(f"/paper/proposals/{pid}/hold", headers=self.h)
+        r = self.client.post(f"/paper/proposals/{pid}/cancel", headers=self.h)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.get_json()["to"], "CANCELLED")
+
+    def test_hold_rejected_from_non_pending_status(self):
+        pid = self._create().get_json()["proposal_id"]
+        self.client.post(f"/paper/proposals/{pid}/approve", headers=self.h)
+        r = self.client.post(f"/paper/proposals/{pid}/hold", headers=self.h)
+        self.assertEqual(r.status_code, 409)
+
+    def test_resume_rejected_from_non_hold_status(self):
+        pid = self._create().get_json()["proposal_id"]
+        r = self.client.post(f"/paper/proposals/{pid}/resume", headers=self.h)
+        self.assertEqual(r.status_code, 409)
+
+    def test_hold_unknown_proposal_404(self):
+        r = self.client.post("/paper/proposals/9999/hold", headers=self.h)
+        self.assertEqual(r.status_code, 404)
+
 
 class RunnerTests(unittest.TestCase):
     def setUp(self):
@@ -322,6 +392,23 @@ class RunnerTests(unittest.TestCase):
         conn.close()
         results = run_once(self._tmp.name, self._provider())
         self.assertEqual(results[0]["status"], "FILLED")
+
+    def test_on_hold_never_auto_claimed_even_past_deadline(self):
+        pid = self._proposal(expires=10)
+        conn = db.connect(self._tmp.name)
+        transition(conn, pid, "ON_HOLD", actor="user", expected_from="PENDING_APPROVAL")
+        conn.execute("UPDATE pe_order_proposals SET expires_at=? WHERE id=?",
+                     ("9999-12-31T23:59:59+00:00", pid))
+        conn.commit()
+        conn.close()
+        # Force the clock far past what would have been the original deadline.
+        results = run_once(self._tmp.name, self._provider())
+        self.assertEqual(results, [])
+        conn = db.connect(self._tmp.name)
+        status = conn.execute("SELECT current_status FROM pe_order_proposals WHERE id=?",
+                              (pid,)).fetchone()["current_status"]
+        conn.close()
+        self.assertEqual(status, "ON_HOLD")
 
     def test_kill_switch_wins_auto_path(self):
         pid = self._proposal(expires=-1)
