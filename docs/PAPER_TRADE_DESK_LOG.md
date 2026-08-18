@@ -35,6 +35,16 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-17 22:34 PT — U — N/A — "last real event" tracking fix + ingestion-gap investigation
+
+**Trigger:** `docs/DEEPSEEK_LAST_EVENT_FIX_TASK.md` — Tiago confirmed against real U data that `recent_event` was blank despite real events (FAIL/MANAGE/etc.) having fired recently.
+**Evidence roots:** N/A — advisory/dashboard + bracket-suggestion inputs; does not touch `paper_execution`'s evidence roots.
+**Discussion (Problem 1 — FIXED):** Root cause confirmed: `recent_event` read the latest bar's own `bar_event` (usually empty) instead of the true most recent real event. Fix: read-time backward query (`_last_real_event` in webhook_receiver.py) returns the latest non-empty `bar_event` + its `bar_time` + `close`; `_shape_state` now exposes `recent_event` / `recent_event_time` / `recent_event_close`. Same fix applied to `paper_execution/bracket_suggestions.py`'s `_to_campaign_state` (had the identical bug), so `recent_support_price`/`recent_resistance_price` use the close AT the last event bar. Dashboard signal rows show the real event + its age; `poll_and_recommend.py` uses `recent_event_close`.
+**Discussion (Problem 2 — investigation):** Live U/30 and U/60 `/history` show bars through 08-17 19:30 (fresh) — **no current multi-day zero-row gap**. Bars on 08-13/08-14 are sporadic (roughly half the 30m slots) — event-driven alerting or a partial stretch, not a full gap. The "~8 days ago Updated" observation is not reproducible from current data; most consistent with a transient stale-relay stretch that has since recovered (same intermittency as the heartbeat-relay issue). U/60's July-30 FAIL is beyond the 50-row `/history` limit — can't be surfaced via the API; the corrected backward query scans the whole table once deployed. No code fix for Problem 2 beyond Problem 1's.
+**Decision:** Problem 1 fixed (both call sites + dashboard + poller); Problem 2 reported as transient, not a current gap. Handed back — NOT committed/deployed.
+**Outcome:** 529 tests pass (4 new), `git diff --check` clean. Re-verified on live data: U/30 corrected `recent_event` = **PEAK @ 08-14 18:00** (close 46.28, ~3d ago); U/60 last event beyond reachable window.
+**Logged by:** DeepSeek
+
 ## 2026-08-17 20:40 PT — AMC — N/A — review fix: activation regression caught before commit
 
 **Trigger:** Claude's verify-then-commit pass on the TP/SL bracket build below.

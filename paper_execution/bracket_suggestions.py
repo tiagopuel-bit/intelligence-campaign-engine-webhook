@@ -79,8 +79,10 @@ def load_campaign_states(webhook_db_path: str | Path, symbol: str,
                          hidden_timeframes=("1", "3")) -> list[CampaignState]:
     """Latest alert per timeframe -> CampaignState, mirroring /state_all.
 
-    ``hidden_timeframes`` drops the live-only micro rungs (1m heartbeat relay
-    and 3m) so they never contribute a structural level, same as the dashboard.
+    ``recent_event`` / support / resistance use the **true last real event**
+    (most recent non-empty ``bar_event`` and the close at that bar), not the
+    latest bar's often-empty event. ``hidden_timeframes`` drops the live-only
+    micro rungs (1m heartbeat relay and 3m), same as the dashboard.
     """
     conn = sqlite3.connect(str(webhook_db_path))
     conn.row_factory = sqlite3.Row
@@ -101,19 +103,27 @@ def load_campaign_states(webhook_db_path: str | Path, symbol: str,
                 "SELECT * FROM watch_state WHERE symbol=? AND timeframe=?",
                 (symbol, tf),
             ).fetchone()
-            states.append(_to_campaign_state(symbol, tf, latest, watch))
+            last_event = conn.execute(
+                "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
+                "AND bar_event IS NOT NULL AND bar_event != '' "
+                "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
+                (symbol, tf),
+            ).fetchone()
+            states.append(_to_campaign_state(symbol, tf, latest, watch, last_event))
         return states
     finally:
         conn.close()
 
 
-def _to_campaign_state(symbol: str, tf: str, latest, watch) -> CampaignState:
+def _to_campaign_state(symbol: str, tf: str, latest, watch, last_event=None) -> CampaignState:
     raw_phase = latest["phase"] or "WAIT"
     raw_momentum = latest["momentum"] or "OFF"
     phase = _PHASE_MAP.get(raw_phase.upper(), Phase.WAIT)
     momentum = _MOMENTUM_MAP.get((raw_momentum or "").upper(), Momentum.FADING)
-    recent_event = (latest["bar_event"] or "").upper()
-    close = latest["close"]
+    recent_event = (last_event["bar_event"] if last_event is not None else latest["bar_event"] or "").upper()
+    event_close = last_event["close"] if last_event is not None else None
+    if event_close is None:
+        event_close = latest["close"]
     return CampaignState(
         symbol=symbol, timeframe=tf, phase=phase, momentum=momentum,
         health=latest["health"] or 0, confidence=latest["confidence"] or 0,
@@ -122,8 +132,8 @@ def _to_campaign_state(symbol: str, tf: str, latest, watch) -> CampaignState:
         rsi=latest["rsi"], ema21_distance_atr=latest["ema21_distance_atr"],
         signal_bar_extension_label=(watch["signal_extension_label"] if watch else None),
         next_event_after_signal=(watch["next_event_after_signal"] if watch else None),
-        recent_support_price=close if recent_event in SUPPORT_EVENTS else None,
-        recent_resistance_price=close if recent_event in STRETCH_EVENTS else None,
+        recent_support_price=event_close if recent_event in SUPPORT_EVENTS else None,
+        recent_resistance_price=event_close if recent_event in STRETCH_EVENTS else None,
     )
 
 

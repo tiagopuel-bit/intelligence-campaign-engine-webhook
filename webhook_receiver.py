@@ -671,11 +671,32 @@ def serve_vendor(filename):
     return send_from_directory(str(Path(__file__).parent / "ui" / "vendor"), filename)
 
 
-def _shape_state(symbol, timeframe, latest, watch):
+def _last_real_event(conn, symbol, timeframe):
+    """The most recent real (non-null, non-empty) named event for a
+    (symbol, timeframe): its event name, bar_time and the close at that bar.
+    Plain WAIT bars (bar_event empty) never count as an event. Fixes the
+    bug where `recent_event` reflected only the latest bar's often-empty
+    event instead of the true last event."""
+    row = conn.execute(
+        "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
+        "AND bar_event IS NOT NULL AND bar_event != '' "
+        "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
+        (symbol, timeframe),
+    ).fetchone()
+    if row is None:
+        return None, None, None
+    return row["bar_event"], row["bar_time"], row["close"]
+
+
+def _shape_state(symbol, timeframe, latest, watch, last_event=None,
+                 last_event_time=None, last_event_close=None):
     return {
         "symbol": symbol, "timeframe": timeframe,
         "phase": latest["phase"], "health": latest["health"], "confidence": latest["confidence"],
-        "momentum": latest["momentum"], "recent_event": latest["bar_event"],
+        "momentum": latest["momentum"],
+        "recent_event": last_event if last_event is not None else latest["bar_event"],
+        "recent_event_time": last_event_time,
+        "recent_event_close": last_event_close,
         "exhaustion_warning": bool(latest["exhaustion_warning"]),
         "reload_quality": latest["reload_quality"], "htf_phase": latest["htf_phase"],
         "campaign_alignment": latest["campaign_alignment"], "last_fail_type": latest["last_fail_type"],
@@ -707,10 +728,11 @@ def get_state(symbol, timeframe):
     watch = conn.execute("""
         SELECT * FROM watch_state WHERE symbol=? AND timeframe=?
     """, (symbol, timeframe)).fetchone()
+    ev, ev_time, ev_close = _last_real_event(conn, symbol, timeframe)
     conn.close()
     if latest is None:
         return jsonify({"error": "no alerts recorded yet for this symbol/timeframe"}), 404
-    return jsonify(_shape_state(symbol, timeframe, latest, watch))
+    return jsonify(_shape_state(symbol, timeframe, latest, watch, ev, ev_time, ev_close))
 
 
 @app.route("/state_all/<symbol>", methods=["GET"])
@@ -733,7 +755,8 @@ def get_state_all(symbol):
             SELECT * FROM watch_state WHERE symbol=? AND timeframe=?
         """, (symbol, tf)).fetchone()
         if latest is not None:
-            states.append(_shape_state(symbol, tf, latest, watch))
+            ev, ev_time, ev_close = _last_real_event(conn, symbol, tf)
+            states.append(_shape_state(symbol, tf, latest, watch, ev, ev_time, ev_close))
     conn.close()
     return jsonify({"symbol": symbol, "timeframe_count": len(states), "states": states})
 

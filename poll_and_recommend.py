@@ -100,8 +100,13 @@ def build_campaign_state(data: dict) -> CampaignState:
         momentum = Momentum.FADING
 
     recent_event = data.get("recent_event") or ""
-    support_price = data.get("close") if recent_event in BULLISH_SUPPORT_EVENTS else None
-    resistance_price = data.get("close") if recent_event in STRETCH_EVENTS else None
+    # The structural level is the close AT the last real event bar, not the
+    # latest bar's close (recent_event may be several bars old).
+    event_close = data.get("recent_event_close")
+    if event_close is None:
+        event_close = data.get("close")
+    support_price = event_close if recent_event in BULLISH_SUPPORT_EVENTS else None
+    resistance_price = event_close if recent_event in STRETCH_EVENTS else None
 
     return CampaignState(
         symbol=data["symbol"],
