@@ -66,8 +66,11 @@ level via delta/gamma — that constraint is unchanged from the base spec §6.
   extension → a `recent_option_resistance` level, max of recent highs), else the
   position **breakeven** (strike + avg_cost — real, position-derived, already
   computed by valuation) as the fallback reference, else an R:R fallback in
-  **option-price** terms. The breakeven is preferred as fallback over a pure
-  R:R multiple for options because it is a real level the human already tracks.
+  **option-price** terms with the same validated constant as the base spec:
+  **k = 2.2** (Trade Box 2.2:1, 17 real AMC 2H trades — 56.25% win vs 31.25%
+  breakeven, +0.87R avg; see `TP_SL_RECOMMENDATION_SPEC.md` §2). The breakeven
+  is preferred as fallback over a pure R:R multiple for options because it is a
+  real level the human already tracks.
 
 **New derived fields required (stated plainly):** `recent_option_support`
 (min of recent lows/closes) and `recent_option_resistance` (max of recent
@@ -137,7 +140,7 @@ blocking `/paper/health`.
 1. Minimum-history floor for an option-native level (proposal: ≥ 30 bars of the
    option's own series) — confirm.
 2. Lookback window (proposal: 20 bars, matching `component_ledger`'s `lookback=20`).
-3. Target precedence: option recent-high first, then breakeven, then R:R — confirm.
+3. Target precedence: option recent-high first, then breakeven, then R:R (k=2.2) — confirm.
 4. Whether the DELAYED Massive-OHLCV path should be a live fallback once the
    relays land, or LIVE-heartbeat-only.
 5. Confirm the cap uses total TPV (positions + cash) at proposal time.

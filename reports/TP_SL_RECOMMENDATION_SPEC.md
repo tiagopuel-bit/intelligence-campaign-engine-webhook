@@ -73,11 +73,14 @@ Evaluated candidates:
 
 **Recommendation: (a) primary, (b) fallback.** For (a): symmetric to support,
 pick the **nearest stretch-event close above current price** across timeframes
-(`min` of levels `> current_price`). For (b): `k = 2` (2:1 reward:risk) is
-proposed as a **declared policy constant, not a validated edge** — it only
-guarantees a defined downside:upside ratio for positions where no structural
-resistance exists yet; it is a floor on target quality, not a claim of
-probability.
+(`min` of levels `> current_price`). For (b): `k = 2.2` — the one **validated**
+reward:risk constant in the codebase: the Trade Box engine's **2.2:1** target,
+backtested on **17 real AMC 2H trades** (56.25% win rate vs a 31.25% breakeven
+requirement, +0.87R average per closed trade; CIF Engineering Bible,
+`Documents/AMC DNA Project/Bible/Claude/filesUPDATED by CLAUDE/
+Volume_VI_Validation_Statistical_Framework.md` §3). It only guarantees a defined
+downside:upside ratio where no structural resistance exists yet; it is a floor
+on target quality, not a claim of probability.
 
 **New tracking required (stated plainly):** unlike support, there is **no
 existing tracked field** for the stretch-event close. `CampaignState` needs one
@@ -177,14 +180,15 @@ fetch, auth read-only):
 - **Recent worked example (real 5m `live_webhook`, Aug 7–10):** current 5m
   close $2.4450; most recent bullish-support event `RELOAD @ 08-10 15:20`,
   close **$2.4050** → **initial stop $2.4050** (−1.64%). No stretch event in
-  window → structural resistance NO_DATA → R:R fallback **$2.5250** (2:1).
+  window → structural resistance NO_DATA → R:R fallback (k=2.2): `2.445 + 2.2 ×
+  (2.445 − 2.405)` = **$2.5330** (2.2:1).
 - **Cap check:** stop distance $0.04; allowed loss = 5% × TPV; the stop is
   inside the cap for notional ≤ ~1.25 × TPV (essentially always at ≤100% of
   the book) — the clamp only binds for wide structural stops.
 
 ## 8. Open items for review (not decided)
 
-1. `k=2` R:R fallback constant — confirm as the declared default.
+1. `k=2.2` R:R fallback constant (the validated Trade Box number cited in §2) — confirm as the declared default.
 2. The 0.5% material-change and 1/day, 3/experiment caps — confirm.
 3. Option-bracket handling in §6 (share-direct, option-reference) — confirm scope.
 4. Whether the initial suggestion should always pair a target (§2) or stop-only
