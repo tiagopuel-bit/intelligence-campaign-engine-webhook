@@ -46,6 +46,18 @@ the actual new design work.
    the tightest defensible support below current price. State exactly how
    this differs from the trailing case (no "must already have a stop"
    gate, otherwise same discipline).
+1a. **Trailing (ongoing) stop updates — explicitly in scope, not just the
+   initial level.** Tiago confirmed this matters as much as the initial
+   suggestion. `suggest_trailing_stop()` already works correctly today
+   (tightest defensible support below price, only ever raises, refuses
+   while a cross-TF exit signal is active) — it just isn't wired to
+   anything. Design how a raised-stop suggestion becomes a real proposal:
+   likely a `set_bracket` proposal against the *existing* active bracket
+   (an update, not a fresh one — decide whether that's a new action
+   variant or `set_bracket` with the bracket's ticker reused and the old
+   one superseded on approval, mirroring how `upsert_bracket` already
+   supersedes the prior ACTIVE bracket). State plainly whether this reuses
+   existing `upsert_bracket` semantics as-is or needs a small extension.
 2. **Target/resistance suggestion — the real new piece.** Propose a
    symmetric structural mechanism to `recent_support_price` but for the
    *upside*: candidates include (a) the price level of the nearest
