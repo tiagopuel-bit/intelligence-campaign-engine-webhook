@@ -63,12 +63,19 @@ the actual new design work.
    *upside*: candidates include (a) the price level of the nearest
    stretch-family event (`PEAK`/`MANAGE`/`PREMIUM` — the same "stretch"
    family from `CAMPAIGN_LIFECYCLE_SPEC.md` §3) above current price on
-   any timeframe, (b) a risk-reward-derived target (e.g., a declared
-   multiple of the stop distance — state the multiple and justify it, not
-   an arbitrary round number), or (c) something else you find in the
-   existing data. Evaluate options, recommend one, and be explicit that
-   unlike the support side, there may not be an existing tracked field for
-   this — say plainly if new tracking is needed and what it costs.
+   any timeframe, (b) a risk-reward-derived target using a **declared,
+   already-validated multiple: 2.2×** the stop distance — this is not an
+   arbitrary pick, it's the CIF Engineering Bible's own Trade Box engine
+   default, backtested against real AMC 2H replay data (17 trades,
+   56.25% win rate vs. a 31.25% breakeven requirement at 2.2:1, +0.87R
+   average — see `Documents/AMC DNA Project/Bible/Claude/filesUPDATED by
+   CLAUDE/Volume_VI_Validation_Statistical_Framework.md` §3 if you want
+   the source numbers). Use 2.2 as the default unless you find a
+   structural reason it doesn't fit this system, or (c) something else
+   you find in the existing data. Evaluate options, recommend one — (b)
+   with the 2.2 multiple is the natural default given it's real evidence,
+   not a guess, but the stretch-event level (a) may be worth combining as
+   a sanity check/cap on the risk-reward target rather than an either/or.
 3. **"Adapted to our challenge goals"** — what this concretely means:
    should suggested position-level risk relate to the experiment's
    declared caps (`max_daily_paper_loss`, `single_contract_max_pct`,
