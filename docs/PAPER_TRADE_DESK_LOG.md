@@ -35,7 +35,37 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
-## 2026-08-17 21:xx PT — AMC — N/A — Freeze/Resume added to the proposal lifecycle
+## 2026-08-17 20:40 PT — AMC — N/A — review fix: activation regression caught before commit
+
+**Trigger:** Claude's verify-then-commit pass on the TP/SL bracket build below.
+**Evidence roots:** N/A — infra/wiring bug, not a trade.
+**Discussion:** While wiring `maybe_suggest_brackets` into `_paper_tick_safely`,
+the diff also changed `activate_if_ready(PAPER_DB_PATH, DB_PATH, "AMC")` to
+`activate_if_ready(PAPER_DB_PATH, DB_PATH, TRACKED_SYMBOLS)` — a 7-symbol
+tuple. `activate_if_ready` requires a fresh underlying heartbeat **and**
+open starting holdings for **every** symbol passed, blocking on the first
+failure. GME/PYPL/RBLX/SPY/VALE/U have neither, so this change would have
+made AMC's activation **permanently impossible** — silently undoing
+tonight's heartbeat-fix work, and structurally similar to the earlier
+`TRACKED_SYMBOLS` incident (`f27850c`), though this time the symbol was
+genuinely committed/importable, not an `ImportError`. Caught via the same
+line-by-line hunk review used all night, not by trusting the report.
+Reverted that one line back to `"AMC"`, removed the now-unused
+`TRACKED_SYMBOLS` import; the bracket-suggestion wiring itself was correct
+and untouched. Full suite re-run after the fix: still 525 passing.
+**Decision:** Fixed before commit — the corrected version is what ships.
+**Outcome:** AMC's activation path is unaffected; bracket suggestions ship
+as designed.
+**Logged by:** Claude
+
+## 2026-08-17 20:12 PT — AMC — N/A — DNA-suggested TP/SL brackets built (both specs)
+
+**Trigger:** `docs/DEEPSEEK_TPSL_BUILD_AUTHORIZATION.md` — Tiago authorized the build after reviewing `reports/TP_SL_RECOMMENDATION_SPEC.md` + `reports/OPTION_NATIVE_TPSL_SPEC.md` (k=2.2 correction applied).
+**Evidence roots:** N/A — advisory producer, not an execution. Every suggestion is an ordinary `set_bracket` proposal (`APPROVAL_REQUIRED`, human approval → `upsert_bracket`); nothing auto-sets/raises a bracket and `set_bracket` is not in `VERY_HIGH_AUTO_ACTIONS`.
+**Discussion:** New `paper_execution/bracket_suggestions.py`: tightest `recent_support_price` below price for the stop (raise-only; refused on cross-TF `EXIT SIGNAL`), nearest stretch-event close for the target (else breakeven, else the validated k=2.2 R:R), option-native levels from the option's own series (≥30-bar floor, 20-bar lookback, DELAYED-Massive fallback labeled DELAYED), single-`contract_max_pct` (15% × TPV) cap clamp, and the on-tick trigger wired into `_paper_tick_safely` with fatigue guards (no outstanding set_bracket per ticker, 1/ticker/day via idempotency key, 3/experiment, ≥0.5% material change). Added `recent_resistance_price` to `CampaignState` (decision_engine.py + poll_and_recommend.py).
+**Decision:** Build complete and handed back — NOT committed/deployed (verify-then-commit pass per every task). 525 tests pass (24 new), `git diff --check` clean.
+**Outcome:** No live proposals created yet — the trigger is wired but the paper challenge is not yet active, and options still fail closed (`NO_SUGGESTION_INSUFFICIENT_OPTION_HISTORY`) until the option heartbeat relays land.
+**Logged by:** DeepSeek
 
 **Trigger:** `docs/DEEPSEEK_PROPOSAL_FREEZE_TASK.md` — Tiago asked Claude to
 execute this one directly. Wanted "if I don't show up, green light to

@@ -58,6 +58,7 @@ MOMENTUM_MAP = {
 }
 
 BULLISH_SUPPORT_EVENTS = ("STRONG START", "RELOAD", "ADD", "FIRE ADD", "MANAGE", "CAMPAIGN START")
+STRETCH_EVENTS = ("PEAK", "MANAGE", "PREMIUM")
 
 
 def _headers(token: str | None) -> dict:
@@ -100,6 +101,7 @@ def build_campaign_state(data: dict) -> CampaignState:
 
     recent_event = data.get("recent_event") or ""
     support_price = data.get("close") if recent_event in BULLISH_SUPPORT_EVENTS else None
+    resistance_price = data.get("close") if recent_event in STRETCH_EVENTS else None
 
     return CampaignState(
         symbol=data["symbol"],
@@ -115,6 +117,7 @@ def build_campaign_state(data: dict) -> CampaignState:
         signal_bar_extension_label=data.get("signal_bar_extension_label"),
         next_event_after_signal=data.get("next_event_after_signal"),
         recent_support_price=support_price,
+        recent_resistance_price=resistance_price,
     )
 
 

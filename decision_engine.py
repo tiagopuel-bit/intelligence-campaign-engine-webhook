@@ -67,6 +67,7 @@ class CampaignState:
     signal_bar_extension_label: str | None = None   # "FRESH" / "EXTENDED" / "UNKNOWN", frozen at signal time
     next_event_after_signal: str | None = None       # e.g. "ADD", "MANAGE", "FAIL TEST" -- None if not yet known
     recent_support_price: float | None = None        # close price at this timeframe's most recent bullish signal event (STRONG START/RELOAD/ADD/MANAGE) -- the real, structural basis for trailing-stop suggestions below, not a guess
+    recent_resistance_price: float | None = None     # close price at this timeframe's most recent stretch-family event (PEAK/MANAGE/PREMIUM) -- the structural basis for target suggestions (TP/SL spec §2), mirror of recent_support_price
 
 
 @dataclass

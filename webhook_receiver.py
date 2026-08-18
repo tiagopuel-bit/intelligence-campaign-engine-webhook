@@ -50,6 +50,7 @@ import sec_filings
 from paper_execution import db as paper_db
 from paper_execution.activation import activate_if_ready
 from paper_execution.api import create_blueprint as create_paper_blueprint
+from paper_execution.bracket_suggestions import maybe_suggest_brackets
 from paper_execution.cloud_state import cloud_state_provider
 from paper_execution.runner import run_once as run_paper_once
 
@@ -519,9 +520,15 @@ def _paper_tick_safely() -> None:
     if app.config.get("TESTING"):
         return
     try:
+        provider = cloud_state_provider(str(DB_PATH))
         activation = activate_if_ready(PAPER_DB_PATH, DB_PATH, "AMC")
         if activation.get("status") in {"ACTIVATED", "ALREADY_ACTIVE"}:
-            run_paper_once(str(PAPER_DB_PATH), cloud_state_provider(str(DB_PATH)))
+            run_paper_once(str(PAPER_DB_PATH), provider)
+            maybe_suggest_brackets(
+                str(PAPER_DB_PATH), str(DB_PATH),
+                price_provider=lambda symbol, ticker: (
+                    provider.latest_close(symbol, ticker) or {}),
+            )
     except Exception as exc:  # fail closed and keep the heartbeat durable
         print(f"paper_tick_blocked={type(exc).__name__}", flush=True)
 
