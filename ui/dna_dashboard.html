@@ -276,7 +276,11 @@
 
   /* ---- approved Asset Page baseline (2026-08-14) ---- */
   .dna-page{display:grid;gap:14px}
-  .dna-decision{height:80px;display:grid;grid-template-columns:1.35fr .72fr 1fr 1fr;gap:8px}
+  .dna-decision{height:80px;display:grid;grid-template-columns:1.35fr .72fr 1fr 1fr;gap:8px;overflow:hidden;position:relative;transition:height .15s ease}
+  .dna-decision.expanded{height:auto}
+  .dna-decision-toggle{position:absolute;right:6px;bottom:4px;z-index:2;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;width:20px;height:20px;line-height:1;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .dna-decision-toggle:hover{color:var(--text);border-color:var(--accent)}
+  .dna-decision.expanded .dna-decision-toggle{transform:rotate(180deg)}
   .dna-decision-cell{min-width:0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);display:flex;flex-direction:column;justify-content:center}
   .dna-decision-cell.risk{background:var(--critical-glow);border-color:color-mix(in srgb,var(--critical) 26%,var(--line))}
   .dna-decision-cell .eyebrow{font-family:var(--font-display);font-size:9px;letter-spacing:.075em;text-transform:uppercase;color:var(--muted);font-weight:700}
@@ -410,6 +414,20 @@
     var next = order[(order.indexOf(cur) + 1) % order.length];
     localStorage.setItem("dna_theme", next);
     applyTheme(next);
+  });
+
+  // Delegated once: the Market-read card is rebuilt on every repaint, so a
+  // per-element listener would need re-wiring each time. One document-level
+  // listener toggles both the DOM class (instant) and the persisted state
+  // (survives the next repaint/auto-refresh).
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-decision-toggle]");
+    if (!btn) return;
+    var sym = btn.dataset.decisionToggle;
+    var section = btn.closest(".dna-decision");
+    var next = !decisionExpanded[sym];
+    decisionExpanded[sym] = next;
+    if (section) section.classList.toggle("expanded", next);
   });
 
   function authHeaders() {
@@ -779,6 +797,7 @@
 
   // --- Render -----------------------------------------------------------
   var assets = [], cache = {}, selected = null;
+  var decisionExpanded = {}; // per-symbol, whether the Market read card is expanded
   var portfolio = [], realized = 0, portfolioById = {};
   var newsBySymbol = {}, marketWatchBySymbol = {}, filingsBySymbol = {};
   var paperChallenge = { health: null, experiment: null, proposals: [], reports: [], brackets: [], error: null, loading: false, seq: 0 };
@@ -2039,11 +2058,12 @@
     var lifecycleBadge = lifecycle.label ? ' <span class="dna-lifecycle dna-lifecycle-' + lifecycle.stage + '" title="' + lifecycle.detail + '">' + lifecycle.label + '</span>' : '';
     var liq = liquidityFlag(sym);
     var liquidityBadge = liq ? ' <span class="dna-liquidity" title="Thin liquidity: latest daily volume ' + Number(liq.latest).toLocaleString("en-US") + ' (' + liq.latest_date + ') is below this asset\'s 20-day ADV p10 of ' + Number(liq.p10).toLocaleString("en-US") + ' (median ' + Number(liq.median).toLocaleString("en-US") + ')">thin liquidity</span>' : '';
-    var decision = '<section class="dna-decision" aria-label="Current campaign decision">' +
+    var decision = '<section class="dna-decision' + (decisionExpanded[sym] ? ' expanded' : '') + '" aria-label="Current campaign decision" data-sym="' + sym + '">' +
       '<div class="dna-decision-cell"><div class="eyebrow">Market read · ' + sym + (price != null ? ' ' + fmtMoney(price) : '') + '</div><h2><span class="positive">' + a.headline + '</span>' + warmupBadge + lifecycleBadge + liquidityBadge + '</h2><div class="copy">' + a.why + '</div>' + warmupNote + '</div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Recommended action</div><div class="big">' + action + '</div><div class="copy">Rule-based DNA guidance</div></div>' +
       '<div class="dna-decision-cell"><div class="eyebrow">Next confirmation</div><div class="copy" style="color:#2563eb;font-weight:700">' + nextText + '</div><div class="copy">Timing before action</div></div>' +
-      '<div class="dna-decision-cell risk"><div class="eyebrow">Main risk</div><div class="copy critical" style="font-weight:700">' + riskText + '</div><div class="copy">Slower structure remains the authority</div></div></section>';
+      '<div class="dna-decision-cell risk"><div class="eyebrow">Main risk</div><div class="copy critical" style="font-weight:700">' + riskText + '</div><div class="copy">Slower structure remains the authority</div></div>' +
+      '<button type="button" class="dna-decision-toggle" data-decision-toggle="' + sym + '" title="Expand/collapse" aria-label="Expand or collapse">⌄</button></section>';
 
     var portfolioBand = '<section class="dna-portfolio" aria-label="' + sym + ' portfolio">' +
       '<div class="dna-portfolio-slice"><div class="dna-slice-head"><strong>' + sym + '</strong><span class="dna-pill green">' + states.length + ' TF live</span></div><div class="dna-slice-metrics">' +
