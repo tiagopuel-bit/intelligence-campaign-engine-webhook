@@ -582,12 +582,20 @@
   // recently) rather than a synthesized number, so it can't imply more
   // precision than the underlying reads actually have.
   var WARMUP_SIGNALS = ["STRONG START", "RELOAD", "ADD", "CAMPAIGN START", "FIRE ADD", "ACCUMULATE"];
+  // "Fresh" here means within the confirm tier's own quiet window (4h, same
+  // convention as CAMPAIGN_LIFECYCLE_SPEC's higher-tier quiet check) -- the
+  // generic 24h age().stale threshold is right for "is this data current at
+  // all" but far too loose for "did this just fire": a signal_event field
+  // that fired hours ago (last session, market since closed) isn't stale by
+  // the 24h bar-freshness definition, but it's not "just fired" either.
+  var WARMUP_FRESH_MINUTES = 4 * 60;
   function warmingUp(t) {
     if (t.owner.empty || t.owner.tone !== "pos") return null;
     if (t.confirm.tone === "pos" || t.confirm.tone === "neg") return null;
     var lowerRows = (t.timing.rows || []).concat(t.micro.rows || []);
     var fresh = lowerRows.filter(function (r) {
-      return WARMUP_SIGNALS.indexOf(String(r.signal_event || "").toUpperCase()) !== -1 && !age(r.bar_time).stale;
+      return WARMUP_SIGNALS.indexOf(String(r.signal_event || "").toUpperCase()) !== -1
+        && age(r.bar_time).mins <= WARMUP_FRESH_MINUTES;
     });
     if (!fresh.length) return null;
     fresh.sort(function (x, y) { return tfKey(x.timeframe) - tfKey(y.timeframe); });
@@ -2053,7 +2061,7 @@
     var riskText = riskTier ? tfLabel(riskTier.lead.timeframe) + " structure is " + riskTier.text : "Pressure propagating into the campaign";
 
     var warmupBadge = a.warmup ? ' <span class="dna-warmup" title="Campaign already constructive, confirmation has not caught up yet, fresh entry signal on ' + tfLabel(a.warmup.row.timeframe) + '">warming up</span>' : '';
-    var warmupNote = a.warmup ? '<div class="copy warmup-note-inline">Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up — ' + tfLabel(a.warmup.row.timeframe) + ' just fired <b>' + a.warmup.row.signal_event + '</b>. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '';
+    var warmupNote = a.warmup ? '<div class="copy warmup-note-inline">Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up — ' + tfLabel(a.warmup.row.timeframe) + ' fired <b>' + a.warmup.row.signal_event + '</b> ' + age(a.warmup.row.bar_time).text + '. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '';
     var lifecycle = lifecycleStage(states, sym);
     var lifecycleBadge = lifecycle.label ? ' <span class="dna-lifecycle dna-lifecycle-' + lifecycle.stage + '" title="' + lifecycle.detail + '">' + lifecycle.label + '</span>' : '';
     var liq = liquidityFlag(sym);
@@ -2154,7 +2162,7 @@
 
     var verdictHtml = '<p class="verdict ' + a.level + '">This asset <span class="em">' + a.headline + '</span> — ' + a.why + '.</p>' +
       '<div class="verdict-sub">' + states.length + ' timeframe' + (states.length === 1 ? "" : "s") + ' reporting · newest ' + age(states.length ? states[0].bar_time : null).text + '</div>' +
-      (a.warmup ? '<div class="warmup-note"><span class="warmup-flag">warming up</span> Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up yet — ' + tfLabel(a.warmup.row.timeframe) + ' just fired <b>' + a.warmup.row.signal_event + '</b>. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '');
+      (a.warmup ? '<div class="warmup-note"><span class="warmup-flag">warming up</span> Campaign (' + tfLabel(a.warmup.ownerTf) + ') is already ' + a.warmup.ownerText + ' while confirmation hasn\'t caught up yet — ' + tfLabel(a.warmup.row.timeframe) + ' fired <b>' + a.warmup.row.signal_event + '</b> ' + age(a.warmup.row.bar_time).text + '. Not a signal to act on by itself, worth watching for confirmation to follow.</div>' : '');
 
     var chartHtml = '<div class="chart-wrap">' +
       '<div class="chart-toprow">' +
