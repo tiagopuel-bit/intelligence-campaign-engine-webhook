@@ -222,6 +222,99 @@ class JoinSymbolTests(unittest.TestCase):
         self.assertEqual(out["blocker"], "EXPERIMENT_NOT_FOUND")
 
 
+class JoinSymbolRouteTests(unittest.TestCase):
+    """POST /paper/experiments/<id>/symbols wires join_symbol_if_ready."""
+
+    def setUp(self):
+        self._tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self._tmp.close()
+        db.init_db(self._tmp.name)
+        conn = db.connect(self._tmp.name)
+        self.eid = create_experiment(
+            conn, version=1, symbol="AMC", start_at="2026-01-01T00:00:00Z",
+            end_at="2027-01-31T16:00:00-08:00", starting_cash=100.0,
+            starting_value_method="marked_market_value", target_value_jan2027=15000.0,
+            target_return_pct=None, max_drawdown_pct=25.0, max_amc_exposure=0.70,
+            max_exposure_per_option_expiry=0.25, deposit_policy="ALLOWED_TRACKED_SEPARATELY",
+            allowed_actions="hold,add,open,partial_reduce,close,roll", benchmark_symbol="AMC",
+            benchmark_success_criteria="x", min_observation_count=30, max_daily_paper_loss=0.05,
+            max_orders_per_day=3, max_consecutive_failed_proposals=3, milestones_json="[]",
+            amc_target_floor_pct=30.0, confidence_status="INTACT", contract_sha256=frozen_goal_hash(),
+        )
+        conn.close()
+        self._wh = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self._wh.close()
+        wconn = sqlite3.connect(self._wh.name)
+        wconn.execute("CREATE TABLE underlying_heartbeats (symbol TEXT, bar_time INTEGER, close REAL, source TEXT)")
+        wconn.commit()
+        wconn.close()
+        self.app = Flask(__name__)
+        self.app.register_blueprint(create_blueprint(
+            self._tmp.name, TOKEN, lambda db_path, symbol: None, webhook_db_path=self._wh.name))
+        self.client = self.app.test_client()
+        self.h = {"Authorization": f"Bearer {TOKEN}"}
+
+    def tearDown(self):
+        Path(self._tmp.name).unlink(missing_ok=True)
+        Path(self._wh.name).unlink(missing_ok=True)
+
+    def _heartbeat(self, symbol, age_ms=0):
+        now = int(datetime.now(timezone.utc).timestamp() * 1000) - age_ms
+        conn = sqlite3.connect(self._wh.name)
+        conn.execute(
+            "INSERT INTO underlying_heartbeats (symbol, bar_time, close, source) VALUES (?,?,?,?)",
+            (symbol, now, 2.0, "live_webhook"),
+        )
+        conn.commit()
+        conn.close()
+
+    def test_unauthorized_returns_401(self):
+        response = self.client.post(f"/paper/experiments/{self.eid}/symbols", json={"symbol": "GME"})
+        self.assertEqual(response.status_code, 401)
+
+    def test_unknown_field_rejected(self):
+        response = self.client.post(f"/paper/experiments/{self.eid}/symbols",
+                                    json={"symbol": "GME", "extra": 1}, headers=self.h)
+        self.assertEqual(response.status_code, 400)
+
+    def test_eligible_symbol_with_fresh_heartbeat_joins(self):
+        self._heartbeat("GME")
+        response = self.client.post(f"/paper/experiments/{self.eid}/symbols",
+                                    json={"symbol": "GME"}, headers=self.h)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.get_json()["status"], "JOINED")
+        conn = db.connect(self._tmp.name)
+        self.assertIn("GME", tracked_symbols(conn, self.eid))
+        conn.close()
+
+    def test_already_tracked_symbol_returns_200(self):
+        self._heartbeat("AMC")
+        response = self.client.post(f"/paper/experiments/{self.eid}/symbols",
+                                    json={"symbol": "AMC"}, headers=self.h)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "ALREADY_TRACKED")
+
+    def test_ineligible_symbol_returns_409(self):
+        self._heartbeat("MARA")
+        response = self.client.post(f"/paper/experiments/{self.eid}/symbols",
+                                    json={"symbol": "MARA"}, headers=self.h)
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.get_json()["blocker"], "ASSET_NOT_ELIGIBLE")
+
+    def test_stale_heartbeat_returns_409(self):
+        self._heartbeat("GME", age_ms=10 * 60 * 1000)
+        response = self.client.post(f"/paper/experiments/{self.eid}/symbols",
+                                    json={"symbol": "GME"}, headers=self.h)
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.get_json()["blocker"], "BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT")
+
+    def test_unknown_experiment_returns_404(self):
+        self._heartbeat("GME")
+        response = self.client.post("/paper/experiments/9999/symbols",
+                                    json={"symbol": "GME"}, headers=self.h)
+        self.assertEqual(response.status_code, 404)
+
+
 class MultiSymbolReadinessTests(unittest.TestCase):
     def test_cloud_readiness_loops_symbols(self):
         wh = tempfile.NamedTemporaryFile(suffix=".db", delete=False)

@@ -35,6 +35,32 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-17 21:xx PT — AMC — N/A — join_symbol_if_ready wired to a route
+
+**Trigger:** `docs/DEEPSEEK_JOIN_SYMBOL_ROUTE_TASK.md` — Tiago asked Claude
+to execute this one directly instead of handing it to DS.
+**Evidence roots:** N/A — infra/API wiring, not a trade.
+**Discussion:** Added `POST /paper/experiments/<id>/symbols` to
+`paper_execution/api.py`, calling the already-built (and already-tested)
+`join_symbol_if_ready()` from `paper_execution/activation.py`.
+`create_blueprint()` gained an optional `webhook_db_path` keyword arg
+(defaults to `None`, so the two pre-existing test call sites in
+`test_amc_paper_execution_p2.py` needed no changes); `webhook_receiver.py`
+now passes `webhook_db_path=str(DB_PATH)` at blueprint registration.
+Status mapping: `JOINED` → 201, `ALREADY_TRACKED` → 200 (idempotent, not
+an error), `EXPERIMENT_NOT_FOUND` → 404, everything else `BLOCKED` → 409
+with the blocker reason in the body. 7 new tests in
+`tests/test_amc_paper_execution_multi_asset.py` (`JoinSymbolRouteTests`)
+covering auth, unknown fields, success, already-tracked, ineligible
+symbol, stale heartbeat, unknown experiment. Full suite: 491 passing (up
+from 484). `git diff --check` clean. This only exposes the *ability* to
+add a symbol — nothing calls this route automatically, and it doesn't
+change AMC-only auto-entry scope or activate any new asset by itself.
+**Decision:** ready for Tiago to commit/push (Claude's sandbox blocks
+`git push` — same pattern as tonight's earlier hotfix).
+**Outcome:** awaiting push.
+**Logged by:** Claude
+
 ## 2026-08-17 — N/A — blocked: Massive Indices entitlement not yet propagated
 
 **Trigger:** `docs/DEEPSEEK_MASSIVE_INDICES_CHECK_TASK.md` — live check

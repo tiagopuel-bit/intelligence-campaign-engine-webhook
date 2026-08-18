@@ -19,6 +19,7 @@ from pathlib import Path
 from flask import Blueprint, jsonify, request
 
 from paper_execution.db import connect
+from paper_execution.activation import join_symbol_if_ready
 from paper_execution.brackets import validate_bracket_payload, validate_side
 from paper_execution.engine import auto_mode_allowed, evaluate_very_high
 from paper_execution.portfolio import (
@@ -120,7 +121,7 @@ def _eligibility_mask() -> dict:
     return _reliability_mask_cache
 
 
-def create_blueprint(db_path, state_token: str, state_provider):
+def create_blueprint(db_path, state_token: str, state_provider, webhook_db_path=None):
     bp = Blueprint("paper_execution", __name__)
 
     def authorized() -> bool:
@@ -449,6 +450,30 @@ def create_blueprint(db_path, state_token: str, state_provider):
             "experiment_id": experiment_id, "scope": scope,
             "position_ref": position_ref, "enabled": enabled,
         }), 200
+
+    @bp.route("/paper/experiments/<int:experiment_id>/symbols", methods=["POST"])
+    def join_symbol(experiment_id):
+        err = require_auth()
+        if err:
+            return err
+        if webhook_db_path is None:
+            return jsonify({"error": "webhook_db_path not configured"}), 500
+        body = request.get_json(silent=True) or {}
+        unknown = _unknown_fields(body, {"symbol"})
+        if unknown:
+            return jsonify({"error": "unknown fields", "fields": unknown}), 400
+        symbol = (body.get("symbol") or "").strip().upper()
+        if not symbol:
+            return jsonify({"error": "symbol is required"}), 400
+        result = join_symbol_if_ready(db_path, webhook_db_path, experiment_id, symbol)
+        status = result.get("status")
+        if status == "JOINED":
+            return jsonify(result), 201
+        if status == "ALREADY_TRACKED":
+            return jsonify(result), 200
+        if status == "BLOCKED" and result.get("blocker") == "EXPERIMENT_NOT_FOUND":
+            return jsonify(result), 404
+        return jsonify(result), 409
 
     @bp.route("/paper/brackets", methods=["POST"])
     def create_bracket():

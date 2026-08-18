@@ -1800,7 +1800,8 @@ def get_position_insight(position_id):
 init_db()
 paper_db.init_db(PAPER_DB_PATH)
 app.register_blueprint(
-    create_paper_blueprint(str(PAPER_DB_PATH), STATE_API_TOKEN, cloud_state_provider(str(DB_PATH)))
+    create_paper_blueprint(str(PAPER_DB_PATH), STATE_API_TOKEN, cloud_state_provider(str(DB_PATH)),
+                            webhook_db_path=str(DB_PATH))
 )
 
 if __name__ == "__main__":
