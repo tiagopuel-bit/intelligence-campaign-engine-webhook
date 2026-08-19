@@ -35,6 +35,15 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-18 21:37 PT — AMC — N/A — option-heartbeat freshness gate fixed for activation
+
+**Trigger:** `docs/DEEPSEEK_ACTIVATION_OPTION_FRESHNESS_TASK.md` — the 2-minute option-heartbeat freshness gate in `activate_if_ready()` was the last blocker keeping AMC's paper experiment from activating.
+**Evidence roots:** N/A — one-time activation gate; does not touch `cloud_state.py` (already age-tolerant) or the underlying's check.
+**Discussion:** Deep-ITM $1.5 calls on a ~$2.35 stock print every 20–130 min on TradingView's delayed OPRA feed, so a 2-min cutoff (right for the continuously-trading underlying) can never be satisfied across all 4 legs. Implemented **same-session freshness** (option 1): an option heartbeat is acceptable iff its stored `session` is a real trading session (RTH/PRE/POST, not CLOSED/UNKNOWN) AND its ET calendar date is today — "real data from today," bounded staleness, no guessed number (Principle 011: silence over fabrication). Underlying keeps `MAX_AGE_MS` (2 min) untouched. Comment added explaining why options differ from the underlying.
+**Decision:** Fix complete, handed back — NOT committed/deployed.
+**Outcome:** 532 tests pass (3 new in `tests/test_amc_paper_activation.py`), `git diff --check` clean. Real gap data re-verified: as-of the 08-18 session, Dec18/Jan2027/Aug21 last prints (11:19/12:11/11:48 ET, 19–71 min old) all PASS the new same-day rule; the old 2-min rule blocked all three. Prior-day prints still correctly block.
+**Logged by:** DeepSeek
+
 ## 2026-08-17 22:34 PT — U — N/A — "last real event" tracking fix + ingestion-gap investigation
 
 **Trigger:** `docs/DEEPSEEK_LAST_EVENT_FIX_TASK.md` — Tiago confirmed against real U data that `recent_event` was blank despite real events (FAIL/MANAGE/etc.) having fired recently.

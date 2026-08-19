@@ -11,6 +11,7 @@ import json
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from paper_execution import db
 from paper_execution.portfolio import asset_eligible, load_reliability_mask
@@ -18,6 +19,34 @@ from paper_execution.store import frozen_goal_hash, tracked_symbols
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_AGE_MS = 2 * 60 * 1000
+
+# Options print every ~20-130 minutes on TradingView's delayed OPRA feed for
+# deep-ITM, long-dated contracts. An absolute 2-minute cutoff (fine for the
+# continuously-trading underlying) can essentially never be satisfied across
+# every open leg at once. Option freshness is therefore "a real print from
+# today's ET trading day" instead — a bounded staleness rule that never
+# fabricates a price. Keep this split: the underlying keeps MAX_AGE_MS because
+# it trades continuously; do not "fix" options back to a minute cutoff.
+_OPTION_SESSIONS = {"RTH", "PRE", "POST"}
+
+
+def _option_heartbeat_fresh(bar_time, session) -> bool:
+    """True when the option heartbeat is a real print from the current ET day.
+
+    The session must be a real trading session (RTH/PRE/POST, not CLOSED/
+    UNKNOWN) and the bar's ET calendar date must be today — a 90-minute-old
+    print from today is real information, silence-over-fabrication honored;
+    anything from a prior session/day is stale and blocked.
+    """
+    session = str(session or "").strip().upper()
+    if session not in _OPTION_SESSIONS:
+        return False
+    try:
+        et = ZoneInfo("America/New_York")
+        hb_date = datetime.fromtimestamp(int(bar_time) / 1000, tz=et).date()
+    except (TypeError, ValueError, OSError):
+        return False
+    return hb_date == datetime.now(et).date()
 
 
 def _now_ms() -> int:
@@ -72,11 +101,11 @@ def activate_if_ready(paper_db_path, webhook_db_path, symbols=("AMC",)) -> dict:
                     ticker, price, quote_time = symbol, float(hb["close"]), int(hb["bar_time"])
                 else:
                     quote = source.execute(
-                        "SELECT ticker, close, bar_time FROM option_heartbeats WHERE instrument_ref=? "
+                        "SELECT ticker, close, bar_time, session FROM option_heartbeats WHERE instrument_ref=? "
                         "AND position_ref=? ORDER BY bar_time DESC LIMIT 1",
                         (str(row["instrument_ref"]), str(row["position_ref"])),
                     ).fetchone()
-                    if quote is None or _now_ms() - int(quote["bar_time"]) > MAX_AGE_MS:
+                    if quote is None or not _option_heartbeat_fresh(quote["bar_time"], quote["session"]):
                         paper.close()
                         return {"status": "BLOCKED", "blocker": "BLOCKED_NO_FRESH_OPTION_HEARTBEAT",
                                 "instrument_ref": str(row["instrument_ref"])}

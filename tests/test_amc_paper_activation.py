@@ -3,6 +3,7 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from paper_execution import db
 from paper_execution.activation import activate_if_ready
@@ -19,7 +20,7 @@ class PaperActivationTests(unittest.TestCase):
         conn = sqlite3.connect(self.webhook_file.name)
         conn.executescript("""
             CREATE TABLE underlying_heartbeats(symbol TEXT,timeframe TEXT,bar_time INTEGER,close REAL,source TEXT,received_at TEXT);
-            CREATE TABLE option_heartbeats(instrument_ref TEXT,position_ref TEXT,symbol TEXT,ticker TEXT,timeframe TEXT,bar_time INTEGER,close REAL,option_return REAL,matched_bars INTEGER,activity_ratio REAL,volume REAL,source TEXT,received_at TEXT);
+            CREATE TABLE option_heartbeats(instrument_ref TEXT,position_ref TEXT,symbol TEXT,ticker TEXT,timeframe TEXT,bar_time INTEGER,close REAL,option_return REAL,matched_bars INTEGER,activity_ratio REAL,volume REAL,session TEXT,source TEXT,received_at TEXT);
             CREATE TABLE positions(id INTEGER PRIMARY KEY,symbol TEXT,direction TEXT,status TEXT);
             CREATE TABLE position_instruments(id INTEGER PRIMARY KEY,position_id INTEGER,instrument_type TEXT,strike REAL,expiration TEXT,quantity REAL,entry_price REAL,status TEXT);
         """)
@@ -46,7 +47,7 @@ class PaperActivationTests(unittest.TestCase):
     def test_atomic_activation_snapshots_cash_and_holdings(self):
         conn = sqlite3.connect(self.webhook_file.name)
         conn.execute(
-            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'live_contract_bar','now')",
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'RTH','live_contract_bar','now')",
             (self.now,),
         )
         conn.commit()
@@ -72,7 +73,7 @@ class PaperActivationTests(unittest.TestCase):
     def test_single_symbol_default_is_unchanged(self):
         conn = sqlite3.connect(self.webhook_file.name)
         conn.execute(
-            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'live_contract_bar','now')",
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'RTH','live_contract_bar','now')",
             (self.now,),
         )
         conn.commit()
@@ -89,7 +90,7 @@ class PaperActivationTests(unittest.TestCase):
     def test_multi_symbol_populates_join_table(self):
         conn = sqlite3.connect(self.webhook_file.name)
         conn.execute(
-            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'live_contract_bar','now')",
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'RTH','live_contract_bar','now')",
             (self.now,),
         )
         # second symbol: GME share-only
@@ -113,7 +114,7 @@ class PaperActivationTests(unittest.TestCase):
     def test_legacy_string_call_equivalent_to_tuple(self):
         conn = sqlite3.connect(self.webhook_file.name)
         conn.execute(
-            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'live_contract_bar','now')",
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'RTH','live_contract_bar','now')",
             (self.now,),
         )
         conn.commit()
@@ -129,11 +130,46 @@ class PaperActivationTests(unittest.TestCase):
     def _seed_amc_call_heartbeat(self):
         conn = sqlite3.connect(self.webhook_file.name)
         conn.execute(
-            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'live_contract_bar','now')",
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,'RTH','live_contract_bar','now')",
             (self.now,),
         )
         conn.commit()
         conn.close()
+
+    def _seed_amc_call_at(self, bar_time, session):
+        conn = sqlite3.connect(self.webhook_file.name)
+        conn.execute(
+            "INSERT INTO option_heartbeats VALUES ('11','7','AMC','O:AMC','1',?,1.25,0.1,20,0.9,10,?,'live_contract_bar','now')",
+            (bar_time, session),
+        )
+        conn.commit()
+        conn.close()
+
+    def test_option_real_but_90min_stale_same_day_activates(self):
+        # Deep-ITM options print every ~20-130 min on the delayed OPRA feed.
+        # A real print from today's ET date — even many hours old — is real
+        # information and must activate. Built from today's ET midnight +1s so
+        # the bar is always the current ET date regardless of when this runs
+        # (a "now - 90min" timestamp would cross midnight when run after ~00:30 ET).
+        et = ZoneInfo("America/New_York")
+        today = datetime.now(et).date()
+        bar_time = int(datetime(today.year, today.month, today.day, 0, 0, 1,
+                                tzinfo=et).timestamp() * 1000)
+        self._seed_amc_call_at(bar_time, "RTH")
+        result = activate_if_ready(self.paper_file.name, self.webhook_file.name)
+        self.assertEqual(result["status"], "ACTIVATED")
+
+    def test_option_from_prior_day_blocks(self):
+        self._seed_amc_call_at(self.now - 30 * 24 * 3600 * 1000, "RTH")
+        result = activate_if_ready(self.paper_file.name, self.webhook_file.name)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["blocker"], "BLOCKED_NO_FRESH_OPTION_HEARTBEAT")
+
+    def test_option_closed_session_blocks(self):
+        self._seed_amc_call_at(self.now, "CLOSED")
+        result = activate_if_ready(self.paper_file.name, self.webhook_file.name)
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertEqual(result["blocker"], "BLOCKED_NO_FRESH_OPTION_HEARTBEAT")
 
     def _seed_share_symbol(self, symbol, pos_id, instr_id):
         conn = sqlite3.connect(self.webhook_file.name)
