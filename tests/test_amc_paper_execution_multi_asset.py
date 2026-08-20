@@ -321,7 +321,7 @@ class MultiSymbolReadinessTests(unittest.TestCase):
         wh.close()
         conn = sqlite3.connect(wh.name)
         conn.execute("CREATE TABLE underlying_heartbeats (symbol TEXT, bar_time INTEGER, close REAL, source TEXT)")
-        conn.execute("CREATE TABLE option_heartbeats (instrument_ref TEXT, position_ref TEXT, ticker TEXT, bar_time INTEGER, close REAL, option_return REAL, matched_bars INTEGER, activity_ratio REAL, source TEXT)")
+        conn.execute("CREATE TABLE option_heartbeats (instrument_ref TEXT, position_ref TEXT, ticker TEXT, bar_time INTEGER, close REAL, option_return REAL, matched_bars INTEGER, activity_ratio REAL, session TEXT, source TEXT)")
         conn.execute("CREATE TABLE positions (id INTEGER PRIMARY KEY, symbol TEXT, direction TEXT, status TEXT)")
         conn.execute("CREATE TABLE position_instruments (id INTEGER PRIMARY KEY, position_id INTEGER, instrument_type TEXT, quantity REAL, strike REAL, expiration TEXT, status TEXT)")
         import datetime
@@ -337,6 +337,36 @@ class MultiSymbolReadinessTests(unittest.TestCase):
         # single-symbol keeps the un-suffixed legacy code.
         r2 = cloud_readiness(wh.name, ("AMC",))
         self.assertFalse(any(b.startswith("BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT") for b in r2["blockers"]))
+        Path(wh.name).unlink(missing_ok=True)
+
+    def test_cloud_readiness_option_uses_same_day_freshness_not_2min(self):
+        # cloud_readiness had its own separate 2-min option cutoff, missed by
+        # the activation.py same-day-freshness fix (deep-ITM/long-dated legs
+        # print every 20-130 min on TradingView's delayed feed, so a flat
+        # 2-min window can never pass for a real open option leg).
+        import datetime
+        wh = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        wh.close()
+        conn = sqlite3.connect(wh.name)
+        conn.execute("CREATE TABLE underlying_heartbeats (symbol TEXT, bar_time INTEGER, close REAL, source TEXT)")
+        conn.execute("CREATE TABLE option_heartbeats (instrument_ref TEXT, position_ref TEXT, ticker TEXT, bar_time INTEGER, close REAL, option_return REAL, matched_bars INTEGER, activity_ratio REAL, session TEXT, source TEXT)")
+        conn.execute("CREATE TABLE positions (id INTEGER PRIMARY KEY, symbol TEXT, direction TEXT, status TEXT)")
+        conn.execute("CREATE TABLE position_instruments (id INTEGER PRIMARY KEY, position_id INTEGER, instrument_type TEXT, quantity REAL, strike REAL, expiration TEXT, status TEXT)")
+        now = int(datetime.datetime.now(datetime.timezone.utc).timestamp() * 1000)
+        et = __import__("zoneinfo").ZoneInfo("America/New_York")
+        today_et = datetime.datetime.now(et).date()
+        stale_but_today = int(datetime.datetime(today_et.year, today_et.month, today_et.day, 0, 0, 1,
+                                                  tzinfo=et).timestamp() * 1000)
+        conn.execute("INSERT INTO underlying_heartbeats VALUES ('AMC', ?, 2.0, 'live_webhook')", (now,))
+        conn.execute("INSERT INTO positions VALUES (1, 'AMC', 'LONG', 'OPEN')")
+        conn.execute("INSERT INTO position_instruments VALUES (11, 1, 'CALL', 1, 1.5, '2026-09-18', 'OPEN')")
+        conn.execute("INSERT INTO option_heartbeats VALUES ('11','1','O:AMC',?,1.14,0.05,20,0.9,'RTH','live_contract_bar')",
+                     (stale_but_today,))
+        conn.commit()
+        conn.close()
+        r = cloud_readiness(wh.name, ("AMC",))
+        self.assertFalse(any(b.startswith("BLOCKED_NO_FRESH_OPTION_HEARTBEAT") for b in r["blockers"]))
+        self.assertTrue(r["authoritative_provider_ready"])
         Path(wh.name).unlink(missing_ok=True)
 
 

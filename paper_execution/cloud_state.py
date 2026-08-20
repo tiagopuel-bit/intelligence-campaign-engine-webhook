@@ -11,6 +11,8 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime, timedelta, timezone
 
+from paper_execution.activation import _option_heartbeat_fresh
+
 _BROKEN = {"FAILED", "FAIL", "MODERATE FAIL", "STRONG FAIL", "CATASTROPHIC FAIL", "FAIL TEST"}
 _STRETCH = {"PREMIUM", "PEAK", "MANAGE"}
 _BUILDING = {"EXPANSION", "IGNITION", "STRONG START", "CAMPAIGN START", "FIRE ADD", "ADD",
@@ -84,11 +86,16 @@ def cloud_readiness(webhook_db_path: str, symbols: tuple[str, ...] = ("AMC",)) -
             ).fetchall()
             for item in open_options:
                 quote = conn.execute(
-                    "SELECT bar_time FROM option_heartbeats WHERE position_ref=? AND instrument_ref=? "
+                    "SELECT bar_time, session FROM option_heartbeats WHERE position_ref=? AND instrument_ref=? "
                     "ORDER BY bar_time DESC LIMIT 1",
                     (str(item["position_ref"]), str(item["instrument_ref"])),
                 ).fetchone()
-                if quote is None or now_ms - int(quote["bar_time"]) > 2 * 60 * 1000:
+                # Same-day freshness (activation.py:_option_heartbeat_fresh), not a
+                # flat 2-min cutoff: deep-ITM/long-dated legs print every 20-130 min
+                # on TradingView's delayed feed, so a 2-min window can never pass.
+                # This mirrors activate_if_ready's rule -- this function was missed
+                # when that fix landed (docs/DEEPSEEK_ACTIVATION_OPTION_FRESHNESS_TASK.md).
+                if quote is None or not _option_heartbeat_fresh(quote["bar_time"], quote["session"]):
                     blockers.append(f"BLOCKED_NO_FRESH_OPTION_HEARTBEAT:{item['instrument_ref']}")
         return {"authoritative_provider_ready": not blockers, "blockers": blockers}
     finally:

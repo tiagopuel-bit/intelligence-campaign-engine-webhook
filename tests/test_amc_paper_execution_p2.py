@@ -490,7 +490,7 @@ class RunnerTests(unittest.TestCase):
         conn.execute("CREATE TABLE positions (id INTEGER PRIMARY KEY, symbol TEXT, direction TEXT, status TEXT)")
         conn.execute("CREATE TABLE position_instruments (id INTEGER PRIMARY KEY, position_id INTEGER, instrument_type TEXT, quantity REAL, strike REAL, expiration TEXT, status TEXT)")
         conn.execute("CREATE TABLE underlying_heartbeats (symbol TEXT, bar_time INTEGER, close REAL, source TEXT)")
-        conn.execute("CREATE TABLE option_heartbeats (instrument_ref TEXT, position_ref TEXT, ticker TEXT, bar_time INTEGER, close REAL, option_return REAL, matched_bars INTEGER, activity_ratio REAL, source TEXT)")
+        conn.execute("CREATE TABLE option_heartbeats (instrument_ref TEXT, position_ref TEXT, ticker TEXT, bar_time INTEGER, close REAL, option_return REAL, matched_bars INTEGER, activity_ratio REAL, session TEXT, source TEXT)")
         conn.execute("CREATE TABLE sec_filings (symbol TEXT, category TEXT, severity TEXT, first_seen_at TEXT, seed_record INTEGER)")
         now = _now_ms()
         conn.execute("INSERT INTO alerts VALUES ('AMC','60','EXPANSION',?,'live_webhook')", (now,))
@@ -498,7 +498,7 @@ class RunnerTests(unittest.TestCase):
         conn.execute("INSERT INTO positions VALUES (7,'AMC','LONG','OPEN')")
         conn.execute("INSERT INTO position_instruments VALUES (11,7,'CALL',2,1.5,'2026-09-18','OPEN')")
         conn.execute("INSERT INTO underlying_heartbeats VALUES ('AMC',?,2.63,'live_webhook')", (now,))
-        conn.execute("INSERT INTO option_heartbeats VALUES ('11','7','O:AMC',?,1.14,0.05,20,0.9,'live_contract_bar')", (now,))
+        conn.execute("INSERT INTO option_heartbeats VALUES ('11','7','O:AMC',?,1.14,0.05,20,0.9,'RTH','live_contract_bar')", (now,))
         # Historical/seeded dilution capacity must not veto forever.
         conn.execute("INSERT INTO sec_filings VALUES ('AMC','DILUTION_WATCH','HIGH','2025-01-01T00:00:00+00:00',1)")
         conn.commit()
