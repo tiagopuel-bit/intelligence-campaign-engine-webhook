@@ -1,0 +1,116 @@
+//@version=6
+// DNA Unified Relay v1 — ONE alert per asset, carrying BOTH the price
+// heartbeat (activation/valuation freshness) AND the batched multi-timeframe
+// DNA events (real signal generation) in a single payload. Replaces running
+// DNA_PRICE_HEARTBEAT_RELAY_V1.pine + DNA_MTF_RELAY_V1.pine as two separate
+// alerts — TradingView's plan alert cap makes per-timeframe-per-asset alerts
+// (~90 for 9 assets) unworkable (docs/TRADINGVIEW_ALERT_CAPACITY_PLAN.md).
+//
+// KNOWN GAP (carried over from DNA_MTF_RELAY_V1.pine, not yet resolved):
+// f_dnaPhase() below is a self-contained, single-bar, price-action-only
+// approximation of the production DNA event cascade -- NOT a byte-for-byte
+// port of the stateful production indicator (campaignHealth persistence,
+// pendingActive, resolvedAddEvent, Trade Box). It has never been validated
+// against DNA_v12.6.21.pine's real output (scripts/compare_mtf_relay.py was
+// never run to completion because AMC's native alerts stopped running before
+// the comparison happened). Treat every event this script produces as
+// PROVISIONAL until that validation happens -- the receiver tags these rows
+// with a distinct source so they're never confused with a fully-validated
+// native alert.
+//
+// MANUAL STEPS (Tiago, in TradingView — DS/Claude cannot touch the TV UI):
+//   1. Add this script to the chart on the 1m timeframe for the asset.
+//   2. For the underlying: leave Relay type = UNDERLYING_HEARTBEAT.
+//      For an option contract: switch Relay type = OPTION_HEARTBEAT and
+//      fill Position ref / Instrument ref (unchanged from the old script —
+//      options don't get DNA event classification, only price).
+//   3. Create ONE alert (Condition = "This indicator", "Any alert() function
+//      call"), Webhook URL = the same /webhook URL, message body EMPTY (this
+//      script builds the JSON), Secret filled in.
+//   4. Recreate the alert after ANY edit to this script or its inputs —
+//      TradingView snapshots inputs at alert-creation time, not edit time.
+
+indicator("DNA Unified Relay v1", overlay=true)
+
+// --- shared inputs -----------------------------------------------------
+relayType = input.string("UNDERLYING_HEARTBEAT", "Relay type", options=["UNDERLYING_HEARTBEAT", "OPTION_HEARTBEAT"], group="Relay")
+underlying = input.string("AMC", "Underlying symbol", group="Relay")
+positionRef = input.string("", "Position ref (option only)", group="Relay")
+instrumentRef = input.string("", "Instrument ref (option only)", group="Relay")
+trackTfs = input.string("3,5,15,30,60,120,180,240,D,W", "Tracked timeframes for events (underlying only, comma)", group="Relay")
+
+sessionLabel = session.ismarket ? "RTH" : session.ispremarket ? "PRE" : session.ispostmarket ? "POST" : "CLOSED"
+
+// --- option-heartbeat fields (unchanged from DNA_PRICE_HEARTBEAT_RELAY_V1) --
+activePrint = not na(close[1]) and close != close[1] ? 1.0 : 0.0
+activityRatio = ta.sma(activePrint, 12)
+optionReturn = not na(close[1]) and close[1] > 0 ? (close / close[1]) - 1.0 : 0.0
+matchedBars = math.min(bar_index + 1, 9999)
+
+// --- DNA event vocabulary (provisional -- see header) ------------------
+f_dnaPhase() =>
+    ema21 = ta.ema(close, 21)
+    ema50 = ta.ema(close, 50)
+    ema21Slope = ema21 - ema21[1]
+    ema50Slope = ema50 - ema50[1]
+    above21 = close > ema21
+    above50 = close > ema50
+    r = ta.rsi(close, 14)
+    result = "WAIT"
+    if ema21Slope > 0 and ema50Slope > 0 and above21 and above50
+        result := "EXPANSION"
+    else if ema21Slope > 0 and above21 and r > 50
+        result := "ACCUMULATE"
+    else if ema21Slope < 0 and ema50Slope < 0 and not above21
+        result := "FAILED"
+    else if ema21Slope < 0 and not above21
+        result := "FAIL TEST"
+    else if r > 70 and above21
+        result := "MANAGE"
+    result
+
+requestEvent(tf) =>
+    request.security(underlying, tf, f_dnaPhase(), lookahead=barmerge.lookahead_off, gaps=barmerge.gaps_off)
+requestTime(tf) =>
+    request.security(underlying, tf, time, lookahead=barmerge.lookahead_off, gaps=barmerge.gaps_off)
+requestClose(tf) =>
+    request.security(underlying, tf, close, lookahead=barmerge.lookahead_off, gaps=barmerge.gaps_off)
+
+eventJson(tf) =>
+    ev = requestEvent(tf)
+    t = requestTime(tf)
+    c = requestClose(tf)
+    tfChanged = not na(t) and not na(t[1]) and t != t[1]
+    out = ""
+    if tfChanged
+        out := "{\"timeframe\":\"" + tf + "\",\"event\":\"" + ev + "\",\"time\":" + str.tostring(t) + ",\"close\":" + str.tostring(c) + ",\"phase\":\"" + ev + "\"}"
+    out
+
+// Pine cannot loop request.security() over a dynamic array at compile time;
+// one literal call per tracked timeframe. Keep in sync with trackTfs.
+tf3m = eventJson("3")
+tf5m = eventJson("5")
+tf15m = eventJson("15")
+tf30m = eventJson("30")
+tf1H = eventJson("60")
+tf2H = eventJson("120")
+tf3H = eventJson("180")
+tf4H = eventJson("240")
+tfD = eventJson("D")
+tfW = eventJson("W")
+
+fragJoin(f1, f2) => f1 != "" and f2 != "" ? f1 + "," + f2 : f1 != "" ? f1 : f2
+allFrags = fragJoin(fragJoin(fragJoin(fragJoin(fragJoin(fragJoin(fragJoin(fragJoin(fragJoin(tf3m, tf5m), tf15m), tf30m), tf1H), tf2H), tf3H), tf4H), tfD), tfW)
+
+// --- assemble ONE payload per anchor (1m) bar close ---------------------
+if barstate.isconfirmed and timeframe.isminutes and timeframe.multiplier == 1
+    if relayType == "OPTION_HEARTBEAT"
+        common = "\"kind\":\"OPTION_HEARTBEAT\",\"symbol\":\"" + underlying + "\",\"ticker\":\"" + syminfo.tickerid + "\",\"timeframe\":\"1\",\"time\":" + str.tostring(time) + ",\"close\":" + str.tostring(close) + ",\"session\":\"" + sessionLabel + "\""
+        optionFields = ",\"position_ref\":\"" + positionRef + "\",\"instrument_ref\":\"" + instrumentRef + "\",\"volume\":" + str.tostring(volume) + ",\"option_return\":" + str.tostring(optionReturn) + ",\"matched_bars\":" + str.tostring(matchedBars) + ",\"activity_ratio\":" + str.tostring(nz(activityRatio, 0.0))
+        alert("{" + common + optionFields + "}", alert.freq_once_per_bar_close)
+    else
+        heartbeat = "\"kind\":\"UNDERLYING_HEARTBEAT\",\"symbol\":\"" + underlying + "\",\"ticker\":\"" + syminfo.tickerid + "\",\"timeframe\":\"1\",\"time\":" + str.tostring(time) + ",\"close\":" + str.tostring(close) + ",\"session\":\"" + sessionLabel + "\""
+        eventsPart = allFrags != "" ? ",\"events\":[" + allFrags + "]" : ""
+        alert("{" + heartbeat + eventsPart + "}", alert.freq_once_per_bar_close)
+
+plot(close, "Relay close", color=color.new(color.blue, 0), display=display.data_window)

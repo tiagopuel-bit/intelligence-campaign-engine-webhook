@@ -35,6 +35,15 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-20 08:18 PT — N/A — N/A — Unified Relay receiver half (batched events → alerts, source='live_relay')
+
+**Trigger:** `docs/DEEPSEEK_UNIFIED_RELAY_RECEIVER_TASK.md` — Claude's `DNA_UNIFIED_RELAY_V1.pine` consolidates per-timeframe alerts into one alert per asset (heartbeat + batched multi-TF events); receiver must land the batched events in the real `alerts` table.
+**Evidence roots:** N/A — ingestion path; tagged `live_relay` so provisional events never impersonate validated native alerts.
+**Discussion:** `_insert_alert` gained a `source` param (default `'live_webhook'`, all existing call sites unaffected); the `UNDERLYING_HEARTBEAT` branch now iterates `payload.get("events")` and inserts each fragment into `alerts` (not `alerts_relay`) with `source='live_relay'`. The three "true last real event" lookups (`_last_real_event`, `_dna_context`, `bracket_suggestions.load_campaign_states`) now accept `source IN ('live_webhook','live_relay')` via an explicit tuple (fail-closed on unrecognized sources); `backfill_replay` stays excluded. `/assets` provenance now breaks out `live_relay` separately. Deliberately left on `live_webhook`-only: `cloud_state._latest_alert` (evidence roots for fills) and the valuation live-close read — provisional relay classifications should not gate execution evidence; flagged for review.
+**Decision:** Complete, handed back — NOT committed/deployed (sits alongside the prior Entry Discovery handback).
+**Outcome:** 555 tests pass (5 new in `tests/test_unified_relay.py`), `git diff --check` clean. Validated: events payload → 2 `alerts` rows `source='live_relay'` retrievable via `_last_real_event`; events-less payload → heartbeat only, 0 alerts; `backfill_replay`/unrecognized source never outrank live; native + old `alerts_relay` paths unchanged.
+**Logged by:** DeepSeek
+
 ## 2026-08-20 — SPY — Tiago's cross-check against real TradingView chart — `recent_event` was surfacing backfill reconstructions as live-confirmed events
 
 **Trigger:** Tiago cross-checked the dashboard's SPY 1H "Last event: RELOAD 8d ago" against the real TradingView chart and found no RELOAD marker anywhere near that window, correctly rejecting my first explanation (chart zoom/label crowding — wrong, Pine labels don't hide that way).

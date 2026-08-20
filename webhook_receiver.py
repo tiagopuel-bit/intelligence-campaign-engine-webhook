@@ -474,8 +474,28 @@ def _record_price_heartbeat(conn, payload: dict, now: str):
             (symbol, timeframe, bar_time, close, session, "live_webhook", now),
         )
         conn.commit()
+        # Unified Relay: one anchor-bar payload may carry a batch of tracked
+        # timeframes' events that just closed. Insert each into the REAL alerts
+        # table (they genuinely feed the DNA read) but tag them source='live_relay'
+        # — PROVISIONAL single-bar classification, never to be confused with a
+        # fully-validated native live_webhook event.
+        events_stored = 0
+        events = payload.get("events")
+        if isinstance(events, list):
+            for item in events:
+                if not isinstance(item, dict):
+                    continue
+                tf = str(item.get("timeframe") or "").strip()
+                ev = str(item.get("event") or "").strip()
+                if not tf or not ev:
+                    continue
+                _insert_alert(conn, "alerts", symbol, tf, ev, item, now,
+                              source="live_relay")
+                events_stored += 1
+            conn.commit()
         _paper_tick_safely()
-        return jsonify({"status": "heartbeat_recorded", "kind": kind, "symbol": symbol, "bar_time": bar_time})
+        return jsonify({"status": "heartbeat_recorded", "kind": kind, "symbol": symbol,
+                        "bar_time": bar_time, "events_stored": events_stored})
 
     position_ref = str(payload.get("position_ref") or "").strip()
     instrument_ref = str(payload.get("instrument_ref") or "").strip()
@@ -536,13 +556,17 @@ def _paper_tick_safely() -> None:
 # -- Routes ------------------------------------------------------------------
 
 def _insert_alert(conn, table: str, symbol: str, timeframe: str, event: str,
-                  fields: dict, now: str) -> None:
+                  fields: dict, now: str, source: str = "live_webhook") -> None:
     """Insert one alert row into `table` (``alerts`` or ``alerts_relay``).
 
     `fields` is the per-timeframe payload dict (the whole native payload, or
     one item of a relay ``events`` batch). The four identity fields the rest of
     the pipeline depends on — symbol, source timeframe, event identity and bar
     timestamp — plus price and the DNA fields are stored verbatim.
+
+    `source` overrides the provenance tag. Default ``'live_webhook'`` (native
+    alerts); the unified relay passes ``'live_relay'`` so its PROVISIONAL
+    events are never mistaken for fully-validated native ones.
     """
     conn.execute(
         f"INSERT INTO {table} (symbol, timeframe, phase, health, score, confidence, "
@@ -550,8 +574,8 @@ def _insert_alert(conn, table: str, symbol: str, timeframe: str, event: str,
         "htf_phase, campaign_alignment, last_fail_type, close, bar_event, "
         "bar_time, rsi, ema21_distance_atr, session, active_trade, "
         "active_entry, active_stop, active_target, active_trade_source, "
-        "active_trade_open_pct, received_at) "
-        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        "active_trade_open_pct, source, received_at) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (symbol, timeframe, fields.get("phase"), fields.get("health"),
          fields.get("score"), fields.get("confidence"), fields.get("momentum"),
          fields.get("status"), fields.get("action"),
@@ -566,7 +590,7 @@ def _insert_alert(conn, table: str, symbol: str, timeframe: str, event: str,
          _parse_float_or_none(fields.get("active_target")),
          _parse_str_or_none(fields.get("active_trade_source")),
          _parse_float_or_none(fields.get("active_trade_open_pct")),
-         now),
+         source, now),
     )
 
 
@@ -687,7 +711,7 @@ def _last_real_event(conn, symbol, timeframe):
     here (no live-confirmed event yet), not a reconstructed one."""
     row = conn.execute(
         "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
-        "AND bar_event IS NOT NULL AND bar_event != '' AND source='live_webhook' "
+        "AND bar_event IS NOT NULL AND bar_event != '' AND source IN ('live_webhook','live_relay') "
         "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
         (symbol, timeframe),
     ).fetchone()
@@ -977,7 +1001,8 @@ def get_assets():
                COUNT(*) AS alert_count,
                MAX(received_at) AS last_updated,
                SUM(CASE WHEN source = 'backfill_replay' THEN 1 ELSE 0 END) AS backfill_count,
-               SUM(CASE WHEN source = 'live_webhook' THEN 1 ELSE 0 END) AS live_count
+               SUM(CASE WHEN source = 'live_webhook' THEN 1 ELSE 0 END) AS live_count,
+               SUM(CASE WHEN source = 'live_relay' THEN 1 ELSE 0 END) AS live_relay_count
         FROM alerts
         WHERE timeframe NOT IN ({hidden})
         GROUP BY symbol
@@ -992,6 +1017,7 @@ def get_assets():
             "last_updated": r["last_updated"],
             "source_counts": {
                 "live_webhook": r["live_count"] or 0,
+                "live_relay": r["live_relay_count"] or 0,
                 "backfill_replay": r["backfill_count"] or 0,
             },
         }
@@ -1226,7 +1252,7 @@ def _dna_context(conn, symbol, opened_at):
         if latest is not None:
             event_row = conn.execute(
                 "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
-                "AND received_at>=? AND bar_event IS NOT NULL AND bar_event != '' AND source='live_webhook' "
+                "AND received_at>=? AND bar_event IS NOT NULL AND bar_event != '' AND source IN ('live_webhook','live_relay') "
                 "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
                 (symbol, tf, opened_at),
             ).fetchone()

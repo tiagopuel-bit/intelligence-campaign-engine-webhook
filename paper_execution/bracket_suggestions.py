@@ -108,7 +108,7 @@ def load_campaign_states(webhook_db_path: str | Path, symbol: str,
             ).fetchone()
             last_event = conn.execute(
                 "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
-                "AND bar_event IS NOT NULL AND bar_event != '' AND source='live_webhook' "
+                "AND bar_event IS NOT NULL AND bar_event != '' AND source IN ('live_webhook','live_relay') "
                 "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
                 (symbol, tf),
             ).fetchone()
