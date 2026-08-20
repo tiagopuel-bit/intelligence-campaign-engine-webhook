@@ -52,7 +52,6 @@ from paper_execution.activation import activate_if_ready
 from paper_execution.api import create_blueprint as create_paper_blueprint
 from paper_execution.bracket_suggestions import maybe_suggest_brackets
 from paper_execution.cloud_state import cloud_state_provider
-from paper_execution.entry_discovery import maybe_discover_entries
 from paper_execution.runner import run_once as run_paper_once
 
 
@@ -530,7 +529,6 @@ def _paper_tick_safely() -> None:
                 price_provider=lambda symbol, ticker: (
                     provider.latest_close(symbol, ticker) or {}),
             )
-            maybe_discover_entries(str(PAPER_DB_PATH), str(DB_PATH))
     except Exception as exc:  # fail closed and keep the heartbeat durable
         print(f"paper_tick_blocked={type(exc).__name__}", flush=True)
 
