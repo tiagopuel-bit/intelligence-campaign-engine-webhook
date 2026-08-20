@@ -569,7 +569,13 @@ def _insert_alert(conn, table: str, symbol: str, timeframe: str, event: str,
     `source` overrides the provenance tag. Default ``'live_webhook'`` (native
     alerts); the unified relay passes ``'live_relay'`` so its PROVISIONAL
     events are never mistaken for fully-validated native ones.
+
+    `timeframe` is canonicalized (``1D``/``1d`` -> ``D``, ``1W``/``1w`` -> ``W``)
+    so native alerts and the unified relay's ``request.security()`` timeframe
+    strings (which are natively "D"/"W", not "1D"/"1W") land in the SAME
+    timeframe slot instead of fragmenting daily/weekly across two keys.
     """
+    timeframe = _canonical_timeframe(timeframe)
     conn.execute(
         f"INSERT INTO {table} (symbol, timeframe, phase, health, score, confidence, "
         "momentum, status, action, exhaustion_warning, reload_quality, "
