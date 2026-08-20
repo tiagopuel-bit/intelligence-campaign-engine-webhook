@@ -35,6 +35,25 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-20 — SPY — Tiago's cross-check against real TradingView chart — `recent_event` was surfacing backfill reconstructions as live-confirmed events
+
+**Trigger:** Tiago cross-checked the dashboard's SPY 1H "Last event: RELOAD 8d ago" against the real TradingView chart and found no RELOAD marker anywhere near that window, correctly rejecting my first explanation (chart zoom/label crowding — wrong, Pine labels don't hide that way).
+**Evidence roots:** Pulled the real `alerts` rows for SPY 1H directly. Every one of the 34 named events between 2026-07-09 and 2026-08-12 (including the RELOAD in question) has `source='backfill_replay'`, all inserted in one batch at `2026-08-13T22:56:21Z` by the historical-replay script — none of them ever fired a real TradingView alert, which is exactly why nothing shows on the real chart. `backfill.py`'s own docstring already states "Replayed rows must never look like a real [live] event" — the last-real-event fix from a few nights ago never actually enforced that; `_last_real_event()` picked the most recent `bar_event` regardless of source.
+**Discussion:** Fixed `_last_real_event()` (`webhook_receiver.py`) and the parallel duplicated query in `bracket_suggestions.load_campaign_states()` to require `source='live_webhook'`. Also removed a fallback in both `_shape_state()` and `_to_campaign_state()` that fell back to the *unfiltered* latest bar's own event when no live event was found — that fallback would have silently reintroduced the exact same fabrication. While fixing this, found and fixed a **third, previously-missed call site**: `_dna_context()` (used by `/positions/<id>/insight` and position detail) called `_shape_state()` without `last_event` at all, so it had *both* bugs this whole time — latest-bar-only, and no source filtering. It now uses the same true-last-live-event lookup, additionally scoped to `received_at >= opened_at` like the rest of that function.
+**Decision:** This is a blocking correctness fix for Entry Discovery (logged below), which calls `load_campaign_states()` directly — without this, `recommend_no_position()` could have generated a real `open` proposal off a confirmation that only exists in a backfill reconstruction. Fixed before reviewing/committing Entry Discovery's delivery.
+**Outcome:** 550 tests pass (9 new in `tests/test_last_event.py`, covering `_last_real_event`, `load_campaign_states`, and `_dna_context` against both bugs), `git diff --check` clean. SPY 1H's `recent_event` now correctly reports no live-confirmed event (matches the real chart) instead of the backfill RELOAD.
+**Logged by:** Claude
+
+## 2026-08-19 23:35 PT — N/A — N/A — Entry Discovery (Phase 1 + caps) + contract assist (Phase 2)
+
+**Trigger:** `docs/DEEPSEEK_ENTRY_DISCOVERY_BUILD_TASK_2.md` — close the gap where DNA never proposed new entries (no automated signal→proposal path existed).
+**Evidence roots:** N/A — creates `open` proposals (PENDING_APPROVAL, APPROVAL_REQUIRED); never auto-executes.
+**Discussion (Phase 1):** New `paper_execution/entry_discovery.py`, wired into `_paper_tick_safely`: for every tracked symbol without an open position that clears the eligibility gate (non-anchor), build the multi-TF `CampaignState` (reuse `bracket_suggestions.load_campaign_states`) and run `recommend_no_position` slowest-TF-first; on `ENTER --` create a share-based `open` proposal, idempotent per `(symbol, signal_time)`. Per-asset discipline: for non-AMC symbols the reason caveats that the confirmation-not-signal rule is applied mechanically and the cited 70.7%/58.2% rates are AMC-validated only. **Blocking prerequisite closed:** `portfolio.check_declared_caps` now enforces single-contract 15%, single-expiry 25%, total-options 50%, daily-loss 5% (risk-to-stop, else full notional), orders/day 3 — wired into the runner's execution revalidation (commit 745c8d8 flagged these as unenforced).
+**Discussion (Phase 2, volume-only):** `massive_options.get_option_quote` now keeps `v` (+ avg daily volume). New `paper_execution/contract_assist.py`: chain-derived liquidity floor (median of the chain's own volumes), 2.2:1 reward:risk strike from spot snapped to listed strikes, expiration ≤45 DTE, every candidate labeled "IV not available — verify manually if relevant."
+**Decision:** Build complete, handed back — NOT committed/deployed.
+**Outcome:** 544 tests pass (12 new: `tests/test_entry_discovery.py`, `tests/test_contract_assist.py`), `git diff --check` clean. Concrete cap test: one CALL contract at 53% of TPV → `CAP_SINGLE_CONTRACT_EXCEEDED` (would have slipped through before).
+**Logged by:** DeepSeek
+
 ## 2026-08-18 21:37 PT — AMC — N/A — option-heartbeat freshness gate fixed for activation
 
 **Trigger:** `docs/DEEPSEEK_ACTIVATION_OPTION_FRESHNESS_TASK.md` — the 2-minute option-heartbeat freshness gate in `activate_if_ready()` was the last blocker keeping AMC's paper experiment from activating.

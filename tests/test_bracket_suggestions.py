@@ -215,7 +215,8 @@ class _DBSetupMixin:
                 id INTEGER PRIMARY KEY AUTOINCREMENT, symbol TEXT, timeframe TEXT,
                 phase TEXT, momentum TEXT, health INTEGER, confidence INTEGER,
                 bar_event TEXT, close REAL, exhaustion_warning INTEGER,
-                rsi REAL, ema21_distance_atr REAL, bar_time INTEGER, received_at TEXT
+                rsi REAL, ema21_distance_atr REAL, bar_time INTEGER,
+                source TEXT NOT NULL DEFAULT 'live_webhook', received_at TEXT
             );
             CREATE TABLE watch_state (
                 symbol TEXT, timeframe TEXT, signal_event TEXT, signal_extension_label TEXT,

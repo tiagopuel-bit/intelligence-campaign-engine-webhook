@@ -80,9 +80,12 @@ def load_campaign_states(webhook_db_path: str | Path, symbol: str,
     """Latest alert per timeframe -> CampaignState, mirroring /state_all.
 
     ``recent_event`` / support / resistance use the **true last real event**
-    (most recent non-empty ``bar_event`` and the close at that bar), not the
-    latest bar's often-empty event. ``hidden_timeframes`` drops the live-only
-    micro rungs (1m heartbeat relay and 3m), same as the dashboard.
+    (most recent non-empty ``bar_event`` and the close at that bar) among
+    ``source='live_webhook'`` rows only -- ``backfill_replay`` reconstructions
+    never fired a real TradingView alert and must never be presented as a
+    confirmed event (mirrors ``webhook_receiver._last_real_event``).
+    ``hidden_timeframes`` drops the live-only micro rungs (1m heartbeat
+    relay and 3m), same as the dashboard.
     """
     conn = sqlite3.connect(str(webhook_db_path))
     conn.row_factory = sqlite3.Row
@@ -105,7 +108,7 @@ def load_campaign_states(webhook_db_path: str | Path, symbol: str,
             ).fetchone()
             last_event = conn.execute(
                 "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
-                "AND bar_event IS NOT NULL AND bar_event != '' "
+                "AND bar_event IS NOT NULL AND bar_event != '' AND source='live_webhook' "
                 "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
                 (symbol, tf),
             ).fetchone()
@@ -120,7 +123,12 @@ def _to_campaign_state(symbol: str, tf: str, latest, watch, last_event=None) -> 
     raw_momentum = latest["momentum"] or "OFF"
     phase = _PHASE_MAP.get(raw_phase.upper(), Phase.WAIT)
     momentum = _MOMENTUM_MAP.get((raw_momentum or "").upper(), Momentum.FADING)
-    recent_event = (last_event["bar_event"] if last_event is not None else latest["bar_event"] or "").upper()
+    # No fallback to latest["bar_event"] here: latest is fetched without a
+    # source filter, so falling back to it would leak a backfill_replay
+    # event right back in whenever it happens to be the most recent row --
+    # exactly the fabrication load_campaign_states's source filter exists
+    # to prevent. last_event is None means no live-confirmed event, full stop.
+    recent_event = (last_event["bar_event"] if last_event is not None else "").upper()
     event_close = last_event["close"] if last_event is not None else None
     if event_close is None:
         event_close = latest["close"]

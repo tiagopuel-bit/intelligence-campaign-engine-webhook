@@ -52,6 +52,7 @@ from paper_execution.activation import activate_if_ready
 from paper_execution.api import create_blueprint as create_paper_blueprint
 from paper_execution.bracket_suggestions import maybe_suggest_brackets
 from paper_execution.cloud_state import cloud_state_provider
+from paper_execution.entry_discovery import maybe_discover_entries
 from paper_execution.runner import run_once as run_paper_once
 
 
@@ -529,6 +530,7 @@ def _paper_tick_safely() -> None:
                 price_provider=lambda symbol, ticker: (
                     provider.latest_close(symbol, ticker) or {}),
             )
+            maybe_discover_entries(str(PAPER_DB_PATH), str(DB_PATH))
     except Exception as exc:  # fail closed and keep the heartbeat durable
         print(f"paper_tick_blocked={type(exc).__name__}", flush=True)
 
@@ -676,10 +678,18 @@ def _last_real_event(conn, symbol, timeframe):
     (symbol, timeframe): its event name, bar_time and the close at that bar.
     Plain WAIT bars (bar_event empty) never count as an event. Fixes the
     bug where `recent_event` reflected only the latest bar's often-empty
-    event instead of the true last event."""
+    event instead of the true last event.
+
+    Only ``source='live_webhook'`` rows count. ``backfill_replay`` rows
+    (see backfill.py: "Replayed rows must never look like a real [live]
+    event") are historical reconstructions that never fired a real
+    TradingView alert -- surfacing one as "last event, X ago" is exactly
+    the kind of fabrication-by-omission Principle 011 rules out. A
+    symbol/timeframe with only backfill history correctly returns None
+    here (no live-confirmed event yet), not a reconstructed one."""
     row = conn.execute(
         "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
-        "AND bar_event IS NOT NULL AND bar_event != '' "
+        "AND bar_event IS NOT NULL AND bar_event != '' AND source='live_webhook' "
         "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
         (symbol, timeframe),
     ).fetchone()
@@ -694,7 +704,11 @@ def _shape_state(symbol, timeframe, latest, watch, last_event=None,
         "symbol": symbol, "timeframe": timeframe,
         "phase": latest["phase"], "health": latest["health"], "confidence": latest["confidence"],
         "momentum": latest["momentum"],
-        "recent_event": last_event if last_event is not None else latest["bar_event"],
+        # No fallback to latest["bar_event"]: latest is fetched without a
+        # source filter, so falling back to it would leak a backfill_replay
+        # event right back in whenever it's the most recent row -- exactly
+        # what _last_real_event's source filter exists to prevent.
+        "recent_event": last_event,
         "recent_event_time": last_event_time,
         "recent_event_close": last_event_close,
         "exhaustion_warning": bool(latest["exhaustion_warning"]),
@@ -1192,7 +1206,11 @@ def _dna_context(conn, symbol, opened_at):
 
     Reuses the get_state_all() query pattern (DISTINCT timeframe + latest alert
     per timeframe, shaped by _shape_state) with a received_at >= opened_at
-    filter, per the positions task packet.
+    filter, per the positions task packet. ``recent_event`` uses the same
+    true-last-real-event lookup as /state and /state_all (mirrors
+    _last_real_event, also scoped to received_at>=opened_at and
+    source='live_webhook' so a backfill reconstruction never surfaces here
+    either) -- this call site was missed by the original last-real-event fix.
     """
     timeframes = [r["timeframe"] for r in conn.execute(
         "SELECT DISTINCT timeframe FROM alerts WHERE symbol=? AND received_at>=?",
@@ -1208,7 +1226,16 @@ def _dna_context(conn, symbol, opened_at):
             "SELECT * FROM watch_state WHERE symbol=? AND timeframe=?", (symbol, tf),
         ).fetchone()
         if latest is not None:
-            states.append(_shape_state(symbol, tf, latest, watch))
+            event_row = conn.execute(
+                "SELECT bar_event, bar_time, close FROM alerts WHERE symbol=? AND timeframe=? "
+                "AND received_at>=? AND bar_event IS NOT NULL AND bar_event != '' AND source='live_webhook' "
+                "ORDER BY CAST(bar_time AS INTEGER) DESC, id DESC LIMIT 1",
+                (symbol, tf, opened_at),
+            ).fetchone()
+            ev = event_row["bar_event"] if event_row else None
+            ev_time = event_row["bar_time"] if event_row else None
+            ev_close = event_row["close"] if event_row else None
+            states.append(_shape_state(symbol, tf, latest, watch, ev, ev_time, ev_close))
     return {"symbol": symbol, "timeframe_count": len(states), "states": states}
 
 
