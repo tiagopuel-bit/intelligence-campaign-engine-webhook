@@ -287,6 +287,21 @@ def init_db():
         )
     """)
     sec_filings.ensure_schema(conn)
+    # Migration 005: normalize legacy "1D"/"1W" timeframe rows to "D"/"W" so
+    # they consolidate with the Unified Relay's request.security() timeframe
+    # strings (natively "D"/"W") instead of fragmenting into two entries per
+    # symbol (observed live on AMC 2026-08-20). New rows are already
+    # canonicalized on insert (_insert_alert); this repairs pre-existing ones.
+    # Idempotent: after the first run there are no more "1D"/"1W" rows left.
+    for table in ("alerts", "alerts_relay"):
+        conn.execute(f"UPDATE {table} SET timeframe='D' WHERE timeframe IN ('1D','1d')")
+        conn.execute(f"UPDATE {table} SET timeframe='W' WHERE timeframe IN ('1W','1w')")
+    # watch_state's PRIMARY KEY is (symbol, timeframe); a stale '1D'/'1W' row
+    # would silently orphan itself from the now-canonicalized alerts rows.
+    # Delete rather than rename to avoid a PK collision with an existing
+    # 'D'/'W' row for the same symbol -- watch_state is a live derived cache,
+    # not history, so losing a stale row here is harmless; it repopulates.
+    conn.execute("DELETE FROM watch_state WHERE timeframe IN ('1D','1d','1W','1w')")
     conn.commit()
     conn.close()
 

@@ -144,6 +144,36 @@ class UnifiedRelayTests(unittest.TestCase):
         self.assertIsNone(ev)
         conn.close()
 
+    def test_legacy_1D_1W_rows_merge_into_D_W_on_restart(self):
+        # Pre-existing native-alert rows stored "1D"/"1W" (the native
+        # convention) before this fix; the Unified Relay's request.security()
+        # timeframe strings are natively "D"/"W". Without migrating existing
+        # rows, they'd fragment into two entries per symbol permanently
+        # (observed live on AMC). init_db()'s migration must merge them.
+        conn = webhook_receiver.get_db()
+        conn.execute(
+            "INSERT INTO alerts (symbol,timeframe,phase,bar_event,close,bar_time,source,received_at) "
+            "VALUES ('MERGE','1D','WAIT',NULL,2.0,100,'live_webhook','now')"
+        )
+        conn.execute(
+            "INSERT INTO alerts (symbol,timeframe,phase,bar_event,close,bar_time,source,received_at) "
+            "VALUES ('MERGE','1W','WAIT',NULL,2.0,100,'live_webhook','now')"
+        )
+        conn.execute(
+            "INSERT INTO watch_state (symbol,timeframe,signal_event) VALUES ('MERGE','1D','STRONG START')"
+        )
+        conn.commit()
+        conn.close()
+        webhook_receiver.init_db()  # simulates a restart / redeploy
+        conn = webhook_receiver.get_db()
+        tfs = {r["timeframe"] for r in conn.execute(
+            "SELECT DISTINCT timeframe FROM alerts WHERE symbol='MERGE'").fetchall()}
+        watch_tfs = {r["timeframe"] for r in conn.execute(
+            "SELECT timeframe FROM watch_state WHERE symbol='MERGE'").fetchall()}
+        conn.close()
+        self.assertEqual(tfs, {"D", "W"})
+        self.assertNotIn("1D", watch_tfs)
+
     def test_native_alert_and_old_relay_path_unchanged(self):
         # native (no kind) still lands as live_webhook
         native = {
