@@ -493,6 +493,7 @@ def _record_price_heartbeat(conn, payload: dict, now: str):
                               source="live_relay")
                 events_stored += 1
             conn.commit()
+        conn.close()
         _paper_tick_safely()
         return jsonify({"status": "heartbeat_recorded", "kind": kind, "symbol": symbol,
                         "bar_time": bar_time, "events_stored": events_stored})
@@ -530,6 +531,7 @@ def _record_price_heartbeat(conn, payload: dict, now: str):
          matched_bars, activity_ratio, volume, session, "live_contract_bar", now),
     )
     conn.commit()
+    conn.close()
     _paper_tick_safely()
     return jsonify({"status": "heartbeat_recorded", "kind": kind, "symbol": symbol,
                     "instrument_ref": instrument_ref, "bar_time": bar_time})
