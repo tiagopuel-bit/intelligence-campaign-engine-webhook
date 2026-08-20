@@ -11,7 +11,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import datetime, timedelta, timezone
 
-from paper_execution.activation import _option_heartbeat_fresh
+from paper_execution.activation import MAX_AGE_MS, _option_heartbeat_fresh
 
 _BROKEN = {"FAILED", "FAIL", "MODERATE FAIL", "STRONG FAIL", "CATASTROPHIC FAIL", "FAIL TEST"}
 _STRETCH = {"PREMIUM", "PEAK", "MANAGE"}
@@ -72,7 +72,7 @@ def cloud_readiness(webhook_db_path: str, symbols: tuple[str, ...] = ("AMC",)) -
                     "SELECT bar_time FROM underlying_heartbeats WHERE symbol=? ORDER BY bar_time DESC LIMIT 1",
                     (symbol,),
                 ).fetchone()
-                if hb is None or now_ms - int(hb["bar_time"]) > 2 * 60 * 1000:
+                if hb is None or now_ms - int(hb["bar_time"]) > MAX_AGE_MS:
                     # Keep the single-symbol code unchanged for backward compat.
                     label = f"BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT:{symbol}" if len(symbols) > 1 \
                         else "BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT"

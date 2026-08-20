@@ -205,7 +205,7 @@ class JoinSymbolTests(unittest.TestCase):
         self.assertEqual(out["blocker"], "ASSET_NOT_ELIGIBLE")
 
     def test_stale_heartbeat_rejected(self):
-        self._heartbeat("GME", age_ms=10 * 60 * 1000)
+        self._heartbeat("GME", age_ms=20 * 60 * 1000)
         out = join_symbol_if_ready(self._tmp.name, self._wh.name, self.eid, "GME")
         self.assertEqual(out["status"], "BLOCKED")
         self.assertEqual(out["blocker"], "BLOCKED_NO_FRESH_UNDERLYING_HEARTBEAT")
@@ -302,7 +302,7 @@ class JoinSymbolRouteTests(unittest.TestCase):
         self.assertEqual(response.get_json()["blocker"], "ASSET_NOT_ELIGIBLE")
 
     def test_stale_heartbeat_returns_409(self):
-        self._heartbeat("GME", age_ms=10 * 60 * 1000)
+        self._heartbeat("GME", age_ms=20 * 60 * 1000)
         response = self.client.post(f"/paper/experiments/{self.eid}/symbols",
                                     json={"symbol": "GME"}, headers=self.h)
         self.assertEqual(response.status_code, 409)

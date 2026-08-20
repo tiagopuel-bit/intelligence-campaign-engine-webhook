@@ -18,7 +18,14 @@ from paper_execution.portfolio import asset_eligible, load_reliability_mask
 from paper_execution.store import frozen_goal_hash, tracked_symbols
 
 ROOT = Path(__file__).resolve().parents[1]
-MAX_AGE_MS = 2 * 60 * 1000
+# Underlying heartbeat freshness. Pine's `time` is the bar's OPEN timestamp,
+# not delivery time -- observed live on AMC (2026-08-20): a genuinely
+# fresh, successfully-delivered tick already carried ~3 min of inherent
+# lag by the time it was processed, on top of real gaps between deliveries
+# (2-6 min apart, not a strict 60s cadence). A flat 2-min cutoff was
+# structurally too tight even for a correctly-firing alert, not just during
+# quiet gaps. Widened with margin over the observed lag+gap pattern.
+MAX_AGE_MS = 10 * 60 * 1000
 
 # Options print every ~20-130 minutes on TradingView's delayed OPRA feed for
 # deep-ITM, long-dated contracts. An absolute 2-minute cutoff (fine for the
