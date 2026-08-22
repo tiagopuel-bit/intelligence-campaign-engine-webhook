@@ -154,5 +154,106 @@ class CashAdjustmentTests(unittest.TestCase):
         self.assertEqual([a["reason"] for a in adjustments], ["second", "first"])
 
 
+class PositionAdjustmentTests(unittest.TestCase):
+    def setUp(self):
+        self._tmp = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        self._tmp.close()
+        db.init_db(self._tmp.name)
+        conn = db.connect(self._tmp.name)
+        self.experiment_id = make_experiment(conn)
+        conn.close()
+        self.app = Flask(__name__)
+        self.app.register_blueprint(create_blueprint(self._tmp.name, TOKEN, lambda db_path, symbol: None))
+        self.client = self.app.test_client()
+        self.h = {"Authorization": f"Bearer {TOKEN}"}
+        self.ticker = "OPRA_DLY:AMC260821C1.5"
+
+    def tearDown(self):
+        Path(self._tmp.name).unlink(missing_ok=True)
+
+    def _seed_position(self, quantity=2.0, instrument_type="CALL"):
+        conn = db.connect(self._tmp.name)
+        conn.execute(
+            "INSERT INTO pe_paper_positions (experiment_id, symbol, instrument_type, ticker, quantity, updated_at) "
+            "VALUES (?,?,?,?,?,?)",
+            (self.experiment_id, "AMC", instrument_type, self.ticker, quantity, _iso()),
+        )
+        conn.commit()
+        conn.close()
+
+    def _quantity(self, instrument_type="CALL"):
+        conn = db.connect(self._tmp.name)
+        row = conn.execute(
+            "SELECT quantity FROM pe_paper_positions WHERE experiment_id=? AND ticker=? AND instrument_type=?",
+            (self.experiment_id, self.ticker, instrument_type),
+        ).fetchone()
+        conn.close()
+        return float(row["quantity"])
+
+    def test_unauthorized_returns_401(self):
+        resp = self.client.post(f"/paper/experiments/{self.experiment_id}/position-adjustment",
+                                json={"ticker": self.ticker, "instrument_type": "CALL",
+                                      "quantity_delta": -2, "reason": "x"})
+        self.assertEqual(resp.status_code, 401)
+
+    def test_read_route_lists_seeded_positions(self):
+        self._seed_position()
+        rows = self.client.get(
+            f"/paper/experiments/{self.experiment_id}/positions", headers=self.h
+        ).get_json()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["ticker"], self.ticker)
+        self.assertEqual(rows[0]["quantity"], 2.0)
+
+    def test_decrements_existing_position_and_records_audit_row(self):
+        self._seed_position(quantity=2.0)
+        resp = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/position-adjustment",
+            json={"ticker": self.ticker, "instrument_type": "CALL", "quantity_delta": -2,
+                  "reason": "AMC Aug21 $1.5C expired, position fully closed",
+                  "position_ref": 8, "instrument_ref": 10},
+            headers=self.h,
+        )
+        self.assertEqual(resp.status_code, 201)
+        body = resp.get_json()
+        self.assertEqual(body["new_quantity"], 0.0)
+        self.assertEqual(self._quantity(), 0.0)
+
+    # -- the critical safety property: never creates a phantom position ---
+    def test_unknown_ticker_never_creates_a_new_position(self):
+        resp = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/position-adjustment",
+            json={"ticker": "NEVER_HELD:XYZ", "instrument_type": "CALL",
+                  "quantity_delta": -5, "reason": "should be rejected"},
+            headers=self.h,
+        )
+        self.assertEqual(resp.status_code, 409)
+        self.assertEqual(resp.get_json()["error"], "PAPER_POSITION_NOT_FOUND")
+        conn = db.connect(self._tmp.name)
+        n = conn.execute("SELECT COUNT(*) n FROM pe_paper_positions").fetchone()["n"]
+        conn.close()
+        self.assertEqual(n, 0)
+
+    def test_zero_delta_rejected(self):
+        self._seed_position()
+        resp = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/position-adjustment",
+            json={"ticker": self.ticker, "instrument_type": "CALL", "quantity_delta": 0, "reason": "x"},
+            headers=self.h,
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(self._quantity(), 2.0)
+
+    def test_missing_reason_rejected(self):
+        self._seed_position()
+        resp = self.client.post(
+            f"/paper/experiments/{self.experiment_id}/position-adjustment",
+            json={"ticker": self.ticker, "instrument_type": "CALL", "quantity_delta": -2},
+            headers=self.h,
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertEqual(self._quantity(), 2.0)
+
+
 if __name__ == "__main__":
     unittest.main()

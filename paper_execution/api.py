@@ -679,6 +679,106 @@ def create_blueprint(db_path, state_token: str, state_provider, webhook_db_path=
         conn.close()
         return jsonify([dict(r) for r in rows])
 
+    @bp.route("/paper/experiments/<int:experiment_id>/positions", methods=["GET"])
+    def list_paper_positions(experiment_id):
+        """Read-only: the paper challenge's own tracked holdings. Exists so a
+        manual reconciliation (position-adjustment below) can look up the
+        real stored `ticker` first instead of guessing it -- there was
+        previously no way to see this at all (found 2026-08-22 doing the
+        AMC Aug21 expiry reconciliation by hand)."""
+        err = require_auth()
+        if err:
+            return err
+        conn = connect(db_path)
+        rows = conn.execute(
+            "SELECT id, symbol, instrument_type, ticker, quantity, updated_at "
+            "FROM pe_paper_positions WHERE experiment_id=? ORDER BY id",
+            (experiment_id,),
+        ).fetchall()
+        conn.close()
+        return jsonify([dict(r) for r in rows])
+
+    @bp.route("/paper/experiments/<int:experiment_id>/position-adjustment", methods=["POST"])
+    def create_position_adjustment(experiment_id):
+        """Manual, audited pe_paper_positions correction -- the position-side
+        counterpart to cash-adjustment above, same discipline: requires a
+        real ticker/instrument_type that already has a pe_paper_positions
+        row (never creates a new phantom row -- use POST /paper/proposals
+        for a genuine new open, which goes through real evidence), a
+        non-zero quantity_delta, and a non-empty reason. Permanently logged
+        in pe_position_adjustments, never auto-triggered by anything else.
+        """
+        err = require_auth()
+        if err:
+            return err
+        body = request.get_json(silent=True) or {}
+        ticker = (body.get("ticker") or "").strip()
+        instrument_type = (body.get("instrument_type") or "").strip().upper()
+        quantity_delta = body.get("quantity_delta")
+        reason = (body.get("reason") or "").strip()
+        if not ticker or not instrument_type:
+            return jsonify({"error": "ticker and instrument_type are required"}), 400
+        if quantity_delta is None:
+            return jsonify({"error": "quantity_delta is required"}), 400
+        try:
+            quantity_delta = float(quantity_delta)
+        except (TypeError, ValueError):
+            return jsonify({"error": "quantity_delta must be a number"}), 400
+        if quantity_delta == 0:
+            return jsonify({"error": "quantity_delta must be non-zero"}), 400
+        if not reason:
+            return jsonify({"error": "reason is required"}), 400
+        position_ref = body.get("position_ref")
+        instrument_ref = body.get("instrument_ref")
+        created_by = (body.get("created_by") or "user").strip() or "user"
+
+        conn = connect(db_path)
+        experiment = conn.execute(
+            "SELECT status FROM pe_experiments WHERE id=?", (experiment_id,)
+        ).fetchone()
+        if experiment is None:
+            conn.close()
+            return jsonify({"error": "EXPERIMENT_NOT_FOUND"}), 404
+        if experiment["status"] != "ACTIVE":
+            conn.close()
+            return jsonify({"error": "EXPERIMENT_NOT_ACTIVE"}), 409
+        existing = conn.execute(
+            "SELECT quantity FROM pe_paper_positions WHERE experiment_id=? AND ticker=? AND instrument_type=?",
+            (experiment_id, ticker, instrument_type),
+        ).fetchone()
+        if existing is None:
+            conn.close()
+            return jsonify({"error": "PAPER_POSITION_NOT_FOUND"}), 409
+
+        now = _now_iso()
+        new_quantity = float(existing["quantity"]) + quantity_delta
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                "UPDATE pe_paper_positions SET quantity=?, updated_at=? "
+                "WHERE experiment_id=? AND ticker=? AND instrument_type=?",
+                (new_quantity, now, experiment_id, ticker, instrument_type),
+            )
+            cur = conn.execute(
+                "INSERT INTO pe_position_adjustments (experiment_id, ticker, instrument_type, "
+                "quantity_delta, reason, position_ref, instrument_ref, created_by, created_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?)",
+                (experiment_id, ticker, instrument_type, quantity_delta, reason,
+                 position_ref, instrument_ref, created_by, now),
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            conn.close()
+            raise
+        adjustment_id = cur.lastrowid
+        conn.close()
+        return jsonify({
+            "adjustment_id": adjustment_id, "experiment_id": experiment_id, "ticker": ticker,
+            "instrument_type": instrument_type, "quantity_delta": quantity_delta,
+            "new_quantity": new_quantity, "reason": reason,
+        }), 201
+
     @bp.route("/paper/reports", methods=["GET"])
     def reports():
         err = require_auth()

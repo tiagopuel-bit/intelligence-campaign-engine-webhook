@@ -229,6 +229,24 @@ CREATE TABLE IF NOT EXISTS pe_cash_adjustments (
     created_at TEXT NOT NULL
 );
 
+-- Position-side counterpart to pe_cash_adjustments -- same discipline,
+-- append-only audit trail, never updated or deleted. Only ever adjusts an
+-- EXISTING pe_paper_positions row (position-adjustment's route enforces
+-- this); never creates a new one, since that would be a genuine new open
+-- and must go through the real /paper/proposals evidence path instead.
+CREATE TABLE IF NOT EXISTS pe_position_adjustments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    experiment_id INTEGER NOT NULL REFERENCES pe_experiments(id),
+    ticker TEXT NOT NULL,
+    instrument_type TEXT NOT NULL,
+    quantity_delta REAL NOT NULL,
+    reason TEXT NOT NULL,
+    position_ref INTEGER,
+    instrument_ref INTEGER,
+    created_by TEXT NOT NULL DEFAULT 'user',
+    created_at TEXT NOT NULL
+);
+
 -- Per-position protective bracket (stop-loss + take-profit). Pre-registered
 -- standing orders: the runner fires them on a price crossing WITHOUT the
 -- 600-second approval window. At most one ACTIVE bracket per paper position;
