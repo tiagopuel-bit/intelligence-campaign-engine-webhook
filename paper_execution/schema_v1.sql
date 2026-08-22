@@ -209,6 +209,26 @@ CREATE TABLE IF NOT EXISTS pe_paper_positions (
     UNIQUE(experiment_id, ticker, instrument_type)
 );
 
+-- Manual cash-ledger correction, deliberately separate from the evidence-
+-- driven proposal path. Exists for cases the automated pipeline structurally
+-- cannot handle -- most commonly a contract that has already expired, so no
+-- live pricing evidence can ever exist for it again (found 2026-08-22: an
+-- AMC option leg genuinely closed at a real price, but /paper/proposals
+-- correctly refused "no authoritative state" since the expired contract has
+-- no fresh option_heartbeats). This table is the append-only audit trail --
+-- every adjustment needs a human-readable reason, and rows are never
+-- updated or deleted, only added.
+CREATE TABLE IF NOT EXISTS pe_cash_adjustments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    experiment_id INTEGER NOT NULL REFERENCES pe_experiments(id),
+    amount REAL NOT NULL,
+    reason TEXT NOT NULL,
+    position_ref INTEGER,
+    instrument_ref INTEGER,
+    created_by TEXT NOT NULL DEFAULT 'user',
+    created_at TEXT NOT NULL
+);
+
 -- Per-position protective bracket (stop-loss + take-profit). Pre-registered
 -- standing orders: the runner fires them on a price crossing WITHOUT the
 -- 600-second approval window. At most one ACTIVE bracket per paper position;

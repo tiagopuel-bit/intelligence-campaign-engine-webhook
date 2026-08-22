@@ -593,6 +593,92 @@ def create_blueprint(db_path, state_token: str, state_provider, webhook_db_path=
             return jsonify({"error": "bracket not found or not active"}), 404
         return jsonify({"bracket_id": bracket_id, "status": "CANCELLED"}), 200
 
+    @bp.route("/paper/experiments/<int:experiment_id>/cash-adjustment", methods=["POST"])
+    def create_cash_adjustment(experiment_id):
+        """Manual, audited cash-ledger correction -- deliberately separate
+        from the evidence-driven /paper/proposals path (see schema_v1.sql's
+        pe_cash_adjustments comment for why this exists: the automated
+        pipeline structurally cannot process an expired contract, since no
+        live pricing evidence can ever exist for it again). Every adjustment
+        requires a human-readable reason and is permanently recorded --
+        never silent, never auto-triggered by anything else in this codebase.
+        """
+        err = require_auth()
+        if err:
+            return err
+        body = request.get_json(silent=True) or {}
+        amount = body.get("amount")
+        reason = (body.get("reason") or "").strip()
+        if amount is None:
+            return jsonify({"error": "amount is required"}), 400
+        try:
+            amount = float(amount)
+        except (TypeError, ValueError):
+            return jsonify({"error": "amount must be a number"}), 400
+        if amount == 0:
+            return jsonify({"error": "amount must be non-zero"}), 400
+        if not reason:
+            return jsonify({"error": "reason is required"}), 400
+        position_ref = body.get("position_ref")
+        instrument_ref = body.get("instrument_ref")
+        created_by = (body.get("created_by") or "user").strip() or "user"
+
+        conn = connect(db_path)
+        experiment = conn.execute(
+            "SELECT status FROM pe_experiments WHERE id=?", (experiment_id,)
+        ).fetchone()
+        if experiment is None:
+            conn.close()
+            return jsonify({"error": "EXPERIMENT_NOT_FOUND"}), 404
+        if experiment["status"] != "ACTIVE":
+            conn.close()
+            return jsonify({"error": "EXPERIMENT_NOT_ACTIVE"}), 409
+        cash_row = conn.execute(
+            "SELECT cash FROM pe_paper_cash WHERE experiment_id=?", (experiment_id,)
+        ).fetchone()
+        if cash_row is None:
+            conn.close()
+            return jsonify({"error": "PAPER_CASH_NOT_INITIALIZED"}), 409
+
+        now = _now_iso()
+        new_cash = float(cash_row["cash"]) + amount
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            conn.execute(
+                "UPDATE pe_paper_cash SET cash=?, updated_at=? WHERE experiment_id=?",
+                (new_cash, now, experiment_id),
+            )
+            cur = conn.execute(
+                "INSERT INTO pe_cash_adjustments (experiment_id, amount, reason, position_ref, "
+                "instrument_ref, created_by, created_at) VALUES (?,?,?,?,?,?,?)",
+                (experiment_id, amount, reason, position_ref, instrument_ref, created_by, now),
+            )
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            conn.close()
+            raise
+        adjustment_id = cur.lastrowid
+        conn.close()
+        return jsonify({
+            "adjustment_id": adjustment_id, "experiment_id": experiment_id,
+            "amount": amount, "reason": reason, "new_cash": new_cash,
+        }), 201
+
+    @bp.route("/paper/experiments/<int:experiment_id>/cash-adjustments", methods=["GET"])
+    def list_cash_adjustments(experiment_id):
+        err = require_auth()
+        if err:
+            return err
+        conn = connect(db_path)
+        rows = conn.execute(
+            "SELECT id, amount, reason, position_ref, instrument_ref, created_by, created_at "
+            "FROM pe_cash_adjustments WHERE experiment_id=? ORDER BY id DESC",
+            (experiment_id,),
+        ).fetchall()
+        conn.close()
+        return jsonify([dict(r) for r in rows])
+
     @bp.route("/paper/reports", methods=["GET"])
     def reports():
         err = require_auth()
