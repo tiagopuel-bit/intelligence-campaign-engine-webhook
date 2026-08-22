@@ -35,6 +35,42 @@ helper exists at `scripts/export_trade_desk_entry.py`.
 
 <!-- newest entries below -->
 
+## 2026-08-21 21:22 PT — AMC — N/A — manual reconciliation: Aug21 $1.5C expiry close COMPLETED (both cash and position sides)
+
+**Trigger:** Follow-on to the 20:16 PT entry below (DS blocked, no DB access) and the same-day dashboard-close bug (`_reconcile_paper_close` gap — Manage-dialog closes never touched `pe_paper_cash`/`pe_paper_positions`). Tiago confirmed the real leg via TradingView (position_ref=8, instrument_ref=10, AMC Aug21 $1.5 CALL, expired worthless-adjacent at $1.03/share) and separately re-tested the dashboard-close path live with a fresh Aug28 position specifically to prove the general bug, then said "yes close out" to also fix the stale Aug21 position row.
+**Evidence roots:** N/A — general-architecture manual correction, not an evidence-gated proposal. Automated `/paper/proposals` correctly refuses (contract expired, no live pricing evidence can ever exist for it again) — this is exactly the class of case the new audited manual endpoints exist for.
+**Discussion:** Built two new audited, phantom-row-preventing endpoints in `paper_execution/api.py`: `POST /paper/experiments/<id>/cash-adjustment` (append-only `pe_cash_adjustments`) and `POST /paper/experiments/<id>/position-adjustment` (append-only `pe_position_adjustments`, hard-requires an existing `pe_paper_positions` row — 409 `PAPER_POSITION_NOT_FOUND` otherwise, never creates a phantom position). Also added `GET /paper/experiments/<id>/positions` to resolve the real stored ticker with certainty instead of guessing from the TV screenshot. 15 new unit tests (`tests/test_cash_adjustment.py`), including dedicated phantom-creation-prevention tests for both cash and position paths. Separately, `_reconcile_paper_close()` was added to `webhook_receiver.py:close_instruments()` so this class of bug does not recur for future dashboard closes of genuine paper holdings.
+**Decision:** APPROVED by Tiago ("yes of course, the contract was duo today, it had to be closed. if has to be fixed" / "can you just add 206 to portifolio cash holdinds?" / "yes close out"). Executed via the two adjustment endpoints, live against the production DB.
+**Outcome:** Cash: `cash-adjustment #1`, `+$206.00` (100→306, confirmed live). Position: `position-adjustment #1`, `ticker=OPRA_DLY:AMC260821C1.5`, `quantity_delta=-2`, `new_quantity=0.0` — confirmed via follow-up `GET /paper/experiments/1/positions` (row id 5 now reads `quantity: 0.0`, `updated_at` refreshed). Both sides of the Aug21 leg are now fully reconciled; the 20:16 PT entry below is superseded/resolved by this one.
+**Logged by:** Claude
+
+## 2026-08-21 20:16 PT — AMC — N/A — manual reconciliation: Aug21 $1.5C expiry close (BLOCKED — no DB access)
+
+**Trigger:** `docs/DEEPSEEK_PAPER_RECONCILIATION_TASK.md` — AMC Aug21 $1.5 CALL (position_ref=8, instrument_ref=10) expired; closed in the manual tracker at $1.03; needs a one-time manual write to `pe_paper_positions`/`pe_paper_cash`.
+**Evidence roots:** N/A — manual data correction; the automated pipeline correctly refuses (no authoritative state on an expired contract).
+**Discussion:** Could not perform — DS has no Railway DB access (no SSH/railway CLI, no route exposing `pe_paper_positions`). Verified the exact conventions from `store.py:apply_paper_fill_ledger`: sell-to-close decrements quantity by 2 (`signed_qty=-2`), credits cash `+206.00` (`2 × 1.03 × 100`), and **leaves zero-quantity rows in place (does not delete)**. Provided the exact single-transaction SQL to Tiago/Claude; the stored `ticker` (TradingView `syminfo.tickerid` format, not Massive `O:…`) must be confirmed against the real row — task's `OPRA_DLY:AMC260821C1.5` hint is unconfirmed.
+**Decision:** NOT executed (no write made). Handed back with the verified recipe + ticker-confirmation stop-condition.
+**Outcome:** Pending until ticker is confirmed and the write runs with Railway access. No `pe_order_proposals`/`pe_paper_orders`/`pe_paper_fills` rows to be created (desk-log entry is the audit trail).
+**Logged by:** DeepSeek
+
+## 2026-08-21 13:06 PT — N/A — N/A — Unified Relay v2 "fires rarely" frequency review
+
+**Trigger:** `docs/DEEPSEEK_MTF_PORT_FREQUENCY_TASK.md` — two events (FAIL health=9, ADD health=95) in ~5h on AMC 3m, vs an expected per-3m-bar event.
+**Evidence roots:** N/A — static Pine + receiver review; cannot execute Pine.
+**Discussion:** NOT a `tfChanged` bug and NOT a var-state cadence bug. `tfChanged` (single-value `requestTime`, V1-proven) fires every 3m close; `f_dnaCore`'s tuple evaluates on the same cadence. Two real causes: (1) DNA **named** events (`currentBarEvent`) are genuinely rare — the DNA engine is cooldown/condition-gated, and a FAIL→ADD over 5h is a normal campaign progression. (2) The native `DNA_v12.6.21.pine` does NOT fire per-bar — it fires on **change** (phase change, health Δ≥5, reload-quality, alignment) OR a named event (`webhookEventFired = currentBarEvent != ""`, source 1949-1970). The relay instead emits a fragment every 3m close with `event=""` on quiet bars, and the receiver's `if not ev: continue` drops empty-event fragments — so the relay surfaces **named events only**, silently dropping the phase-change/health-change updates native would emit. "Event every 3 min" was never native's cadence; the relay is under-counting vs native on the change-driven signals, not over-firing.
+**Decision:** Diagnosis only — did NOT apply a fix (mirroring native's on-change gating is a design decision + needs either risky Pine var-state or a receiver change; flagged for Tiago). The observed FAIL→ADD sequence indicates the state machine itself is working.
+**Outcome:** Per-point confidence reported (tfChanged=high, gaps_off=medium, var-state=low-not-the-cause, root-cause=high). Recommend: either mirror native's change-gating in the relay, or have the receiver keep fragments on phase-change/health-Δ≥5/named-event — Tiago's call on cadence.
+**Logged by:** DeepSeek
+
+## 2026-08-21 08:13 PT — N/A — N/A — independent static review of DNA_UNIFIED_RELAY_V2_VALIDATED.pine
+
+**Trigger:** `docs/DEEPSEEK_MTF_PORT_REVIEW_TASK.md` — re-verify the two bug fixes + full fidelity of the validated MTF port, independently, before another live test.
+**Evidence roots:** N/A — static Pine review; neither I nor Claude can execute Pine.
+**Discussion:** (1) Bug-2 fix structurally sound — `request.security()` and the `t[1]` history-reference are now in the same `eventJson()` function on directly-destructured locals, matching V1's working pattern. (2) Bug-1 fix correct — `campaignHealth = math.round(persistentHealth)` is float (value-equivalent to source's `int(math.round(...))`). (3) **Key finding:** `time` was still int-typed and returned in the SAME tuple that already turned int `campaignHealth` into na across the boundary — if that mechanism is general, `t`→na makes `tfChanged` always false and suppresses events (bug-2 symptom persists). Applied the same float treatment (`math.round(time)` + whole-number JSON format `str.tostring(t,"#")`). (4) Full fidelity vs DNA_v12.6.21.pine: formulas match across component scores / classification / peak / health / failure / resolution-reload / campaignPhase / currentBarEvent / event-memory. Omitted vars (`pendingHigh`, `recoveryFailPrice`, `campaignStartedPrinted`, `healthRebound`, `swingHigh`, `tradeStructuralLow8`, `tradeHigherLow4`, `campaignType`, `campaignLifeStage`, `campaignAge`) are all assigned-never-read dead state, display-only, or Trade-Box-scope — no decision logic omitted (grep-confirmed). The two prior omissions (duplicated ATR, catastrophic-fail recovery-watch nested condition) are both present/correct in the current file.
+**Decision:** Static review + one defensive `.pine` fix (`time`→float). Handed back — NOT deployed; Tiago to re-test live in TradingView.
+**Outcome:** All 4 review points reported with explicit per-finding confidence. The `time`-int fix is execution-unconfirmed (same class as the prior unconfirmed fixes) — flagged as the thing to watch in the next live test (is `t`/`time` non-na and are events actually included?).
+**Logged by:** DeepSeek
+
 ## 2026-08-20 08:18 PT — N/A — N/A — Unified Relay receiver half (batched events → alerts, source='live_relay')
 
 **Trigger:** `docs/DEEPSEEK_UNIFIED_RELAY_RECEIVER_TASK.md` — Claude's `DNA_UNIFIED_RELAY_V1.pine` consolidates per-timeframe alerts into one alert per asset (heartbeat + batched multi-TF events); receiver must land the batched events in the real `alerts` table.
