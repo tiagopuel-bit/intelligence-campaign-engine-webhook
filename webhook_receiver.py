@@ -53,6 +53,7 @@ from paper_execution.api import create_blueprint as create_paper_blueprint
 from paper_execution.bracket_suggestions import maybe_suggest_brackets
 from paper_execution.cloud_state import cloud_state_provider
 from paper_execution.runner import run_once as run_paper_once
+from paper_execution.store import tracked_symbols as paper_tracked_symbols
 
 
 # -- Database path -----------------------------------------------------------
@@ -1637,6 +1638,74 @@ def update_instrument(position_id, iid):
     return jsonify(positions.shape_instrument(updated))
 
 
+def _reconcile_paper_close(symbol: str, position_id: int, instrument_id: int) -> dict:
+    """Best-effort: if this just-closed regular-tracker instrument is a
+    genuine OPEN holding in an ACTIVE paper experiment, submit a matching
+    `close` proposal so the paper challenge's cash/holdings actually update
+    instead of silently drifting out of sync (found 2026-08-22: the regular
+    Manage/close dialog was never wired to the paper challenge at all).
+
+    Deliberately does NOT create a proposal for a position the paper
+    challenge never held -- apply_paper_fill_ledger's `INSERT ... ON
+    CONFLICT` would happily create a brand-new pe_paper_positions row with
+    negative quantity and credit cash for a "sale" of something never
+    bought. This checks for a genuine existing pe_paper_positions row with
+    positive quantity FIRST; only then does it submit through the real,
+    unmodified /paper/proposals path so pricing evidence, caps, and the
+    approval-window mechanics are identical to any other close -- this
+    never fabricates or bypasses evidence itself.
+
+    Never raises -- any failure here must not break the regular close.
+    """
+    try:
+        paper_conn = paper_db.connect(PAPER_DB_PATH)
+        try:
+            experiment = paper_conn.execute(
+                "SELECT id FROM pe_experiments WHERE status='ACTIVE' ORDER BY id DESC LIMIT 1"
+            ).fetchone()
+            if experiment is None:
+                return {"reconciled": False, "reason": "NO_ACTIVE_EXPERIMENT"}
+            experiment_id = experiment["id"]
+            if symbol not in paper_tracked_symbols(paper_conn, experiment_id):
+                return {"reconciled": False, "reason": "SYMBOL_NOT_TRACKED"}
+
+            provider = cloud_state_provider(str(DB_PATH))
+            state = provider(str(DB_PATH), symbol, position_ref=str(position_id),
+                             instrument_ref=str(instrument_id))
+            position_state = (state or {}).get("position") or {}
+            ticker = position_state.get("ticker")
+            instrument_type = str(position_state.get("instrument_type") or "SHARE").upper()
+            if not ticker:
+                return {"reconciled": False, "reason": "NO_AUTHORITATIVE_STATE"}
+
+            existing = paper_conn.execute(
+                "SELECT quantity FROM pe_paper_positions WHERE experiment_id=? AND ticker=? AND instrument_type=?",
+                (experiment_id, ticker, instrument_type),
+            ).fetchone()
+            if existing is None or float(existing["quantity"]) <= 0:
+                return {"reconciled": False, "reason": "NOT_A_PAPER_HOLDING"}
+        finally:
+            paper_conn.close()
+
+        # Genuine paper holding confirmed -- submit through the real,
+        # unmodified proposal endpoint (same evidence/caps/approval-window
+        # path as any other close) rather than duplicating that logic here.
+        resp = app.test_client().post(
+            "/paper/proposals",
+            json={"action": "close", "symbol": symbol, "experiment_id": experiment_id,
+                  "position_ref": position_id, "instrument_ref": instrument_id,
+                  "time_sensitive_reason": "manual close via dashboard Manage dialog"},
+            headers={"Authorization": f"Bearer {STATE_API_TOKEN}"},
+        )
+        data = resp.get_json(silent=True) or {}
+        if resp.status_code >= 400:
+            return {"reconciled": False, "reason": data.get("error", f"HTTP_{resp.status_code}")}
+        return {"reconciled": True, "proposal_id": data.get("proposal_id"), "mode": data.get("mode")}
+    except Exception as exc:
+        print(f"paper_close_reconciliation_failed={type(exc).__name__}", flush=True)
+        return {"reconciled": False, "reason": "INTERNAL_ERROR"}
+
+
 @app.route("/positions/<int:position_id>/instruments/close", methods=["POST"])
 def close_instruments(position_id):
     """Close some or all of a displayed holding while preserving its trade log."""
@@ -1681,6 +1750,41 @@ def close_instruments(position_id):
         if quantity > total_open + 1e-9:
             conn.rollback()
             return jsonify({"error": "quantity exceeds the open holding", "available_quantity": total_open}), 400
+
+        # Determine which rows will be FULLY closed (a partial close instead
+        # creates a brand-new split row that was never part of any paper
+        # snapshot, so it's excluded) WITHOUT writing yet, so paper
+        # reconciliation can run first -- reconstruct_cloud_state requires
+        # the regular instrument to still show status='OPEN' (it's the
+        # normal create-proposal precondition), so it must be checked and
+        # the matching close proposal submitted BEFORE this transaction's
+        # UPDATE flips that status to CLOSED, not after.
+        remaining_to_plan = quantity
+        fully_closed_ids = []
+        for row in rows:
+            if remaining_to_plan <= 1e-9:
+                break
+            row_quantity = float(row["quantity"])
+            closing = min(row_quantity, remaining_to_plan)
+            if abs(closing - row_quantity) <= 1e-9:
+                fully_closed_ids.append(row["id"])
+            remaining_to_plan -= closing
+
+        symbol = pos["symbol"]
+        paper_reconciliation = []
+        for iid in fully_closed_ids:
+            # _reconcile_paper_close already catches everything internally
+            # and never raises -- this is a second, independent guard so a
+            # future regression there can never roll back or fail the
+            # regular close, which must always be able to succeed on its
+            # own regardless of paper-challenge reconciliation.
+            try:
+                paper_reconciliation.append(
+                    {"instrument_id": iid, **_reconcile_paper_close(symbol, position_id, iid)})
+            except Exception as exc:
+                print(f"paper_close_reconciliation_call_site_failed={type(exc).__name__}", flush=True)
+                paper_reconciliation.append(
+                    {"instrument_id": iid, "reconciled": False, "reason": "INTERNAL_ERROR"})
 
         remaining_to_close = quantity
         closed_ids = []
@@ -1734,6 +1838,7 @@ def close_instruments(position_id):
             "remaining_quantity": max(0.0, total_open - quantity),
             "closed_instrument_ids": closed_ids,
             "position": detail,
+            "paper_reconciliation": paper_reconciliation,
         })
     except Exception:
         conn.rollback()
